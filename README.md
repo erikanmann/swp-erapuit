@@ -1,6 +1,13 @@
 # swp-erapuit 
 
+Software developed for the course "Software Project"
+This software aims to help manage a sawmills warehouse and eventually automatize work
 
+Team consists of four members:
+Ruud Tammel,
+Erik Anmann,
+Tõnis Tõnissoo,
+Juri Tsombaljuk
 
 ## Getting started
 
