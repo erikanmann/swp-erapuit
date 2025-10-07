@@ -1,0 +1,50 @@
+stages:
+  - build
+  - test
+  - deploy
+
+
+backend-build:
+  stage: build
+  image: maven:3.8.6
+  script:
+    - cd backend
+    - mvn clean package -DskipTests
+  artifacts:
+    paths:
+      - backend/target/*.jar
+
+
+backend-test:
+  stage: test
+  image: maven:3.8.6
+  script:
+    - cd backend
+    - mvn test
+
+
+frontend-build:
+  stage: build
+  image: node:lts
+  script:
+    - cd frontend
+    - npm install
+    - npm run build
+  artifacts:
+    paths:
+      - frontend/build
+
+frontend-test:
+  stage: test
+  image: node:lts
+  script:
+    - cd frontend
+    - npm install
+    - npm test -- --watchAll=false
+
+deploy-job:
+  stage: deploy
+  script:
+    - echo "Deploy successful!"
+  only:
+    - main
