@@ -8,7 +8,7 @@ from log intake and production to packing, logistics and future full automation.
 - Ruud Tammel
 - Erik Anmann
 - Tõnis Tõnissoo
-- Juri Tsombaljuk
+- Jüri Tsõmbaljuk
 
 ## Key Features
 - Record, track and analyse all production and logistics data in one place
@@ -16,9 +16,9 @@ from log intake and production to packing, logistics and future full automation.
 - Prepare the factory for future sensor and camera integrations
 
 ## Technology Stack
-- Backend: …
-- Frontend: …
-- Database: …
+- Backend: Java 17+, Spring Boot, Maven or Gradle
+- Frontend: React, CSS, Optimized for desktop, tablet, and smartphone
+- Database: PostgreSQL, Hibernate (JPA), Flyway or Liquibase
 
 ## Getting Started
 Clone the repository:
