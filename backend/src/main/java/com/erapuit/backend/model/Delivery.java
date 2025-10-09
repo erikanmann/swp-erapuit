@@ -1,0 +1,4 @@
+package com.erapuit.backend.model;
+
+public class Delivery {
+}
