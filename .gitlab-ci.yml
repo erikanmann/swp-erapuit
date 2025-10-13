@@ -6,17 +6,17 @@ stages:
 
 backend-build:
   stage: build
-  image: maven:3.8.6
+  image: gradle:8.3-jdk17
   script:
     - echo "Backend build placeholder"
   artifacts:
     paths:
-      - backend/target/*.jar
+      - backend/build/libs/*.jar
 
 
 backend-test:
   stage: test
-  image: maven:3.8.6
+  image: gradle:8.3-jdk17
   script:
     - echo "No backend tests yet"
 
@@ -25,10 +25,15 @@ frontend-build:
   stage: build
   image: node:lts
   script:
-    - echo "Backend build placeholder"
+    - echo "Installing frontend dependencies..."
+    - cd frontend
+    - npm ci
+    - echo "Building React frontend..."
+    - npm run build
   artifacts:
     paths:
       - frontend/build
+    expire_in: 1 week
 
 frontend-test:
   stage: test
