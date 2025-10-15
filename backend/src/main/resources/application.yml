@@ -1,0 +1,29 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/erapuit_dev?currentSchema=app
+    username: postgres
+    password: postgres
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    properties:
+      hibernate:
+        default_schema: app
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+    show-sql: true
+    open-in-view: false
+
+  flyway:
+    enabled: true
+    baseline-on-migrate: true
+    locations: classpath:db/migration
+    schemas: app
+    default-schema: app
+    validate-on-migrate: true
+
+logging:
+  level:
+    org.flywaydb: info
+    org.hibernate.SQL: debug
