@@ -1,0 +1,96 @@
+/* --- Global base styles and layout (Erapuit Theme) --- */
+body {
+    font-family: "Inter", Arial, sans-serif;
+    background: linear-gradient(135deg, #4b4b4b 0%, #2e2e2e 100%);
+    background-attachment: fixed;
+    background-size: cover;
+    color: #f4f1eb;
+    margin: 0;
+    padding: 0;
+}
+
+/* --- Headings --- */
+h1, h2, h3 {
+    font-weight: 600;
+    color: #050505;
+    margin-top: 0;
+}
+
+/* --- Primary buttons --- */
+button {
+    background-color: #d6a03b; /* warm golden tone */
+    color: #fff;
+    border: none;
+    padding: 10px 18px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 500;
+    transition: background-color 0.2s ease, transform 0.1s ease;
+}
+
+button:hover {
+    background-color: #b98722;
+    transform: translateY(-1px);
+}
+
+/* --- Global table styles --- */
+table {
+    border-collapse: collapse;
+    width: 100%;
+    background-color: #f4f1eb;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+}
+
+th, td {
+    border: 1px solid #ddd;
+    padding: 10px 14px;
+    text-align: left;
+    color: #2b2b2b;
+}
+
+th {
+    background-color: #e9e3d7;
+    color: #2b2b2b;
+}
+
+/* --- Main application container --- */
+.app-container {
+    max-width: 1100px;
+    margin: 2rem auto;
+    padding: 2rem;
+}
+
+/* --- Fade-in animation for content --- */
+.app-container > * {
+    animation: fadeIn 0.5s ease-in;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* --- Responsive design for smaller screens --- */
+@media (max-width: 768px) {
+    .app-container {
+        padding: 1rem;
+        margin: 1rem;
+    }
+
+    button {
+        width: 100%;
+        padding: 10px;
+    }
+
+    table {
+        font-size: 14px;
+    }
+}
