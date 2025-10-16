@@ -131,3 +131,17 @@
         width: 100%;
     }
 }
+.form select,
+.form input {
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.form label {
+    display: block;
+    margin-bottom: 4px;
+}
+
+.form div {
+    margin-bottom: 12px;
+}
