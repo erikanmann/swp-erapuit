@@ -4,7 +4,7 @@ import "../styles/delivery.css";
 const DeliveryList = ({ deliveries, onDelete }) => {
     return (
         <div className="list">
-            <h2>Veoselehtede nimekiri</h2>
+            <h2>Registreeritud kaupade nimekiri</h2>
             {deliveries.length === 0 ? (
                 <p>Veoselehti pole veel lisatud.</p>
             ) : (
