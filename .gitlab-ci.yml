@@ -3,44 +3,48 @@ stages:
   - test
   - deploy
 
-
+# --- Backend Build ---
 backend-build:
   stage: build
   image: gradle:8.3-jdk17
   script:
-    - echo "Backend build placeholder"
+    - cd backend
+    - ./gradlew clean build -x test
   artifacts:
     paths:
       - backend/build/libs/*.jar
+    expire_in: 1 week
 
-
+# --- Backend Tests (placeholder) ---
 backend-test:
   stage: test
   image: gradle:8.3-jdk17
   script:
     - echo "No backend tests yet"
+  allow_failure: true
 
-
+# --- Frontend Build ---
 frontend-build:
   stage: build
   image: node:lts
   script:
-    - echo "Installing frontend dependencies..."
     - cd frontend
-    - npm ci
-    - echo "Building React frontend..."
+    - npm ci --prefer-offline --no-audit
     - npm run build
   artifacts:
     paths:
       - frontend/build
     expire_in: 1 week
 
+# --- Frontend Tests (placeholder) ---
 frontend-test:
   stage: test
   image: node:lts
   script:
     - echo "No frontend tests yet"
+  allow_failure: true
 
+# --- Deploy Stage ---
 deploy-job:
   stage: deploy
   script:
