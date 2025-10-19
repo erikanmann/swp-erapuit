@@ -24,6 +24,10 @@ public class DeliveryService {
 
     // --- POST / salvestamine ---
     public Delivery save(Delivery delivery) {
+        repo.findByWaybillNo(delivery.getWaybillNo())
+                .ifPresent(existing -> {
+                    throw new IllegalArgumentException("Sama veoselehe numbriga tarne on juba süsteemis olemas.");
+                });
         if (delivery.getCreatedAt() == null) {
             delivery.setCreatedAt(OffsetDateTime.now());
         }

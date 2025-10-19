@@ -42,4 +42,9 @@ public class DeliveryController {
         }
         return ResponseEntity.noContent().build();
     }
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<String> handleDuplicateReference(IllegalArgumentException ex) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
+    }
+
 }

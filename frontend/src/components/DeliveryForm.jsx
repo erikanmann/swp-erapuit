@@ -18,24 +18,40 @@ const DeliveryForm = ({ onSave }) => {
     const handleChange = (e) =>
         setForm({ ...form, [e.target.name]: e.target.value });
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
-        if (!form.driverName || !form.truckNo) {
+
+        if (
+            !form.driverName ||
+            !form.truckNo ||
+            !form.waybillNo ||
+            !form.supplierName ||
+            !form.supplierAddress ||
+            !form.woodType ||
+            !form.arrivalDate ||
+            !form.totalVolumeM3
+        ) {
             return alert("Palun täida kõik kohustuslikud väljad");
         }
-        onSave(form);
-        setForm({
-            driverName: "",
-            truckNo: "",
-            waybillNo: "",
-            supplierName: "",
-            supplierAddress: "",
-            woodType: "",
-            arrivalDate: "",
-            logLengthCm: "",
-            logDiameterCm: "",
-            totalVolumeM3: "",
-        });
+
+        try {
+            await onSave(form);
+            alert("Tarne edukalt salvestatud!");
+            setForm({
+                driverName: "",
+                truckNo: "",
+                waybillNo: "",
+                supplierName: "",
+                supplierAddress: "",
+                woodType: "",
+                arrivalDate: "",
+                logLengthCm: "",
+                logDiameterCm: "",
+                totalVolumeM3: "",
+            });
+        } catch (err) {
+            alert(err.message || "Salvestamine ebaõnnestus");
+        }
     };
 
     return (
@@ -43,33 +59,63 @@ const DeliveryForm = ({ onSave }) => {
             <h2>Registreeri saabuv tarne</h2>
 
             <div>
-                <label>Juhi nimi:</label>
-                <input name="driverName" value={form.driverName} onChange={handleChange} required />
+                <label>Juhi nimi<span style={{ color: "red" }}> *</span>:</label>
+                <input
+                    name="driverName"
+                    value={form.driverName}
+                    onChange={handleChange}
+                    required
+                />
             </div>
 
             <div>
-                <label>Veoki number:</label>
-                <input name="truckNo" value={form.truckNo} onChange={handleChange} required />
+                <label>Veoki number<span style={{ color: "red" }}> *</span>:</label>
+                <input
+                    name="truckNo"
+                    value={form.truckNo}
+                    onChange={handleChange}
+                    required
+                />
             </div>
 
             <div>
-                <label>Veoselehe number:</label>
-                <input name="waybillNo" value={form.waybillNo} onChange={handleChange} />
+                <label>Veoselehe number<span style={{ color: "red" }}> *</span>:</label>
+                <input
+                    name="waybillNo"
+                    value={form.waybillNo}
+                    onChange={handleChange}
+                    required
+                />
             </div>
 
             <div>
-                <label>Tarnija nimi:</label>
-                <input name="supplierName" value={form.supplierName} onChange={handleChange} />
+                <label>Tarnija nimi<span style={{ color: "red" }}> *</span>:</label>
+                <input
+                    name="supplierName"
+                    value={form.supplierName}
+                    onChange={handleChange}
+                    required
+                />
             </div>
 
             <div>
-                <label>Tarnija aadress / päritolu:</label>
-                <input name="supplierAddress" value={form.supplierAddress} onChange={handleChange} />
+                <label>Tarnija aadress / päritolu<span style={{ color: "red" }}> *</span>:</label>
+                <input
+                    name="supplierAddress"
+                    value={form.supplierAddress}
+                    onChange={handleChange}
+                    required
+                />
             </div>
 
             <div>
-                <label>Puiduliik:</label>
-                <select name="woodType" value={form.woodType} onChange={handleChange} required>
+                <label>Puiduliik<span style={{ color: "red" }}> *</span>:</label>
+                <select
+                    name="woodType"
+                    value={form.woodType}
+                    onChange={handleChange}
+                    required
+                >
                     <option value="">Vali liik</option>
                     <option value="Kuusk">Kuusk</option>
                     <option value="Mänd">Mänd</option>
@@ -78,23 +124,49 @@ const DeliveryForm = ({ onSave }) => {
             </div>
 
             <div>
-                <label>Saabumiskuupäev:</label>
-                <input type="date" name="arrivalDate" value={form.arrivalDate} onChange={handleChange} required />
+                <label>Saabumiskuupäev<span style={{ color: "red" }}> *</span>:</label>
+                <input
+                    type="date"
+                    name="arrivalDate"
+                    value={form.arrivalDate}
+                    onChange={handleChange}
+                    required
+                />
             </div>
 
             <div>
                 <label>Palkide pikkus (cm):</label>
-                <input type="number" name="logLengthCm" value={form.logLengthCm} onChange={handleChange} />
+                <input
+                    type="number"
+                    name="logLengthCm"
+                    min="0"
+                    value={form.logLengthCm}
+                    onChange={handleChange}
+                />
             </div>
 
             <div>
                 <label>Palkide diameeter (cm):</label>
-                <input type="number" name="logDiameterCm" value={form.logDiameterCm} onChange={handleChange} />
+                <input
+                    type="number"
+                    name="logDiameterCm"
+                    min="0"
+                    value={form.logDiameterCm}
+                    onChange={handleChange}
+                />
             </div>
 
             <div>
-                <label>Kogumaht (m³):</label>
-                <input type="number" name="totalVolumeM3" value={form.totalVolumeM3} onChange={handleChange} />
+                <label>Kogumaht (m³)<span style={{ color: "red" }}> *</span>:</label>
+                <input
+                    type="number"
+                    name="totalVolumeM3"
+                    min="0"
+                    step="0.001"
+                    value={form.totalVolumeM3}
+                    onChange={handleChange}
+                    required
+                />
             </div>
 
             <button type="submit">Salvesta</button>
