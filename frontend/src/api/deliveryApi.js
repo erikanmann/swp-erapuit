@@ -1,5 +1,3 @@
-// Simuleerib backend API-t
-
 const BASE = "http://localhost:8080/api/deliveries";
 
 export const getDeliveries = async () => {

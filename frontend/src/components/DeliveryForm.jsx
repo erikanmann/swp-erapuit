@@ -21,7 +21,7 @@ const DeliveryForm = ({ onSave }) => {
     const handleSubmit = (e) => {
         e.preventDefault();
         if (!form.driver_name || !form.truck_no) {
-            return alert("Please fill in all required fields");
+            return alert("Palun täida kõik kohustuslikud väljad");
         }
         onSave(form);
         setForm({
@@ -40,37 +40,37 @@ const DeliveryForm = ({ onSave }) => {
 
     return (
         <form onSubmit={handleSubmit} className="form">
-            <h2>Register Incoming Delivery</h2>
+            <h2>Registreeri saabuv tarne</h2>
 
             <div>
-                <label>Driver name:</label>
+                <label>Juhi nimi:</label>
                 <input name="driver_name" value={form.driver_name} onChange={handleChange} required />
             </div>
 
             <div>
-                <label>Truck number:</label>
+                <label>Veoki number:</label>
                 <input name="truck_no" value={form.truck_no} onChange={handleChange} required />
             </div>
 
             <div>
-                <label>Waybill number:</label>
+                <label>Veoselehe number :</label>
                 <input name="waybill_no" value={form.waybill_no} onChange={handleChange} />
             </div>
 
             <div>
-                <label>Supplier name:</label>
+                <label>Tarnija nimi:</label>
                 <input name="supplier_name" value={form.supplier_name} onChange={handleChange} />
             </div>
 
             <div>
-                <label>Supplier address / origin:</label>
+                <label>Tarnija aadress / päritolu:</label>
                 <input name="supplier_address" value={form.supplier_address} onChange={handleChange} />
             </div>
 
             <div>
-                <label>Wood type:</label>
+                <label>Puiduliik:</label>
                 <select name="wood_type" value={form.wood_type} onChange={handleChange} required>
-                    <option value="">Select type</option>
+                    <option value="">Vali liik</option>
                     <option value="Kuusk">Kuusk</option>
                     <option value="Mänd">Mänd</option>
                     <option value="Kask">Kask</option>
@@ -78,26 +78,26 @@ const DeliveryForm = ({ onSave }) => {
             </div>
 
             <div>
-                <label>Arrival date:</label>
+                <label>Saabumiskuupäev:</label>
                 <input type="date" name="arrival_date" value={form.arrival_date} onChange={handleChange} required />
             </div>
 
             <div>
-                <label>Log length (cm):</label>
+                <label>Palkide pikkus (cm):</label>
                 <input type="number" name="length_cm" value={form.length_cm} onChange={handleChange} />
             </div>
 
             <div>
-                <label>Log diameter (cm):</label>
+                <label>Palkide diameeter (cm):</label>
                 <input type="number" name="diameter_cm" value={form.diameter_cm} onChange={handleChange} />
             </div>
 
             <div>
-                <label>Total volume (m³):</label>
+                <label>Kogumaht (m³):</label>
                 <input type="number" name="total_volume_m3" value={form.total_volume_m3} onChange={handleChange} />
             </div>
 
-            <button type="submit">Save</button>
+            <button type="submit">Salvesta</button>
         </form>
     );
 };
