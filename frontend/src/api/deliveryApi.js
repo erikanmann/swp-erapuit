@@ -1,18 +1,22 @@
 // Simuleerib backend API-t
 
-let deliveries = [];
+const BASE = "http://localhost:8080/api/deliveries";
 
 export const getDeliveries = async () => {
-    return new Promise((resolve) => {
-        setTimeout(() => resolve(deliveries), 200);
-    });
+  const res = await fetch(BASE);
+  if (!res.ok) throw new Error("Failed to fetch deliveries");
+  return res.json();
 };
 
 export const addDelivery = async (delivery) => {
-    return new Promise((resolve) => {
-        setTimeout(() => {
-            deliveries.push({ id: Date.now(), ...delivery });
-            resolve({ success: true });
-        }, 200);
-    });
+  const res = await fetch(BASE, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(delivery),
+  });
+  if (!res.ok) {
+    const text = await res.text();
+    throw new Error(`Post failed: ${res.status} ${text}`);
+  }
+  return res.json();
 };

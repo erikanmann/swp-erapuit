@@ -2,12 +2,12 @@ spring:
   datasource:
     url: jdbc:postgresql://localhost:5432/erapuit_dev?currentSchema=app
     username: postgres
-    password: postgres
+    password: sql
     driver-class-name: org.postgresql.Driver
 
   jpa:
     hibernate:
-      ddl-auto: validate
+      ddl-auto: update
     properties:
       hibernate:
         default_schema: app
