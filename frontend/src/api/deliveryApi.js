@@ -18,3 +18,13 @@ export const addDelivery = async (delivery) => {
   }
   return res.json();
 };
+
+export const deleteDelivery = async (id) => {
+  const res = await fetch(`${BASE}/${id}`, { method: "DELETE" });
+  if (!res.ok) {
+    const text = await res.text();
+    throw new Error(`Delete failed: ${res.status} ${text}`);
+  }
+
+  return getDeliveries();
+};
