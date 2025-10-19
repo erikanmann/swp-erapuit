@@ -2,7 +2,7 @@ spring:
   datasource:
     url: jdbc:postgresql://localhost:5432/erapuit_dev?currentSchema=app
     username: postgres
-    password: sql
+    password: postgres
     driver-class-name: org.postgresql.Driver
 
   jpa:

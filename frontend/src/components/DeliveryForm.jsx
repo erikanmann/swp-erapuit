@@ -3,16 +3,16 @@ import "../styles/delivery.css";
 
 const DeliveryForm = ({ onSave }) => {
     const [form, setForm] = useState({
-        driver_name: "",
-        truck_no: "",
-        waybill_no: "",
-        supplier_name: "",
-        supplier_address: "",
-        wood_type: "",
-        arrival_date: "",
-        length_cm: "",
-        diameter_cm: "",
-        total_volume_m3: "",
+        driverName: "",
+        truckNo: "",
+        waybillNo: "",
+        supplierName: "",
+        supplierAddress: "",
+        woodType: "",
+        arrivalDate: "",
+        logLengthCm: "",
+        logDiameterCm: "",
+        totalVolumeM3: "",
     });
 
     const handleChange = (e) =>
@@ -20,21 +20,21 @@ const DeliveryForm = ({ onSave }) => {
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        if (!form.driver_name || !form.truck_no) {
+        if (!form.driverName || !form.truckNo) {
             return alert("Palun täida kõik kohustuslikud väljad");
         }
         onSave(form);
         setForm({
-            driver_name: "",
-            truck_no: "",
-            waybill_no: "",
-            supplier_name: "",
-            supplier_address: "",
-            wood_type: "",
-            arrival_date: "",
-            length_cm: "",
-            diameter_cm: "",
-            total_volume_m3: "",
+            driverName: "",
+            truckNo: "",
+            waybillNo: "",
+            supplierName: "",
+            supplierAddress: "",
+            woodType: "",
+            arrivalDate: "",
+            logLengthCm: "",
+            logDiameterCm: "",
+            totalVolumeM3: "",
         });
     };
 
@@ -44,32 +44,32 @@ const DeliveryForm = ({ onSave }) => {
 
             <div>
                 <label>Juhi nimi:</label>
-                <input name="driver_name" value={form.driver_name} onChange={handleChange} required />
+                <input name="driverName" value={form.driverName} onChange={handleChange} required />
             </div>
 
             <div>
                 <label>Veoki number:</label>
-                <input name="truck_no" value={form.truck_no} onChange={handleChange} required />
+                <input name="truckNo" value={form.truckNo} onChange={handleChange} required />
             </div>
 
             <div>
-                <label>Veoselehe number :</label>
-                <input name="waybill_no" value={form.waybill_no} onChange={handleChange} />
+                <label>Veoselehe number:</label>
+                <input name="waybillNo" value={form.waybillNo} onChange={handleChange} />
             </div>
 
             <div>
                 <label>Tarnija nimi:</label>
-                <input name="supplier_name" value={form.supplier_name} onChange={handleChange} />
+                <input name="supplierName" value={form.supplierName} onChange={handleChange} />
             </div>
 
             <div>
                 <label>Tarnija aadress / päritolu:</label>
-                <input name="supplier_address" value={form.supplier_address} onChange={handleChange} />
+                <input name="supplierAddress" value={form.supplierAddress} onChange={handleChange} />
             </div>
 
             <div>
                 <label>Puiduliik:</label>
-                <select name="wood_type" value={form.wood_type} onChange={handleChange} required>
+                <select name="woodType" value={form.woodType} onChange={handleChange} required>
                     <option value="">Vali liik</option>
                     <option value="Kuusk">Kuusk</option>
                     <option value="Mänd">Mänd</option>
@@ -79,22 +79,22 @@ const DeliveryForm = ({ onSave }) => {
 
             <div>
                 <label>Saabumiskuupäev:</label>
-                <input type="date" name="arrival_date" value={form.arrival_date} onChange={handleChange} required />
+                <input type="date" name="arrivalDate" value={form.arrivalDate} onChange={handleChange} required />
             </div>
 
             <div>
                 <label>Palkide pikkus (cm):</label>
-                <input type="number" name="length_cm" value={form.length_cm} onChange={handleChange} />
+                <input type="number" name="logLengthCm" value={form.logLengthCm} onChange={handleChange} />
             </div>
 
             <div>
                 <label>Palkide diameeter (cm):</label>
-                <input type="number" name="diameter_cm" value={form.diameter_cm} onChange={handleChange} />
+                <input type="number" name="logDiameterCm" value={form.logDiameterCm} onChange={handleChange} />
             </div>
 
             <div>
                 <label>Kogumaht (m³):</label>
-                <input type="number" name="total_volume_m3" value={form.total_volume_m3} onChange={handleChange} />
+                <input type="number" name="totalVolumeM3" value={form.totalVolumeM3} onChange={handleChange} />
             </div>
 
             <button type="submit">Salvesta</button>

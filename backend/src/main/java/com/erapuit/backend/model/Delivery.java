@@ -3,16 +3,18 @@ package com.erapuit.backend.model;
 import jakarta.persistence.*;
 import org.hibernate.annotations.GenericGenerator;
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.OffsetDateTime;
 import java.util.UUID;
 
 @Entity
 @Table(name = "delivery")
 public class Delivery {
+
     @Id
     @GeneratedValue(generator = "UUID")
     @GenericGenerator(name = "UUID", strategy = "org.hibernate.id.UUIDGenerator")
-    @Column(columnDefinition = "uuid", updatable = false)
+    @Column(columnDefinition = "uuid", updatable = false, nullable = false)
     private UUID id;
 
     @Column(name = "supplier_name", nullable = false)
@@ -24,10 +26,10 @@ public class Delivery {
     @Column(name = "supplier_address")
     private String supplierAddress;
 
-    @Column(name = "driver_name")
+    @Column(name = "driver_name", nullable = false)
     private String driverName;
 
-    @Column(name = "truck_no")
+    @Column(name = "truck_no", nullable = false)
     private String truckNo;
 
     @Column(name = "waybill_no")
@@ -37,9 +39,8 @@ public class Delivery {
     private String woodType;
 
     @Column(name = "arrival_date")
-    private OffsetDateTime arrivalDate;
+    private LocalDate arrivalDate;
 
-    // log dimensions from frontend
     @Column(name = "log_length_cm", precision = 10, scale = 2)
     private BigDecimal logLengthCm;
 
@@ -54,12 +55,12 @@ public class Delivery {
     private DeliveryStatus deliveryStatus = DeliveryStatus.RECEIVED;
 
     @Column(name = "created_at")
-    private OffsetDateTime createdAt;
+    private OffsetDateTime createdAt = OffsetDateTime.now();
 
-    public Delivery() {
-    }
+    // === Konstruktorid ===
+    public Delivery() {}
 
-    // Getters and Setters
+    // === Getterid ja Setterid ===
     public UUID getId() {
         return id;
     }
@@ -124,11 +125,11 @@ public class Delivery {
         this.woodType = woodType;
     }
 
-    public OffsetDateTime getArrivalDate() {
+    public LocalDate getArrivalDate() {
         return arrivalDate;
     }
 
-    public void setArrivalDate(OffsetDateTime arrivalDate) {
+    public void setArrivalDate(LocalDate arrivalDate) {
         this.arrivalDate = arrivalDate;
     }
 

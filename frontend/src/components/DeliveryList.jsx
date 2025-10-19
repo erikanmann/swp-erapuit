@@ -23,12 +23,16 @@ const DeliveryList = ({ deliveries, onDelete }) => {
                     <tbody>
                     {deliveries.map((d) => (
                         <tr key={d.id}>
-                            <td>{d.driver_name}</td>
-                            <td>{d.truck_no}</td>
-                            <td>{d.waybill_no}</td>
-                            <td>{d.supplier_name}</td>
-                            <td>{d.arrival_date}</td>
-                            <td>{d.total_volume_m3}</td>
+                            <td>{d.driverName}</td>
+                            <td>{d.truckNo}</td>
+                            <td>{d.waybillNo}</td>
+                            <td>{d.supplierName}</td>
+                            <td>
+                                {d.arrivalDate
+                                    ? new Date(d.arrivalDate).toLocaleDateString("et-EE")
+                                    : ""}
+                            </td>
+                            <td>{d.totalVolumeM3}</td>
                             <td>
                                 <button onClick={() => onDelete(d.id)}>Kustuta</button>
                             </td>
