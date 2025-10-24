@@ -10,10 +10,19 @@ const DeliveryForm = ({ onSave }) => {
         supplierAddress: "",
         woodType: "",
         arrivalDate: "",
-        logLengthCm: "",
-        logDiameterCm: "",
-        totalVolumeM3: "",
+        totalVolumeTm: "",
     });
+
+    const convertDateToISO = (dateStr) => {
+        if (!dateStr) return "";
+        const match = dateStr.match(/(\d{2})\.(\d{2})\.(\d{4})/);
+        if (match) {
+            const [, dd, mm, yyyy] = match;
+
+            return `${yyyy}-${mm}-${dd}`;
+        }
+        return dateStr; // juba õiges formaadis
+    };
 
     const handleChange = (e) =>
         setForm({ ...form, [e.target.name]: e.target.value });
@@ -29,7 +38,7 @@ const DeliveryForm = ({ onSave }) => {
             !form.supplierAddress ||
             !form.woodType ||
             !form.arrivalDate ||
-            !form.totalVolumeM3
+            !form.totalVolumeTm
         ) {
             return alert("Palun täida kõik kohustuslikud väljad");
         }
@@ -45,9 +54,7 @@ const DeliveryForm = ({ onSave }) => {
                 supplierAddress: "",
                 woodType: "",
                 arrivalDate: "",
-                logLengthCm: "",
-                logDiameterCm: "",
-                totalVolumeM3: "",
+                totalVolumeTm: "",
             });
         } catch (err) {
             alert(err.message || "Salvestamine ebaõnnestus");
@@ -59,63 +66,59 @@ const DeliveryForm = ({ onSave }) => {
             <h2>Registreeri saabuv tarne</h2>
 
             <div>
-                <label>Juhi nimi<span style={{ color: "red" }}> *</span>:</label>
+                <label>Upload Waybill (PDF):</label>
                 <input
-                    name="driverName"
-                    value={form.driverName}
-                    onChange={handleChange}
-                    required
+                    type="file"
+                    accept="application/pdf"
+                    onChange={async (e) => {
+                        const file = e.target.files[0];
+                        if (!file) return;
+                        const formData = new FormData();
+                        formData.append("file", file);
+
+                        const res = await fetch("http://localhost:8080/api/file/parse-waybill", {
+                            method: "POST",
+                            body: formData,
+                        });
+                        const data = await res.json();
+
+                        if (data.arrivalDate) {
+                            data.arrivalDate = convertDateToISO(data.arrivalDate);
+                        }
+
+                        setForm({ ...form, ...data });
+                    }}
                 />
+            </div>
+
+            <div>
+                <label>Juhi nimi<span style={{ color: "red" }}> *</span>:</label>
+                <input name="driverName" value={form.driverName} onChange={handleChange} required />
             </div>
 
             <div>
                 <label>Veoki number<span style={{ color: "red" }}> *</span>:</label>
-                <input
-                    name="truckNo"
-                    value={form.truckNo}
-                    onChange={handleChange}
-                    required
-                />
+                <input name="truckNo" value={form.truckNo} onChange={handleChange} required />
             </div>
 
             <div>
                 <label>Veoselehe number<span style={{ color: "red" }}> *</span>:</label>
-                <input
-                    name="waybillNo"
-                    value={form.waybillNo}
-                    onChange={handleChange}
-                    required
-                />
+                <input name="waybillNo" value={form.waybillNo} onChange={handleChange} required />
             </div>
 
             <div>
                 <label>Tarnija nimi<span style={{ color: "red" }}> *</span>:</label>
-                <input
-                    name="supplierName"
-                    value={form.supplierName}
-                    onChange={handleChange}
-                    required
-                />
+                <input name="supplierName" value={form.supplierName} onChange={handleChange} required />
             </div>
 
             <div>
                 <label>Tarnija aadress / päritolu<span style={{ color: "red" }}> *</span>:</label>
-                <input
-                    name="supplierAddress"
-                    value={form.supplierAddress}
-                    onChange={handleChange}
-                    required
-                />
+                <input name="supplierAddress" value={form.supplierAddress} onChange={handleChange} required />
             </div>
 
             <div>
                 <label>Puiduliik<span style={{ color: "red" }}> *</span>:</label>
-                <select
-                    name="woodType"
-                    value={form.woodType}
-                    onChange={handleChange}
-                    required
-                >
+                <select name="woodType" value={form.woodType} onChange={handleChange} required>
                     <option value="">Vali liik</option>
                     <option value="Kuusk">Kuusk</option>
                     <option value="Mänd">Mänd</option>
@@ -128,42 +131,22 @@ const DeliveryForm = ({ onSave }) => {
                 <input
                     type="date"
                     name="arrivalDate"
+                    placeholder="yyyy-mm-dd või vali kalendrist"
                     value={form.arrivalDate}
                     onChange={handleChange}
                     required
+                    style={{ width: "100%" }}
                 />
             </div>
 
             <div>
-                <label>Palkide pikkus (cm):</label>
+                <label>Kogukogus (tm)<span style={{ color: "red" }}> *</span>:</label>
                 <input
                     type="number"
-                    name="logLengthCm"
-                    min="0"
-                    value={form.logLengthCm}
-                    onChange={handleChange}
-                />
-            </div>
-
-            <div>
-                <label>Palkide diameeter (cm):</label>
-                <input
-                    type="number"
-                    name="logDiameterCm"
-                    min="0"
-                    value={form.logDiameterCm}
-                    onChange={handleChange}
-                />
-            </div>
-
-            <div>
-                <label>Kogumaht (m³)<span style={{ color: "red" }}> *</span>:</label>
-                <input
-                    type="number"
-                    name="totalVolumeM3"
+                    name="totalVolumeTm"
                     min="0"
                     step="0.001"
-                    value={form.totalVolumeM3}
+                    value={form.totalVolumeTm}
                     onChange={handleChange}
                     required
                 />

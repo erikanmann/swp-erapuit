@@ -41,14 +41,10 @@ public class Delivery {
     @Column(name = "arrival_date")
     private LocalDate arrivalDate;
 
-    @Column(name = "log_length_cm", precision = 10, scale = 2)
-    private BigDecimal logLengthCm;
 
-    @Column(name = "log_diameter_cm", precision = 10, scale = 2)
-    private BigDecimal logDiameterCm;
+    @Column(name = "total_volume_tm", precision = 10, scale = 3)
+    private BigDecimal totalVolumeTm;
 
-    @Column(name = "total_volume_m3", precision = 10, scale = 3)
-    private BigDecimal totalVolumeM3;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "delivery_status")
@@ -133,28 +129,12 @@ public class Delivery {
         this.arrivalDate = arrivalDate;
     }
 
-    public BigDecimal getLogLengthCm() {
-        return logLengthCm;
+    public BigDecimal getTotalVolumeTm() {
+        return totalVolumeTm;
     }
 
-    public void setLogLengthCm(BigDecimal logLengthCm) {
-        this.logLengthCm = logLengthCm;
-    }
-
-    public BigDecimal getLogDiameterCm() {
-        return logDiameterCm;
-    }
-
-    public void setLogDiameterCm(BigDecimal logDiameterCm) {
-        this.logDiameterCm = logDiameterCm;
-    }
-
-    public BigDecimal getTotalVolumeM3() {
-        return totalVolumeM3;
-    }
-
-    public void setTotalVolumeM3(BigDecimal totalVolumeM3) {
-        this.totalVolumeM3 = totalVolumeM3;
+    public void setTotalVolumeTm(BigDecimal totalVolumeTm) {
+        this.totalVolumeTm = totalVolumeTm;
     }
 
     public DeliveryStatus getDeliveryStatus() {

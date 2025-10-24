@@ -16,7 +16,7 @@ const DeliveryList = ({ deliveries, onDelete }) => {
                         <th>Veoselehe nr</th>
                         <th>Tarnija</th>
                         <th>Kuupäev</th>
-                        <th>Maht (m³)</th>
+                        <th>Maht</th>
                         <th>Tegevus</th>
                     </tr>
                     </thead>
@@ -32,7 +32,7 @@ const DeliveryList = ({ deliveries, onDelete }) => {
                                     ? new Date(d.arrivalDate).toLocaleDateString("et-EE")
                                     : ""}
                             </td>
-                            <td>{d.totalVolumeM3}</td>
+                            <td>{d.totalVolumeTm}</td>
                             <td>
                                 <button onClick={() => onDelete(d.id)}>Kustuta</button>
                             </td>
