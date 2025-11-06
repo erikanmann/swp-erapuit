@@ -1,17 +1,17 @@
 import React, { useState, useEffect } from "react";
 import "../styles/delivery.css";
-
+const emptyForm = {
+    driverName: "",
+    truckNo: "",
+    waybillNo: "",
+    supplierName: "",
+    supplierAddress: "",
+    woodType: "",
+    arrivalDate: "",
+    totalVolumeTm: "",
+};
 const DeliveryForm = ({ onSave, editingDelivery, onCancelEdit }) => {
-    const emptyForm = {
-        driverName: "",
-        truckNo: "",
-        waybillNo: "",
-        supplierName: "",
-        supplierAddress: "",
-        woodType: "",
-        arrivalDate: "",
-        totalVolumeTm: "",
-    };
+
 
     const [form, setForm] = useState(emptyForm);
 
