@@ -42,6 +42,19 @@ public class DeliveryController {
         }
         return ResponseEntity.noContent().build();
     }
+    // --- PUT ---
+    // Uuendab olemasolevat tarnet ID alusel
+    @PutMapping("/{id}")
+    public ResponseEntity<Delivery> update(@PathVariable UUID id, @RequestBody Delivery updatedDelivery) {
+        try {
+            Delivery saved = service.update(id, updatedDelivery);
+            return ResponseEntity.ok(saved);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
     @ExceptionHandler(IllegalArgumentException.class)
     public ResponseEntity<String> handleDuplicateReference(IllegalArgumentException ex) {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());

@@ -1,7 +1,7 @@
 import React from "react";
 import "../styles/delivery.css";
 
-const DeliveryList = ({ deliveries, onDelete }) => {
+const DeliveryList = ({ deliveries, onDelete, onEdit }) => {
     return (
         <div className="list">
             <h2>Registreeritud kaupade nimekiri</h2>
@@ -34,6 +34,7 @@ const DeliveryList = ({ deliveries, onDelete }) => {
                             </td>
                             <td>{d.totalVolumeTm}</td>
                             <td>
+                                <button onClick={() => onEdit(d)}>Muuda</button>
                                 <button onClick={() => onDelete(d.id)}>Kustuta</button>
                             </td>
                         </tr>

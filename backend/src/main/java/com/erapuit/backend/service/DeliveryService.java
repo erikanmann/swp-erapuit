@@ -42,4 +42,26 @@ public class DeliveryService {
         repo.deleteById(id);
         return true;
     }
+
+    // --- PUT / uuendamine ---
+    public Delivery update(UUID id, Delivery updatedDelivery) {
+        Delivery existing = repo.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Delivery not found with id: " + id));
+
+        existing.setDriverName(updatedDelivery.getDriverName());
+        existing.setTruckNo(updatedDelivery.getTruckNo());
+        existing.setWaybillNo(updatedDelivery.getWaybillNo());
+        existing.setSupplierName(updatedDelivery.getSupplierName());
+        existing.setSupplierAddress(updatedDelivery.getSupplierAddress());
+        existing.setWoodType(updatedDelivery.getWoodType());
+        existing.setArrivalDate(updatedDelivery.getArrivalDate());
+
+        if (updatedDelivery.getTotalVolumeTm() != null) {
+            existing.setTotalVolumeTm(updatedDelivery.getTotalVolumeTm());
+        }
+
+        return repo.save(existing);
+    }
+
+
 }

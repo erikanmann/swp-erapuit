@@ -28,3 +28,17 @@ export const deleteDelivery = async (id) => {
 
   return getDeliveries();
 };
+
+export const updateDelivery = async (id, data) => {
+  const res = await fetch(`${BASE}/${id}`, {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data),
+  });
+  if (!res.ok) {
+    const text = await res.text();
+    throw new Error(`Update failed: ${res.status} ${text}`);
+  }
+  return res.json();
+};
+

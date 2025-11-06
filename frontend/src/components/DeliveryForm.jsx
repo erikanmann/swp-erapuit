@@ -1,8 +1,8 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import "../styles/delivery.css";
 
-const DeliveryForm = ({ onSave }) => {
-    const [form, setForm] = useState({
+const DeliveryForm = ({ onSave, editingDelivery, onCancelEdit }) => {
+    const emptyForm = {
         driverName: "",
         truckNo: "",
         waybillNo: "",
@@ -11,17 +11,27 @@ const DeliveryForm = ({ onSave }) => {
         woodType: "",
         arrivalDate: "",
         totalVolumeTm: "",
-    });
+    };
+
+    const [form, setForm] = useState(emptyForm);
+
+    // Kui editingDelivery muutub, täida vormi väärtused
+    useEffect(() => {
+        if (editingDelivery) {
+            setForm(editingDelivery);
+        } else {
+            setForm(emptyForm);
+        }
+    }, [editingDelivery]);
 
     const convertDateToISO = (dateStr) => {
         if (!dateStr) return "";
         const match = dateStr.match(/(\d{2})\.(\d{2})\.(\d{4})/);
         if (match) {
             const [, dd, mm, yyyy] = match;
-
             return `${yyyy}-${mm}-${dd}`;
         }
-        return dateStr; // juba õiges formaadis
+        return dateStr;
     };
 
     const handleChange = (e) =>
@@ -30,32 +40,27 @@ const DeliveryForm = ({ onSave }) => {
     const handleSubmit = async (e) => {
         e.preventDefault();
 
-        if (
-            !form.driverName ||
-            !form.truckNo ||
-            !form.waybillNo ||
-            !form.supplierName ||
-            !form.supplierAddress ||
-            !form.woodType ||
-            !form.arrivalDate ||
-            !form.totalVolumeTm
-        ) {
-            return alert("Palun täida kõik kohustuslikud väljad");
+        const required = [
+            "driverName",
+            "truckNo",
+            "waybillNo",
+            "supplierName",
+            "supplierAddress",
+            "woodType",
+            "arrivalDate",
+            "totalVolumeTm",
+        ];
+        for (const field of required) {
+            if (!form[field]) {
+                alert("Palun täida kõik kohustuslikud väljad");
+                return;
+            }
         }
 
         try {
             await onSave(form);
-            alert("Tarne edukalt salvestatud!");
-            setForm({
-                driverName: "",
-                truckNo: "",
-                waybillNo: "",
-                supplierName: "",
-                supplierAddress: "",
-                woodType: "",
-                arrivalDate: "",
-                totalVolumeTm: "",
-            });
+            alert(editingDelivery ? "Andmed edukalt uuendatud!" : "Tarne edukalt salvestatud!");
+            setForm(emptyForm);
         } catch (err) {
             alert(err.message || "Salvestamine ebaõnnestus");
         }
@@ -63,7 +68,7 @@ const DeliveryForm = ({ onSave }) => {
 
     return (
         <form onSubmit={handleSubmit} className="form">
-            <h2>Registreeri saabuv tarne</h2>
+            <h2>{editingDelivery ? "Muuda tarnet" : "Registreeri saabuv tarne"}</h2>
 
             <div>
                 <label>Upload Waybill (PDF):</label>
@@ -131,7 +136,6 @@ const DeliveryForm = ({ onSave }) => {
                 <input
                     type="date"
                     name="arrivalDate"
-                    placeholder="yyyy-mm-dd või vali kalendrist"
                     value={form.arrivalDate}
                     onChange={handleChange}
                     required
@@ -152,7 +156,24 @@ const DeliveryForm = ({ onSave }) => {
                 />
             </div>
 
-            <button type="submit">Salvesta</button>
+            <div style={{ display: "flex", gap: "1rem" }}>
+                <button type="submit">
+                    {editingDelivery ? "Uuenda" : "Salvesta"}
+                </button>
+
+                {editingDelivery && (
+                    <button
+                        type="button"
+                        onClick={() => {
+                            setForm(emptyForm);
+                            onCancelEdit?.();
+                        }}
+                        style={{ backgroundColor: "#ccc" }}
+                    >
+                        Tühista
+                    </button>
+                )}
+            </div>
         </form>
     );
 };
