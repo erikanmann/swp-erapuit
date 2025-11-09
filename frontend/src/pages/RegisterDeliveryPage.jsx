@@ -2,13 +2,17 @@ import React, { useEffect, useState } from "react";
 import { getDeliveries, addDelivery, deleteDelivery, updateDelivery } from "../api/deliveryApi";
 import DeliveryForm from "../components/DeliveryForm";
 import DeliveryList from "../components/DeliveryList";
-import "../styles/delivery.css";
+import "../styles/delivery.css";     // vormi ja tabeli stiil
+import "../styles/main.css";         // globaalne teema
+import "../styles/warehouse.css";    // ülemise tabi/nav stiil
+import { useNavigate } from "react-router-dom";
 
 const RegisterDeliveryPage = () => {
-    const [deliveries, setDeliveries] = useState([]);
-    const [editingDelivery, setEditingDelivery] = useState(null); // 👈 lisatud
+    const navigate = useNavigate();
 
-    // lae tarned esmasel laadimisel
+    const [deliveries, setDeliveries] = useState([]);
+    const [editingDelivery, setEditingDelivery] = useState(null);
+
     useEffect(() => {
         getDeliveries().then(setDeliveries);
     }, []);
@@ -16,14 +20,11 @@ const RegisterDeliveryPage = () => {
     const handleSave = async (data) => {
         try {
             if (editingDelivery) {
-                // uuenda olemasolev
                 await updateDelivery(editingDelivery.id, data);
                 setEditingDelivery(null);
             } else {
-                // lisa uus
                 await addDelivery(data);
             }
-
             const updated = await getDeliveries();
             setDeliveries(updated);
         } catch (err) {
@@ -45,12 +46,17 @@ const RegisterDeliveryPage = () => {
         window.scrollTo({ top: 0, behavior: "smooth" });
     };
 
-    const handleCancelEdit = () => {
-        setEditingDelivery(null);
-    };
+    const handleCancelEdit = () => setEditingDelivery(null);
 
     return (
         <div className="delivery-page">
+            {/* Ülemine navigeerimisriba (samad tabid mis warehouse'is) */}
+            <div className="warehouse-tabs">
+                <button className="active-tab">Register Delivery</button>
+                <button onClick={() => navigate("/warehouse")}>Warehouse Dashboard</button>
+                <button disabled>Production Usage</button>
+            </div>
+
             <h1>Sissetuleva kauba registreerimine</h1>
 
             <DeliveryForm

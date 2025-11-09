@@ -1,0 +1,134 @@
+/* --- Warehouse Dashboard Layout --- */
+.warehouse-tabs {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+
+.warehouse-tabs button {
+    background: #f4f1eb;
+    color: #333;
+    border: 1px solid #ddd0b8;
+    border-radius: 20px;
+    padding: 10px 20px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.warehouse-tabs .active-tab {
+    background-color: #d6a03b;
+    color: white;
+    border-color: #b98722;
+}
+
+.warehouse-tabs button:hover:not(.active-tab):not(:disabled) {
+    background-color: #e9e3d7;
+}
+
+/* --- Stats cards --- */
+.warehouse-stats {
+    display: flex;
+    gap: 1rem;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    margin-bottom: 2rem;
+}
+
+.stat-card {
+    flex: 1;
+    min-width: 200px;
+    background: #fffefc;
+    border-radius: 10px;
+    padding: 1rem;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+    text-align: center;
+}
+
+.stat-card h4 {
+    margin: 0;
+    color: #444;
+    font-weight: 600;
+}
+
+.stat-card p {
+    margin-top: 8px;
+    font-size: 1rem;
+    color: #222;
+}
+
+/* --- Sections --- */
+.warehouse-section {
+    background: #f4f1eb;
+    padding: 1.5rem;
+    border-radius: 12px;
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);
+    margin-bottom: 2rem;
+}
+
+.section-subtitle {
+    color: #666;
+    font-size: 0.9rem;
+    margin-top: -0.4rem;
+}
+
+/* --- Filter bar --- */
+.filter-bar {
+    display: flex;
+    gap: 0.8rem;
+    margin: 1rem 0;
+}
+
+.filter-bar input {
+    flex: 1;
+    padding: 8px 10px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+}
+
+.filter-bar select,
+.filter-bar button {
+    padding: 8px 12px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+    background: #fff;
+    cursor: pointer;
+}
+
+/* --- Empty box --- */
+.empty-box {
+    text-align: center;
+    color: #777;
+    padding: 2rem;
+    background: #fffefc;
+    border: 1px dashed #ccc;
+    border-radius: 8px;
+}
+/* --- Warehouse Table --- */
+.warehouse-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 1rem;
+    background-color: #fffefc;
+    border-radius: 6px;
+    overflow: hidden;
+}
+
+.warehouse-table th,
+.warehouse-table td {
+    padding: 10px;
+    border-bottom: 1px solid #e0d8cc;
+    color: #2b2b2b;
+}
+
+.warehouse-table th {
+    background-color: #e9e3d7;
+    font-weight: 600;
+    text-align: left;
+}
+
+.warehouse-table tr:hover {
+    background-color: #f7f4ef;
+}
+

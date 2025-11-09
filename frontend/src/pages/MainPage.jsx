@@ -16,7 +16,9 @@ const MainPage = () => {
                     <button onClick={() => navigate("/register-delivery")}>
                         Sissetuleva kauba registreerimine
                     </button>
-                    <button disabled>Lao ülevaade ja jälgimine</button>
+                    <button onClick={() => navigate("/warehouse")}>
+                        Lao ülevaade ja jälgimine
+                    </button>
                     <button disabled>Väljuva kauba registreerimine</button>
                 </div>
             </div>

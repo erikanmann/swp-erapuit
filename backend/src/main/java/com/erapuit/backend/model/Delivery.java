@@ -41,10 +41,13 @@ public class Delivery {
     @Column(name = "arrival_date")
     private LocalDate arrivalDate;
 
-
+    // --- Kogumaht (sisestatakse sissetulekul) ---
     @Column(name = "total_volume_tm", precision = 10, scale = 3)
     private BigDecimal totalVolumeTm;
 
+    // --- Tegelik kasutatav maht (uuendatakse lao dashboardil) ---
+    @Column(name = "actual_volume_tm", precision = 10, scale = 3)
+    private BigDecimal actualVolumeTm;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "delivery_status")
@@ -135,6 +138,14 @@ public class Delivery {
 
     public void setTotalVolumeTm(BigDecimal totalVolumeTm) {
         this.totalVolumeTm = totalVolumeTm;
+    }
+
+    public BigDecimal getActualVolumeTm() {
+        return actualVolumeTm;
+    }
+
+    public void setActualVolumeTm(BigDecimal actualVolumeTm) {
+        this.actualVolumeTm = actualVolumeTm;
     }
 
     public DeliveryStatus getDeliveryStatus() {
