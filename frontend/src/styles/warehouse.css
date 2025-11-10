@@ -132,3 +132,11 @@
     background-color: #f7f4ef;
 }
 
+/* Empty message styling */
+.empty-message {
+    color: #333;
+    font-style: italic;
+    padding: 1rem;
+    text-align: center;
+}
+

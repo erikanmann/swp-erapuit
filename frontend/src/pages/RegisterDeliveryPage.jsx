@@ -52,6 +52,7 @@ const RegisterDeliveryPage = () => {
         <div className="delivery-page">
             {/* Ülemine navigeerimisriba (samad tabid mis warehouse'is) */}
             <div className="warehouse-tabs">
+                <button onClick={() => navigate('/home')}>Home</button>
                 <button className="active-tab">Register Delivery</button>
                 <button onClick={() => navigate("/warehouse")}>Warehouse Dashboard</button>
                 <button disabled>Production Usage</button>

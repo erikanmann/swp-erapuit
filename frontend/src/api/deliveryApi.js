@@ -42,3 +42,8 @@ export const updateDelivery = async (id, data) => {
   return res.json();
 };
 
+export const getIncomingMaterials = async (period = 'all') => {
+    const response = await fetch(`http://localhost:8080/api/deliveries/incoming?period=${period}`);
+    if (!response.ok) throw new Error('Failed to fetch incoming materials');
+    return response.json();
+};

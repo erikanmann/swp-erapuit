@@ -1,22 +1,23 @@
-import React from "react";
-import "../styles/delivery.css";
-import "../styles/main.css";
-import { useNavigate } from "react-router-dom";
+import React from 'react';
+import '../styles/delivery.css';
+import '../styles/main.css';
+import { useNavigate } from 'react-router-dom';
 
 const MainPage = () => {
     const navigate = useNavigate();
-
     return (
         <div className="main-container">
             <div className="main-card">
                 <h1>Erapuit lao süsteem</h1>
                 <p>Moodulid</p>
-
                 <div className="main-buttons">
-                    <button onClick={() => navigate("/register-delivery")}>
+                    <button onClick={() => navigate('/home')}>
+                        Avaleht
+                    </button>
+                    <button onClick={() => navigate('/register-delivery')}>
                         Sissetuleva kauba registreerimine
                     </button>
-                    <button onClick={() => navigate("/warehouse")}>
+                    <button onClick={() => navigate('/warehouse')}>
                         Lao ülevaade ja jälgimine
                     </button>
                     <button disabled>Väljuva kauba registreerimine</button>

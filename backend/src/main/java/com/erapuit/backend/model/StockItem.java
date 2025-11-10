@@ -3,7 +3,7 @@ package com.erapuit.backend.model;
 import jakarta.persistence.*;
 
 @Entity
-@Table(name = "stock_items")
+@Table(name = "stockitems")
 public class StockItem {
 
     @Id

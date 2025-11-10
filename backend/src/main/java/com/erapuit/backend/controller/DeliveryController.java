@@ -1,11 +1,14 @@
 package com.erapuit.backend.controller;
 
 import com.erapuit.backend.model.Delivery;
+import com.erapuit.backend.model.DeliveryStatus;
+import com.erapuit.backend.repository.DeliveryRepository;
 import com.erapuit.backend.service.DeliveryService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
 
@@ -15,22 +18,53 @@ import java.util.UUID;
 public class DeliveryController {
 
     private final DeliveryService service;
+    private final DeliveryRepository deliveryRepository;
 
-    public DeliveryController(DeliveryService service) {
+    public DeliveryController(DeliveryService service, DeliveryRepository deliveryRepository) {
         this.service = service;
+        this.deliveryRepository = deliveryRepository;
     }
 
     // --- GET ---
-    @GetMapping
-    public List<Delivery> list() {
-        return service.getAll();
+    @GetMapping("/incoming")
+    public List<Delivery> getIncomingMaterials(@RequestParam(required = false) String period) {
+        LocalDate startDate;
+        LocalDate today = LocalDate.now();
+
+        if (period == null || period.equals("all")) {
+            return deliveryRepository.findAll();
+        }
+
+        switch (period) {
+            case "week":
+                startDate = today.minusWeeks(1);
+                break;
+            case "month":
+                startDate = today.minusMonths(1);
+                break;
+            case "year":
+                startDate = today.minusYears(1);
+                break;
+            default:
+                return deliveryRepository.findAll();
+        }
+
+        return deliveryRepository.findByArrivalDateGreaterThanEqual(startDate);
     }
+    @GetMapping
+    public List<Delivery> getAllDeliveries() {
+        return deliveryRepository.findAll();
+    }
+
 
     // --- POST ---
     @PostMapping
     public ResponseEntity<Delivery> create(@RequestBody Delivery delivery) {
+        if (delivery.getDeliveryStatus() == null) {
+            delivery.setDeliveryStatus(DeliveryStatus.RECEIVED);
+        }
         Delivery saved = service.save(delivery);
-        return ResponseEntity.status(HttpStatus.CREATED).body(saved);
+        return ResponseEntity.ok(saved);
     }
 
     // --- DELETE ---

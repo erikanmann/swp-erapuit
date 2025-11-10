@@ -6,6 +6,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.OffsetDateTime;
 import java.util.UUID;
+import com.erapuit.backend.model.DeliveryStatus;
 
 @Entity
 @Table(name = "delivery")
@@ -50,7 +51,7 @@ public class Delivery {
     private BigDecimal actualVolumeTm;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "delivery_status")
+    @Column(name = "delivery_status", nullable = false)
     private DeliveryStatus deliveryStatus = DeliveryStatus.RECEIVED;
 
     @Column(name = "created_at")

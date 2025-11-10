@@ -1,9 +1,10 @@
-import React from "react";
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import MainPage from "./pages/MainPage";
-import RegisterDeliveryPage from "./pages/RegisterDeliveryPage";
-import "./styles/main.css";
-import WarehouseDashboard from "./pages/WarehouseDashboard";
+import React from 'react';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import MainPage from './pages/MainPage';
+import HomePage from './pages/HomePage';
+import RegisterDeliveryPage from './pages/RegisterDeliveryPage';
+import './styles/main.css';
+import WarehouseDashboard from './pages/WarehouseDashboard';
 
 function App() {
     return (
@@ -11,6 +12,7 @@ function App() {
             <div className="App">
                 <Routes>
                     <Route path="/" element={<MainPage />} />
+                    <Route path="/home" element={<HomePage />} />
                     <Route path="/register-delivery" element={<RegisterDeliveryPage />} />
                     <Route path="/warehouse" element={<WarehouseDashboard />} />
                 </Routes>
