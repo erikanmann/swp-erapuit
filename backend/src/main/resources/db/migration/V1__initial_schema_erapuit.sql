@@ -30,6 +30,7 @@ CREATE TABLE IF NOT EXISTS delivery (
                                         id              UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     supplier_name   TEXT NOT NULL,
     supplier_reg_code TEXT,
+    supplier_address TEXT,
     driver_name     TEXT,
     truck_no        TEXT,
     waybill_no      TEXT,
@@ -178,6 +179,19 @@ CREATE TABLE IF NOT EXISTS shipment_item (
     );
 
 CREATE INDEX IF NOT EXISTS ix_shipment_item_shipment ON shipment_item(shipment_id);
+
+-- ============================================================
+-- 11. STOCKITEMS
+-- ============================================================
+CREATE TABLE IF NOT EXISTS stockitems (
+                                          id BIGINT PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
+                                          delivery_id TEXT,
+                                          supplier TEXT,
+                                          wood_type TEXT,
+                                          arrival_date TEXT,
+                                          total_volume DOUBLE PRECISION,
+                                          usable_volume DOUBLE PRECISION
+);
 
 -- ============================================================
 -- VIEWS (optional)

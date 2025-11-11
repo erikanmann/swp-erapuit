@@ -75,6 +75,7 @@
 
 /* --- Filter bar --- */
 .filter-bar {
+    align-items: center;
     display: flex;
     gap: 0.8rem;
     margin: 1rem 0;
@@ -94,6 +95,27 @@
     border: 1px solid #ccc;
     background: #fff;
     cursor: pointer;
+}
+.filter-bar select,
+.warehouse-select {
+    background: #f4f1eb;
+    color: #222;
+    border: 1px solid #ddd0b8;
+    border-radius: 8px;
+    padding: 10px 16px;
+    font-size: 1rem;
+    font-weight: 500;
+    transition: border-color 0.15s;
+}
+.filter-bar select:focus {
+    border-color: #d6a03b;
+    outline: none;
+}
+.filter-bar label {
+    font-weight: 500;
+    color: #333;
+    margin-right: 0.5rem;
+    font-size: 1rem;
 }
 
 /* --- Empty box --- */
@@ -139,4 +161,3 @@
     padding: 1rem;
     text-align: center;
 }
-

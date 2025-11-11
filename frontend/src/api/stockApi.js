@@ -52,6 +52,7 @@ export const deleteStockItem = async (id) => {
     }
     return res.json();
 };
+
 export const updateUsableVolume = async (id, value) => {
     const res = await fetch(`${BASE}/${id}/usable-volume`, {
         method: "PUT",
@@ -61,3 +62,12 @@ export const updateUsableVolume = async (id, value) => {
     if (!res.ok) throw new Error("Failed to update usable volume");
     return res.json();
 };
+
+export const getStockByWoodType = async (woodType) => {
+    const BASE = "http://localhost:8080/api/stock"; // or your actual base path
+    const url = `${BASE}/by-wood-type?woodType=${encodeURIComponent(woodType)}`;
+    const res = await fetch(url);
+    if (!res.ok) throw new Error("Failed to fetch stock items by wood type");
+    return res.json();
+};
+

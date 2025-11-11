@@ -40,7 +40,7 @@ public class Delivery {
     private String woodType;
 
     @Column(name = "arrival_date")
-    private LocalDate arrivalDate;
+    private OffsetDateTime arrivalDate;
 
     // --- Kogumaht (sisestatakse sissetulekul) ---
     @Column(name = "total_volume_tm", precision = 10, scale = 3)
@@ -125,11 +125,11 @@ public class Delivery {
         this.woodType = woodType;
     }
 
-    public LocalDate getArrivalDate() {
+    public OffsetDateTime getArrivalDate() {
         return arrivalDate;
     }
 
-    public void setArrivalDate(LocalDate arrivalDate) {
+    public void setArrivalDate(OffsetDateTime arrivalDate) {
         this.arrivalDate = arrivalDate;
     }
 
