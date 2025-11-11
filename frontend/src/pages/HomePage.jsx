@@ -59,7 +59,7 @@ const HomePage = () => {
             .then(setShipments)
             .catch(err => console.error(err))
             .finally(() => setLoadingShipments(false));
-    }, []);
+    }, [outgoingPeriod]);
 
     const filteredShipments = filterShipmentsByPeriod(shipments, outgoingPeriod);
 

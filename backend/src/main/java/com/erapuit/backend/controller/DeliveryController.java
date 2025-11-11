@@ -10,7 +10,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDate;
+import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -32,28 +32,22 @@ public class DeliveryController {
     // --- GET ---
     @GetMapping("/incoming")
     public List<Delivery> getIncomingMaterials(@RequestParam(required = false) String period) {
-        LocalDate startDate;
-        LocalDate today = LocalDate.now();
-
-        if (period == null || period.equals("all")) {
-            return deliveryRepository.findAll();
-        }
-
+        OffsetDateTime today = OffsetDateTime.now();
+        OffsetDateTime startDate;
         switch (period) {
             case "week":
                 startDate = today.minusWeeks(1);
-                break;
+                return deliveryRepository.findByArrivalDateGreaterThanEqual(startDate);
             case "month":
                 startDate = today.minusMonths(1);
-                break;
+                return deliveryRepository.findByArrivalDateGreaterThanEqual(startDate);
             case "year":
                 startDate = today.minusYears(1);
-                break;
+                return deliveryRepository.findByArrivalDateGreaterThanEqual(startDate);
+            case "all":
             default:
                 return deliveryRepository.findAll();
         }
-
-        return deliveryRepository.findByArrivalDateGreaterThanEqual(startDate);
     }
     @GetMapping
     public List<Delivery> getAllDeliveries() {
