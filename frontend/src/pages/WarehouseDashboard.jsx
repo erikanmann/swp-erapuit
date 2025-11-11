@@ -49,7 +49,7 @@ const WarehouseDashboard = () => {
                 <button onClick={() => navigate("/home")}>Home</button>
                 <button onClick={() => navigate("/register-delivery")}>Register Delivery</button>
                 <button className="active-tab">Warehouse Dashboard</button>
-                <button disabled>Production Usage</button>
+                <button onClick={() => navigate('/production-usage')}>Production Usage</button>
             </div>
             <h2>Lao ülevaade ja jälgimine</h2>
             <div className="filter-bar">

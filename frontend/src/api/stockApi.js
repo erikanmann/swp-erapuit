@@ -64,10 +64,23 @@ export const updateUsableVolume = async (id, value) => {
 };
 
 export const getStockByWoodType = async (woodType) => {
-    const BASE = "http://localhost:8080/api/stock"; // or your actual base path
+    const BASE = "http://localhost:8080/api/stock";
     const url = `${BASE}/by-wood-type?woodType=${encodeURIComponent(woodType)}`;
     const res = await fetch(url);
     if (!res.ok) throw new Error("Failed to fetch stock items by wood type");
     return res.json();
 };
+
+/**
+ * US12
+ */
+export async function sendMaterialToProduction(woodType, usage) {
+    const response = await fetch("/api/production/use-material", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ woodType, usage })
+    });
+    if (!response.ok) throw new Error("Tootmisesse saatmine ebaõnnestus");
+    return await response.json();
+}
 

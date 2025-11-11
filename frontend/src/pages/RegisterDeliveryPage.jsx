@@ -55,7 +55,7 @@ const RegisterDeliveryPage = () => {
                 <button onClick={() => navigate('/home')}>Home</button>
                 <button className="active-tab">Register Delivery</button>
                 <button onClick={() => navigate("/warehouse")}>Warehouse Dashboard</button>
-                <button disabled>Production Usage</button>
+                <button onClick={() => navigate('/production-usage')}>Production usage</button>
             </div>
 
             <h1>Sissetuleva kauba registreerimine</h1>

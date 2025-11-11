@@ -11,16 +11,10 @@ const MainPage = () => {
                 <h1>Erapuit lao süsteem</h1>
                 <p>Moodulid</p>
                 <div className="main-buttons">
-                    <button onClick={() => navigate('/home')}>
-                        Avaleht
-                    </button>
-                    <button onClick={() => navigate('/register-delivery')}>
-                        Sissetuleva kauba registreerimine
-                    </button>
-                    <button onClick={() => navigate('/warehouse')}>
-                        Lao ülevaade ja jälgimine
-                    </button>
-                    <button disabled>Väljuva kauba registreerimine</button>
+                    <button onClick={() => navigate('/home')}>Avaleht</button>
+                    <button onClick={() => navigate('/register-delivery')}>Sissetuleva kauba registreerimine</button>
+                    <button onClick={() => navigate('/warehouse')}>Lao ülevaade ja jälgimine</button>
+                    <button onClick={() => navigate('/production-usage')}>Produkti kasutamine</button>
                 </div>
             </div>
         </div>

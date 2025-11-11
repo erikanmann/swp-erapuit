@@ -68,8 +68,8 @@ const HomePage = () => {
             <div className="warehouse-tabs">
                 <button className="active-tab">Home</button>
                 <button onClick={() => navigate('/register-delivery')}>Register Delivery</button>
-                <button onClick={() => navigate("/warehouse")}>Warehouse Dashboard</button>
-                <button disabled>Production Usage</button>
+                <button onClick={() => navigate('/warehouse')}>Warehouse Dashboard</button>
+                <button onClick={() => navigate('/production-usage')}>Production Usage</button>
             </div>
 
             <h2>Sissetulnud materjalid</h2>

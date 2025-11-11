@@ -27,4 +27,20 @@ public class StockService {
         existing.setUsableVolume(updated.getUsableVolume());
         return stockRepository.save(existing);
     }
+    // --- US12
+    public StockItem useForProductionByType(String woodType, double usage) {
+        List<StockItem> items = stockRepository.findByWoodTypeIgnoreCase(woodType);
+        if (items.isEmpty()) {
+            System.out.println("ERROR: Material not found: " + woodType);
+            throw new RuntimeException("Material not found: " + woodType);
+        }
+        StockItem item = items.get(0);
+        if (item.getUsableVolume() < usage) {
+            System.out.println("ERROR: Not enough stock for " + woodType + " (laos: " + item.getUsableVolume() + ", soovitud: " + usage + ")");
+            throw new RuntimeException("Not enough stock! (laos: " + item.getUsableVolume() + ")");
+        }
+        item.setUsableVolume(item.getUsableVolume() - usage);
+        return stockRepository.save(item);
+    }
+
 }
