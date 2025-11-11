@@ -11,8 +11,7 @@ ALTER TABLE app.delivery
 
 --Drop unused columns if they exist (defensive style)
 ALTER TABLE app.delivery
-    DROP COLUMN IF EXISTS load_weight_t,
-    DROP COLUMN IF EXISTS supplier_reg_code;
+    DROP COLUMN IF EXISTS load_weight_t;
 
 --Add future-ready column for actual (measured) volume (optional, currently null)
 ALTER TABLE app.delivery

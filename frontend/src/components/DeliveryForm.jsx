@@ -1,5 +1,17 @@
 import React, { useState, useEffect } from "react";
 import "../styles/delivery.css";
+
+function convertDateToISO(dateStr) {
+    if (!dateStr) return "";
+    const match = dateStr.match(/(\d{2})\.(\d{2})\.(\d{4})/);
+    if (match) {
+        const [, dd, mm, yyyy] = match;
+        return `${yyyy}-${mm}-${dd}`;
+    }
+    return dateStr;
+}
+
+const enumDeliveryStatus = ["RECEIVED", "UNLOADED", "IN_STOCK", "REJECTED"];
 const emptyForm = {
     driverName: "",
     truckNo: "",
@@ -9,6 +21,7 @@ const emptyForm = {
     woodType: "",
     arrivalDate: "",
     totalVolumeTm: "",
+    deliveryStatus: "RECEIVED",
 };
 const DeliveryForm = ({ onSave, editingDelivery, onCancelEdit }) => {
 
@@ -23,16 +36,6 @@ const DeliveryForm = ({ onSave, editingDelivery, onCancelEdit }) => {
             setForm(emptyForm);
         }
     }, [editingDelivery]);
-
-    const convertDateToISO = (dateStr) => {
-        if (!dateStr) return "";
-        const match = dateStr.match(/(\d{2})\.(\d{2})\.(\d{4})/);
-        if (match) {
-            const [, dd, mm, yyyy] = match;
-            return `${yyyy}-${mm}-${dd}`;
-        }
-        return dateStr;
-    };
 
     const handleChange = (e) =>
         setForm({ ...form, [e.target.name]: e.target.value });
@@ -56,9 +59,23 @@ const DeliveryForm = ({ onSave, editingDelivery, onCancelEdit }) => {
                 return;
             }
         }
+        // --- Fix arrivalDate as OffsetDateTime (required by backend) ---
+        const offsetDateTime =
+            form.arrivalDate && !form.arrivalDate.includes("T")
+                ? `${form.arrivalDate}T00:00:00+02:00` // change as needed for your time zone!
+                : form.arrivalDate;
+
+        // --- Ensure deliveryStatus is a valid enum for backend/DB ---
+        const fixedDeliveryStatus = enumDeliveryStatus.includes(form.deliveryStatus)
+            ? form.deliveryStatus
+            : "received";
 
         try {
-            await onSave(form);
+            await onSave({
+                ...form,
+                arrivalDate: offsetDateTime,
+                deliveryStatus: fixedDeliveryStatus,
+            });
             alert(editingDelivery ? "Andmed edukalt uuendatud!" : "Tarne edukalt salvestatud!");
             setForm(emptyForm);
         } catch (err) {
@@ -154,6 +171,21 @@ const DeliveryForm = ({ onSave, editingDelivery, onCancelEdit }) => {
                     onChange={handleChange}
                     required
                 />
+            </div>
+
+            <div>
+                <label>Tarne staatus<span style={{ color: "red" }}> *</span>:</label>
+                <select
+                    name="deliveryStatus"
+                    value={form.deliveryStatus || "RECEIVED"}
+                    onChange={handleChange}
+                    required
+                >
+                    <option value="RECEIVED">RECEIVED</option>
+                    <option value="UNLOADED">UNLOADED</option>
+                    <option value="IN_STOCK">IN_STOCK</option>
+                    <option value="REJECTED">REJECTED</option>
+                </select>
             </div>
 
             <div style={{ display: "flex", gap: "1rem" }}>

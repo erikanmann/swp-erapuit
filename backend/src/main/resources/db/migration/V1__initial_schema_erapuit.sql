@@ -37,7 +37,7 @@ CREATE TABLE IF NOT EXISTS delivery (
     arrival_date    TIMESTAMPTZ NOT NULL DEFAULT now(),
     total_volume_m3 NUMERIC(10,3),
     load_weight_t   NUMERIC(10,3),
-    delivery_status delivery_status NOT NULL DEFAULT 'received',
+    delivery_status VARCHAR(32) NOT NULL DEFAULT 'RECEIVED',
     created_at      TIMESTAMPTZ NOT NULL DEFAULT now()
     );
 
