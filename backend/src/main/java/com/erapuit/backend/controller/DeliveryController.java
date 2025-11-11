@@ -2,7 +2,9 @@ package com.erapuit.backend.controller;
 
 import com.erapuit.backend.model.Delivery;
 import com.erapuit.backend.model.DeliveryStatus;
+import com.erapuit.backend.model.StockItem;
 import com.erapuit.backend.repository.DeliveryRepository;
+import com.erapuit.backend.repository.StockRepository;
 import com.erapuit.backend.service.DeliveryService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -19,10 +21,12 @@ public class DeliveryController {
 
     private final DeliveryService service;
     private final DeliveryRepository deliveryRepository;
+    private final StockRepository stockRepository;
 
-    public DeliveryController(DeliveryService service, DeliveryRepository deliveryRepository) {
+    public DeliveryController(DeliveryService service, DeliveryRepository deliveryRepository, StockRepository stockRepository) {
         this.service = service;
         this.deliveryRepository = deliveryRepository;
+        this.stockRepository = stockRepository;
     }
 
     // --- GET ---
@@ -64,6 +68,17 @@ public class DeliveryController {
             delivery.setDeliveryStatus(DeliveryStatus.RECEIVED);
         }
         Delivery saved = service.save(delivery);
+
+        StockItem stock = new StockItem();
+        stock.setDeliveryId(saved.getId().toString());
+        stock.setSupplier(saved.getSupplierName());
+        stock.setWoodType(saved.getWoodType());
+        stock.setArrivalDate(saved.getArrivalDate().toString());
+        stock.setTotalVolume(saved.getTotalVolumeTm() != null ? saved.getTotalVolumeTm().doubleValue() : 0.0);
+        stock.setUsableVolume(saved.getTotalVolumeTm() != null ? saved.getTotalVolumeTm().doubleValue() : 0.0);
+
+        stockRepository.save(stock);
+
         return ResponseEntity.ok(saved);
     }
 

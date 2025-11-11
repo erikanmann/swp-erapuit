@@ -11,14 +11,19 @@ const WarehouseDashboard = () => {
     const [allWoodTypes, setAllWoodTypes] = useState([]);
     const [woodTypeFilter, setWoodTypeFilter] = useState(""); // "" = Kõik
 
-    // Keep a backup of ALL stock to derive dropdown options!
     useEffect(() => {
         getStockItems()
             .then(data => {
-                // Only use this for dropdown, not for table
-                const types = Array.from(new Set(data.map(item => item.woodType).filter(Boolean)));
+                const types = Array.from(
+                    new Set(
+                        data
+                            .map(item => (item.woodType || "").trim())
+                            .filter(Boolean)
+                            .map(type => type.charAt(0).toUpperCase() + type.slice(1).toLowerCase())
+                    )
+                );
                 setAllWoodTypes(types);
-                setStock(data); // Shows all initially
+                setStock(data);
             })
             .catch(err => console.error("Stock load failed:", err));
     }, []);
@@ -28,12 +33,11 @@ const WarehouseDashboard = () => {
         if (!woodTypeFilter || woodTypeFilter === "Kõik") {
             getStockItems().then(setStock);
         } else {
-            console.log(woodTypeFilter)
-            getStockByWoodType(woodTypeFilter).then(setStock);
+            getStockByWoodType(woodTypeFilter.trim()).then(setStock);
         }
     }, [woodTypeFilter]);
 
-    // Now ALWAYS use THIS "stock" array for all table/stats calculations
+    // --- Statistika arvutused ---
     const totalDeliveries = stock.length;
     const totalStock = stock.reduce((sum, s) => sum + (s.totalVolumeTm ?? s.totalVolume ?? 0), 0);
     const usableStock = stock.reduce((sum, s) => sum + (s.actualVolumeTm ?? s.usableVolume ?? 0), 0);
@@ -130,6 +134,7 @@ const WarehouseDashboard = () => {
                                         if (isNaN(newValue)) return;
                                         try {
                                             await updateUsableVolume(item.id, newValue);
+                                            // Värskenda lokaalselt tabelit
                                             setStock((prev) =>
                                                 prev.map((s) =>
                                                     s.id === item.id
