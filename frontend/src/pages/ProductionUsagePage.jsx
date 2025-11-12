@@ -38,6 +38,7 @@ function ProductionUsagePage() {
                 <button onClick={() => navigate("/register-delivery")}>Register Delivery</button>
                 <button onClick={() => navigate("/warehouse")}>Warehouse Dashboard</button>
                 <button className="active-tab">Production Usage</button>
+                <button onClick={() => navigate('/outbound-shipping')}>Outbound Shipping</button>
             </div>
             <div className="form-section">
                 <form onSubmit={handleSubmit} className="form">

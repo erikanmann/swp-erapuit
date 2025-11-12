@@ -27,7 +27,7 @@ public class Package {
     @Column(name = "location")
     private String location;
 
-    // Getters and Setters
+    // --- Getters ja Setters ---
     public UUID getId() { return id; }
     public void setId(UUID id) { this.id = id; }
 

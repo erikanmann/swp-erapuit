@@ -135,3 +135,68 @@ th {
     padding: 14px 20px;
     font-size: 16px;
 }
+
+/* ✅ Edukas teade */
+.success {
+    background-color: #e8f5e9;         /* hele roheline taust */
+    border: 1px solid #2e7d32;         /* tumeroheline äär */
+    color: #1b5e20;                    /* tumeroheline tekst */
+    padding: 12px 16px;
+    border-radius: 8px;
+    margin-top: 16px;
+    font-weight: 500;
+    font-size: 14px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+/* ❌ Veateade */
+.error {
+    background-color: #ffebee;         /* helepunane taust */
+    border: 1px solid #c62828;         /* tumepunane äär */
+    color: #b71c1c;                    /* tumepunane tekst */
+    padding: 12px 16px;
+    border-radius: 8px;
+    margin-top: 16px;
+    font-weight: 500;
+    font-size: 14px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+/* 💡 Hover efekt nupule */
+.main-button {
+    background-color: #d4a24c;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 10px 18px;
+    font-weight: 500;
+    transition: all 0.2s ease;
+}
+
+.main-button:hover {
+    background-color: #b9883e;
+    cursor: pointer;
+}
+
+.filter-input {
+    margin-bottom: 10px;
+    padding: 6px 10px;
+    width: 250px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+    outline: none;
+}
+.filter-input:focus {
+    border-color: #d4a24c;
+    box-shadow: 0 0 4px rgba(212, 162, 76, 0.5);
+}
+.package-list p {
+    color: #333; /* tumehall musta lähedane tekst */
+    font-weight: 500;
+    margin-top: 6px;
+    background: #f7f7f7; /* õrn hall taust, et eristuks */
+    padding: 6px 10px;
+    border-radius: 6px;
+    border: 1px solid #e0e0e0;
+    width: fit-content;
+}

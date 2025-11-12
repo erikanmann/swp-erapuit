@@ -5,25 +5,30 @@ import { getShipments } from '../api/shipmentApi';
 import '../styles/delivery.css';
 import '../styles/main.css';
 import '../styles/warehouse.css';
-import '../styles/home.css'
+import '../styles/home.css';
 
+// ✅ Parandatud filtreerimine – kuvab MINEVIKU saadetisi
 function filterShipmentsByPeriod(shipments, period) {
     const now = new Date();
     return shipments.filter(shipment => {
         const date = new Date(shipment.dateSent);
+
         switch (period) {
-            case "week":
-                const weekAhead = new Date(now);
-                weekAhead.setDate(now.getDate() + 7);
-                return date > now && date <= weekAhead;
-            case "month":
-                const monthAhead = new Date(now);
-                monthAhead.setMonth(now.getMonth() + 1);
-                return date > now && date <= monthAhead;
-            case "year":
-                const yearAhead = new Date(now);
-                yearAhead.setFullYear(now.getFullYear() + 1);
-                return date > now && date <= yearAhead;
+            case "week": {
+                const weekAgo = new Date(now);
+                weekAgo.setDate(now.getDate() - 7);
+                return date >= weekAgo && date <= now;
+            }
+            case "month": {
+                const monthAgo = new Date(now);
+                monthAgo.setMonth(now.getMonth() - 1);
+                return date >= monthAgo && date <= now;
+            }
+            case "year": {
+                const yearAgo = new Date(now);
+                yearAgo.setFullYear(now.getFullYear() - 1);
+                return date >= yearAgo && date <= now;
+            }
             default:
                 return true;
         }
@@ -33,7 +38,7 @@ function filterShipmentsByPeriod(shipments, period) {
 const HomePage = () => {
     const navigate = useNavigate();
 
-    // Default period is week for both sections
+    // Default filter
     const [incomingPeriod, setIncomingPeriod] = useState("week");
     const [outgoingPeriod, setOutgoingPeriod] = useState("week");
 
@@ -43,7 +48,7 @@ const HomePage = () => {
     const [shipments, setShipments] = useState([]);
     const [loadingShipments, setLoadingShipments] = useState(true);
 
-    // Incoming fetch
+    // --- Sissetulnud materjalid ---
     useEffect(() => {
         setLoading(true);
         getIncomingMaterials(incomingPeriod)
@@ -52,7 +57,7 @@ const HomePage = () => {
             .finally(() => setLoading(false));
     }, [incomingPeriod]);
 
-    // Outgoing fetch
+    // --- Väljaminevad saadetised ---
     useEffect(() => {
         setLoadingShipments(true);
         getShipments()
@@ -65,13 +70,16 @@ const HomePage = () => {
 
     return (
         <div className="delivery-page">
+            {/* 🔹 Ühtne navigatsiooniriba */}
             <div className="warehouse-tabs">
                 <button className="active-tab">Home</button>
                 <button onClick={() => navigate('/register-delivery')}>Register Delivery</button>
                 <button onClick={() => navigate('/warehouse')}>Warehouse Dashboard</button>
                 <button onClick={() => navigate('/production-usage')}>Production Usage</button>
+                <button onClick={() => navigate('/outbound-shipping')}>Outbound Shipping</button>
             </div>
 
+            {/* --- SISSETULNUD MATERJALID --- */}
             <h2>Sissetulnud materjalid</h2>
             <div className="filter-bar">
                 <button className={`filter-btn${incomingPeriod === "week" ? " active" : ""}`} onClick={() => setIncomingPeriod("week")}>Viimane nädal</button>
@@ -79,6 +87,7 @@ const HomePage = () => {
                 <button className={`filter-btn${incomingPeriod === "year" ? " active" : ""}`} onClick={() => setIncomingPeriod("year")}>Viimane aasta</button>
                 <button className={`filter-btn${incomingPeriod === "all" ? " active" : ""}`} onClick={() => setIncomingPeriod("all")}>Kõik</button>
             </div>
+
             {loading ? (
                 <p>Laadimine...</p>
             ) : (
@@ -110,33 +119,39 @@ const HomePage = () => {
                 </table>
             )}
 
-            <h2>Väljaminevad tellimused</h2>
+            {/* --- VÄLJAMINEVAD TELLIMUSED --- */}
+            <h2>Väljasaadetud tellimused</h2>
             <div className="filter-bar">
-                <button className={`filter-btn${outgoingPeriod === "week" ? " active" : ""}`} onClick={() => setOutgoingPeriod("week")}>Järgnev nädal</button>
-                <button className={`filter-btn${outgoingPeriod === "month" ? " active" : ""}`} onClick={() => setOutgoingPeriod("month")}>Järgnev kuu</button>
-                <button className={`filter-btn${outgoingPeriod === "year" ? " active" : ""}`} onClick={() => setOutgoingPeriod("year")}>Järgnev aasta</button>
+                <button className={`filter-btn${outgoingPeriod === "week" ? " active" : ""}`} onClick={() => setOutgoingPeriod("week")}>Viimane nädal</button>
+                <button className={`filter-btn${outgoingPeriod === "month" ? " active" : ""}`} onClick={() => setOutgoingPeriod("month")}>Viimane kuu</button>
+                <button className={`filter-btn${outgoingPeriod === "year" ? " active" : ""}`} onClick={() => setOutgoingPeriod("year")}>Viimane aasta</button>
                 <button className={`filter-btn${outgoingPeriod === "all" ? " active" : ""}`} onClick={() => setOutgoingPeriod("all")}>Kõik</button>
             </div>
+
             {loadingShipments ? (
                 <p>Laadimine...</p>
             ) : (
-                <table className="shipments-table">
+                <table className="materials-table">
                     <thead>
                     <tr>
-                        <th>Tellimuse number</th>
-                        <th>Tellimuse kuupäev</th>
+                        <th>Saatelehe nr</th>
+                        <th>Kuupäev</th>
+                        <th>Kliendi nimi</th>
+                        <th>Transpordifirma</th>
+                        <th>Reg-nr</th>
                     </tr>
                     </thead>
                     <tbody>
                     {filteredShipments.length === 0 ? (
-                        <tr>
-                            <td colSpan={2}>Väljaminevaid tellimusi ei leitud.</td>
-                        </tr>
+                        <tr><td colSpan={5}>Väljasaadetud tellimusi ei leitud.</td></tr>
                     ) : (
-                        filteredShipments.map(shipment => (
-                            <tr key={shipment.id}>
-                                <td>{shipment.vehicleNo}</td>
-                                <td>{new Date(shipment.dateSent).toLocaleDateString('et-EE')}</td>
+                        filteredShipments.map(sh => (
+                            <tr key={sh.id}>
+                                <td>{sh.deliveryNoteNo || "—"}</td>
+                                <td>{new Date(sh.dateSent).toLocaleDateString("et-EE")}</td>
+                                <td>{sh.customer || "—"}</td>
+                                <td>{sh.transportCompany || "—"}</td>
+                                <td>{sh.vehicleNo || "—"}</td>
                             </tr>
                         ))
                     )}

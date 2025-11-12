@@ -50,6 +50,7 @@ const WarehouseDashboard = () => {
                 <button onClick={() => navigate("/register-delivery")}>Register Delivery</button>
                 <button className="active-tab">Warehouse Dashboard</button>
                 <button onClick={() => navigate('/production-usage')}>Production Usage</button>
+                <button onClick={() => navigate('/outbound-shipping')}>Outbound Shipping</button>
             </div>
             <h2>Lao ülevaade ja jälgimine</h2>
             <div className="filter-bar">
