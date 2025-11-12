@@ -229,7 +229,7 @@ function OutboundShippingPage() {
                 />
 
                 {visibleShipments.length === 0 ? (
-                    <p>Ühtegi saadetist ei leitud.</p>
+                    <p className="no-shipments">Ühtegi saadetist ei leitud.</p>
                 ) : (
                     <table className="materials-table">
                         <thead>

@@ -200,3 +200,14 @@ th {
     border: 1px solid #e0e0e0;
     width: fit-content;
 }
+
+.no-shipments {
+    color: #333; /* Tume tekst */
+    background: #fff8e5; /* Õrn kollakas taust */
+    border: 1px solid #e0c56b;
+    border-radius: 6px;
+    padding: 10px 14px;
+    margin-top: 8px;
+    width: fit-content;
+    font-weight: 500;
+}
