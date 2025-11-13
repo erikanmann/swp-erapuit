@@ -1,5 +1,8 @@
 import React, { useState, useEffect } from "react";
-import { getStockItems,  sendMaterialToProduction } from "../api/stockApi";
+import {
+    getStockItems,
+    sendMaterialToProduction
+} from "../api/stockApi";
 import "../styles/delivery.css";
 import "../styles/main.css";
 import "../styles/warehouse.css";
@@ -7,24 +10,46 @@ import { useNavigate } from "react-router-dom";
 
 function ProductionUsagePage() {
     const navigate = useNavigate();
+
     const [stockItems, setStockItems] = useState([]);
-    const [selectedId, setSelectedId] = useState("");
+    const [woodTypes, setWoodTypes] = useState([]);
+
+    const [selectedWoodType, setSelectedWoodType] = useState("");
     const [usage, setUsage] = useState("");
+
     const [result, setResult] = useState(null);
     const [error, setError] = useState("");
 
     useEffect(() => {
         getStockItems()
-            .then(setStockItems)
-            .catch((err) => setError("Could not load warehouse items"));
+            .then(items => {
+                setStockItems(items);
+                const types = Array.from(
+                    new Set(items.map(i => (i.woodType || "").trim()).filter(Boolean))
+                );
+                setWoodTypes(types);
+            })
+            .catch(() => setError("Could not load warehouse items"));
     }, []);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
         setError("");
         setResult(null);
+
+        if (!selectedWoodType) {
+            setError("Palun vali puiduliik.");
+            return;
+        }
+
+        const usageValue = parseFloat(usage);
+        if (isNaN(usageValue) || usageValue <= 0) {
+            setError("Kogus peab olema positiivne number.");
+            return;
+        }
+
         try {
-            const updated = await  sendMaterialToProduction(selectedId, usage);
+            const updated = await sendMaterialToProduction(selectedWoodType, usageValue);
             setResult(updated);
         } catch (err) {
             setError(err.message || "Failed to update material.");
@@ -38,24 +63,30 @@ function ProductionUsagePage() {
                 <button onClick={() => navigate("/register-delivery")}>Register Delivery</button>
                 <button onClick={() => navigate("/warehouse")}>Warehouse Dashboard</button>
                 <button className="active-tab">Production Usage</button>
-                <button onClick={() => navigate('/outbound-shipping')}>Outbound Shipping</button>
+                <button onClick={() => navigate("/outbound-shipping")}>Outbound Shipping</button>
             </div>
+
             <div className="form-section">
                 <form onSubmit={handleSubmit} className="form">
+                    <h2>Materjali kasutamine tootmises</h2>
+
                     <label>
-                        <span>Vali materjal laost:</span>
+                        <span>Vali materjal laost (puiduliik):</span>
                         <select
-                            value={selectedId}
-                            onChange={e => setSelectedId(e.target.value)}
+                            value={selectedWoodType}
+                            onChange={e => setSelectedWoodType(e.target.value)}
                             required
                             className="dropdown"
                         >
-                            <option value="">-- Vali --</option>
-                            <option value="Mänd">Mänd</option>
-                            <option value="Kuusk">Kuusk</option>
-                            <option value="Kask">Kask</option>
+                            <option value="">-- Vali puiduliik --</option>
+                            {woodTypes.map(type => (
+                                <option key={type} value={type}>
+                                    {type}
+                                </option>
+                            ))}
                         </select>
                     </label>
+
                     <label>
                         <span>Sisesta kogus tootmisse (m³):</span>
                         <input
@@ -68,18 +99,23 @@ function ProductionUsagePage() {
                             className="input"
                         />
                     </label>
-                    <button type="submit" className="main-button">Saada tootmisse</button>
+
+                    <button type="submit" className="main-button">
+                        Saada tootmisse
+                    </button>
                 </form>
+
                 {error && <div className="error">{error}</div>}
+
                 {result && (
                     <div className="success">
-                        Uuendatud laoseis: {result.woodType} materjalil on nüüd {result.usableVolume} m³ alles.
+                        Uuendatud laoseis: {result.woodType} materjalil on nüüd{" "}
+                        {result.usableVolume.toFixed(2)} m³ alles.
                     </div>
                 )}
             </div>
         </div>
     );
-
 }
 
 export default ProductionUsagePage;

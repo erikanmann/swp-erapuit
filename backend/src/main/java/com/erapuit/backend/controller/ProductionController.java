@@ -3,27 +3,27 @@ package com.erapuit.backend.controller;
 import com.erapuit.backend.model.StockItem;
 import com.erapuit.backend.model.Production;
 import com.erapuit.backend.service.StockService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/production")
+@CrossOrigin(origins = "http://localhost:3000")
 public class ProductionController {
 
-    @Autowired
-    private StockService stockService;
+    private final StockService stockService;
 
-    @PutMapping("/use-material")
-    public ResponseEntity useMaterial(@RequestBody Production production) {
-        StockItem updated = stockService.useForProductionByType(production.getWoodType(), production.getUsage());
-        return ResponseEntity.ok(updated);
+    public ProductionController(StockService stockService) {
+        this.stockService = stockService;
     }
-    @RestControllerAdvice
-    public class GlobalExceptionHandler {
-        @ExceptionHandler(RuntimeException.class)
-        public ResponseEntity<String> handleRuntimeException(RuntimeException ex) {
-            return ResponseEntity.badRequest().body(ex.getMessage());
-        }
+
+    // UC2: US 2.6 ja 2.7 – materjali kasutamine tootmises
+    @PutMapping("/use-material")
+    public ResponseEntity<StockItem> useMaterial(@RequestBody Production production) {
+        StockItem updated = stockService.useForProductionByType(
+                production.getWoodType(),
+                production.getUsage()
+        );
+        return ResponseEntity.ok(updated);
     }
 }

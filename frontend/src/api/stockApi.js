@@ -1,86 +1,84 @@
-const BASE = "http://localhost:8080/api/stock";
+// src/api/stockApi.js
+
+const STOCK_BASE = "http://localhost:8080/api/stock";
+const PROD_BASE = "http://localhost:8080/api/production";
 
 /**
  * Kõigi laoseisu kirjete toomine
  */
 export const getStockItems = async () => {
-    const res = await fetch(BASE);
+    const res = await fetch(STOCK_BASE);
     if (!res.ok) throw new Error("Failed to fetch stock items");
     return res.json();
 };
 
 /**
- * Uue laoseisu kirje lisamine
+ * Filtreerimine: woodType / supplier / fromDate
  */
-export const addStockItem = async (item) => {
-    const res = await fetch(BASE, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(item),
-    });
-    if (!res.ok) {
-        const text = await res.text();
-        throw new Error(`Post failed: ${res.status} ${text}`);
-    }
+export const filterStock = async (params) => {
+    const query = new URLSearchParams(params).toString();
+    const res = await fetch(`${STOCK_BASE}/filter?${query}`);
+    if (!res.ok) throw new Error("Failed to filter stock");
     return res.json();
 };
 
 /**
- * Laoseisu kirje uuendamine (nt usableVolume muutmine)
+ * Filtreerimine ainult puuliigi järgi
  */
-export const updateStockItem = async (id, data) => {
-    const res = await fetch(`${BASE}/${id}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
-    });
-    if (!res.ok) {
-        const text = await res.text();
-        throw new Error(`Update failed: ${res.status} ${text}`);
-    }
-    return res.json();
-};
-
-/**
- * Ühe kirje kustutamine (valikuline)
- */
-export const deleteStockItem = async (id) => {
-    const res = await fetch(`${BASE}/${id}`, { method: "DELETE" });
-    if (!res.ok) {
-        const text = await res.text();
-        throw new Error(`Delete failed: ${res.status} ${text}`);
-    }
-    return res.json();
-};
-
-export const updateUsableVolume = async (id, value) => {
-    const res = await fetch(`${BASE}/${id}/usable-volume`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ actualVolumeTm: value }),
-    });
-    if (!res.ok) throw new Error("Failed to update usable volume");
-    return res.json();
-};
-
 export const getStockByWoodType = async (woodType) => {
-    const BASE = "http://localhost:8080/api/stock";
-    const url = `${BASE}/by-wood-type?woodType=${encodeURIComponent(woodType)}`;
+    const url = `${STOCK_BASE}/by-wood-type?woodType=${encodeURIComponent(woodType)}`;
     const res = await fetch(url);
     if (!res.ok) throw new Error("Failed to fetch stock items by wood type");
     return res.json();
 };
 
 /**
- * US12
+ * Laoseisu kirje uuendamine (usableVolume)
+ * NB! Backend ootab: { usableVolume: number }
  */
-export async function sendMaterialToProduction(woodType, usage) {
-    const response = await fetch("/api/production/use-material", {
+export const updateUsableVolume = async (id, usableVolume) => {
+    const res = await fetch(`${STOCK_BASE}/${id}/usable-volume`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ woodType, usage })
+        body: JSON.stringify({ usableVolume }),
     });
-    if (!response.ok) throw new Error("Tootmisesse saatmine ebaõnnestus");
-    return await response.json();
-}
 
+    if (!res.ok) {
+        const msg = await res.text();
+        throw new Error(msg || "Failed to update usable volume");
+    }
+
+    return res.json();
+};
+
+/**
+ * Materjali kasutamine tootmises (UC2: US 2.6, 2.7)
+ * Backend ootab body:
+ * {
+ *   "woodType": "KUUSK",
+ *   "usage": 10
+ * }
+ */
+export const sendMaterialToProduction = async (woodType, usage) => {
+    const response = await fetch(`${PROD_BASE}/use-material`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ woodType, usage }),
+    });
+
+    if (!response.ok) {
+        const msg = await response.text();
+        throw new Error(msg || "Tootmisesse saatmine ebaõnnestus");
+    }
+
+    return response.json();
+};
+
+/**
+ * Statistika puuliigi kaupa
+ */
+export const getStatsByWoodType = async () => {
+    const res = await fetch(`${STOCK_BASE}/stats/usage-by-wood-type`);
+    if (!res.ok) throw new Error("Failed to load wood-type statistics");
+    return res.json();
+};

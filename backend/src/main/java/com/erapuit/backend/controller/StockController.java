@@ -1,58 +1,59 @@
 package com.erapuit.backend.controller;
 
-import com.erapuit.backend.model.Delivery;
 import com.erapuit.backend.model.StockItem;
-import com.erapuit.backend.model.Production;
-import com.erapuit.backend.repository.DeliveryRepository;
-import com.erapuit.backend.repository.StockRepository;
+import com.erapuit.backend.model.StockUsageByWoodTypeDto;
 import com.erapuit.backend.service.StockService;
-import org.springframework.web.bind.annotation.*;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/stock")
 @CrossOrigin(origins = "http://localhost:3000")
 public class StockController {
 
-    private final DeliveryRepository deliveryRepository;
-    private final StockRepository stockRepository;
     private final StockService stockService;
 
-    public StockController(DeliveryRepository deliveryRepository, StockRepository stockRepository, StockService stockService) {
-        this.deliveryRepository = deliveryRepository;
-        this.stockRepository = stockRepository;
+    public StockController(StockService stockService) {
         this.stockService = stockService;
     }
 
-    // --- US7: kuvab kõik tarned (total + usable volume) ---
+    // UC2: põhidashboard – kõik laokirjed
     @GetMapping
-    public List<Delivery> getAllStock() {
-        return deliveryRepository.findAll();
+    public List<StockItem> getAllStock() {
+        return stockService.getAllStock();
     }
 
-    // --- US11: filtreerib puutüübi järgi
+    // UC2: filter puuliigi järgi (US 2.5)
     @GetMapping("/by-wood-type")
     public List<StockItem> getStockByWoodType(@RequestParam String woodType) {
-        return stockRepository.findByWoodTypeIgnoreCase(woodType);
+        return stockService.getByWoodType(woodType);
     }
 
-    // --- US9: uuendab usable volume (actual_volume_tm) ---
-    @PutMapping("/{id}/usable-volume")
-    public Delivery updateUsableVolume(@PathVariable UUID id, @RequestBody Delivery updatedDelivery) {
-        return deliveryRepository.findById(id)
-                .map(existing -> {
-                    existing.setActualVolumeTm(updatedDelivery.getActualVolumeTm());
-                    return deliveryRepository.save(existing);
-                })
-                .orElseThrow(() -> new RuntimeException("Delivery not found"));
+    // UC2: kombineeritud filter – puuliik, tarnija, kuupäev (valikulised)
+    @GetMapping("/filter")
+    public List<StockItem> filterStock(
+            @RequestParam(required = false) String woodType,
+            @RequestParam(required = false) String supplier,
+            @RequestParam(required = false) String fromDate
+    ) {
+        return stockService.filterStock(woodType, supplier, fromDate);
     }
-    // --- US12: use material for production
-    @PutMapping("/stock/production")
-    public ResponseEntity<StockItem> useForProduction(@RequestBody Production production) {
-        StockItem updated = stockService.useForProductionByType(production.getWoodType(), production.getUsage());
+
+    // UC2: US 2.3 – muuta usableVolume
+    @PutMapping("/{id}/usable-volume")
+    public ResponseEntity<StockItem> updateUsableVolume(
+            @PathVariable Long id,
+            @RequestBody StockItem updatedItem
+    ) {
+        StockItem updated = stockService.update(id, updatedItem);
         return ResponseEntity.ok(updated);
+    }
+
+    // UC2: US 2.4 – statistika materjali kasutusest
+    @GetMapping("/stats/usage-by-wood-type")
+    public List<StockUsageByWoodTypeDto> getUsageStats() {
+        return stockService.getUsageByWoodType();
     }
 }
