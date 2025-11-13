@@ -1,10 +1,15 @@
 import React, { useEffect, useState } from "react";
-import { getDeliveries, addDelivery, deleteDelivery, updateDelivery } from "../api/deliveryApi";
+import {
+    getDeliveries,
+    addDelivery,
+    deleteDelivery,
+    updateDelivery,
+} from "../api/deliveryApi";
 import DeliveryForm from "../components/DeliveryForm";
 import DeliveryList from "../components/DeliveryList";
-import "../styles/delivery.css";     // vormi ja tabeli stiil
-import "../styles/main.css";         // globaalne teema
-import "../styles/warehouse.css";    // ülemise tabi/nav stiil
+import "../styles/delivery.css";
+import "../styles/main.css";
+import "../styles/warehouse.css";
 import { useNavigate } from "react-router-dom";
 
 const RegisterDeliveryPage = () => {
@@ -50,16 +55,20 @@ const RegisterDeliveryPage = () => {
 
     return (
         <div className="delivery-page">
-            {/* Ülemine navigeerimisriba (samad tabid mis warehouse'is) */}
+            {/* Ülemine navigeerimisriba */}
             <div className="warehouse-tabs">
-                <button onClick={() => navigate('/home')}>Home</button>
-                <button className="active-tab">Register Delivery</button>
-                <button onClick={() => navigate("/warehouse")}>Warehouse Dashboard</button>
-                <button onClick={() => navigate('/production-usage')}>Production usage</button>
-                <button onClick={() => navigate('/outbound-shipping')}>Outbound Shipping</button>
+                <button onClick={() => navigate("/home")}>Avaleht</button>
+                <button className="active-tab">Tarne registreerimine</button>
+                <button onClick={() => navigate("/warehouse")}>Lao ülevaade</button>
+                <button onClick={() => navigate("/production-usage")}>
+                    Tootmise kasutus
+                </button>
+                <button onClick={() => navigate("/outbound-shipping")}>
+                    Väljaminev kaup
+                </button>
             </div>
 
-            <h1>Sissetuleva kauba registreerimine</h1>
+            <h1>Tarne registreerimine</h1>
 
             <DeliveryForm
                 onSave={handleSave}

@@ -1,5 +1,10 @@
 import React, { useState, useEffect } from "react";
-import { addShipment, getShipments, deleteShipment, updateShipment } from "../api/shipmentApi";
+import {
+    addShipment,
+    getShipments,
+    deleteShipment,
+    updateShipment,
+} from "../api/shipmentApi";
 import "../styles/delivery.css";
 import "../styles/main.css";
 import "../styles/warehouse.css";
@@ -40,9 +45,9 @@ function OutboundShippingPage() {
     };
 
     const handlePackageSelect = (pkgId) => {
-        setSelectedPackages(prev =>
+        setSelectedPackages((prev) =>
             prev.includes(pkgId)
-                ? prev.filter(id => id !== pkgId)
+                ? prev.filter((id) => id !== pkgId)
                 : [...prev, pkgId]
         );
     };
@@ -97,7 +102,12 @@ function OutboundShippingPage() {
     };
 
     const handleDelete = async (id, deliveryNoteNo) => {
-        if (!window.confirm(`Kas soovid kindlasti kustutada saadetise ${deliveryNoteNo}?`)) return;
+        if (
+            !window.confirm(
+                `Kas soovid kindlasti kustutada saadetise ${deliveryNoteNo}?`
+            )
+        )
+            return;
 
         try {
             await deleteShipment(id);
@@ -117,8 +127,7 @@ function OutboundShippingPage() {
         window.scrollTo({ top: 0, behavior: "smooth" });
     };
 
-    // 🔍 Filtreerime saadetised kliendi järgi
-    const visibleShipments = shipments.filter(s =>
+    const visibleShipments = shipments.filter((s) =>
         s.customer?.toLowerCase().includes(filterCustomer.toLowerCase())
     );
 
@@ -126,9 +135,13 @@ function OutboundShippingPage() {
         <div className="delivery-page">
             <div className="warehouse-tabs">
                 <button onClick={() => navigate("/home")}>Avaleht</button>
-                <button onClick={() => navigate("/register-delivery")}>Sisenev kaup</button>
+                <button onClick={() => navigate("/register-delivery")}>
+                    Tarne registreerimine
+                </button>
                 <button onClick={() => navigate("/warehouse")}>Lao ülevaade</button>
-                <button onClick={() => navigate("/production-usage")}>Tootmine</button>
+                <button onClick={() => navigate("/production-usage")}>
+                    Tootmise kasutus
+                </button>
                 <button className="active-tab">Väljaminev kaup</button>
             </div>
 
@@ -193,7 +206,8 @@ function OutboundShippingPage() {
                                                 checked={selectedPackages.includes(pkg.id)}
                                                 onChange={() => handlePackageSelect(pkg.id)}
                                             />
-                                            {pkg.productId || "Pakk"} – {pkg.volumeM3} m³, {pkg.weightKg} kg, {pkg.location}
+                                            {pkg.productId || "Pakk"} – {pkg.volumeM3} m³,{" "}
+                                            {pkg.weightKg} kg, {pkg.location}
                                         </label>
                                     ))
                                 )}
@@ -206,7 +220,11 @@ function OutboundShippingPage() {
                             {editingId ? "Salvesta muudatused" : "Loo saadetis"}
                         </button>
                         {editingId && (
-                            <button type="button" className="secondary-button" onClick={resetForm}>
+                            <button
+                                type="button"
+                                className="secondary-button"
+                                onClick={resetForm}
+                            >
                                 Tühista muutmine
                             </button>
                         )}
@@ -217,7 +235,6 @@ function OutboundShippingPage() {
                 {success && <div className="success">{success.message}</div>}
             </div>
 
-            {/* 🔍 Filtri väli */}
             <div className="shipments-section">
                 <h3>Olemasolevad saadetised</h3>
                 <input
@@ -251,8 +268,20 @@ function OutboundShippingPage() {
                                 <td>{s.transportCompany || "—"}</td>
                                 <td>{s.vehicleNo || "—"}</td>
                                 <td>
-                                    <button className="edit-button" onClick={() => handleEdit(s)}>Muuda</button>
-                                    <button className="delete-button" onClick={() => handleDelete(s.id, s.deliveryNoteNo)}>Kustuta</button>
+                                    <button
+                                        className="edit-button"
+                                        onClick={() => handleEdit(s)}
+                                    >
+                                        Muuda
+                                    </button>
+                                    <button
+                                        className="delete-button"
+                                        onClick={() =>
+                                            handleDelete(s.id, s.deliveryNoteNo)
+                                        }
+                                    >
+                                        Kustuta
+                                    </button>
                                 </td>
                             </tr>
                         ))}
