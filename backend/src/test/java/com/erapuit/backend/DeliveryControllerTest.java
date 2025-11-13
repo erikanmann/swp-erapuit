@@ -2,6 +2,8 @@ package com.erapuit.backend;
 
 import com.erapuit.backend.controller.DeliveryController;
 import com.erapuit.backend.model.Delivery;
+import com.erapuit.backend.repository.DeliveryRepository;
+import com.erapuit.backend.repository.StockRepository;
 import com.erapuit.backend.service.DeliveryService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
@@ -35,6 +37,13 @@ public class DeliveryControllerTest {
     @MockBean
     private DeliveryService deliveryService;
 
+    @MockBean
+    private DeliveryRepository deliveryRepository;
+
+    @MockBean
+    private StockRepository stockRepository;
+
+
     private ObjectMapper objectMapper;
 
     @BeforeEach
@@ -48,7 +57,8 @@ public class DeliveryControllerTest {
         d.setId(UUID.randomUUID());
         d.setSupplierName("Supplier A");
         d.setArrivalDate(OffsetDateTime.now());
-        when(deliveryService.getAll()).thenReturn(List.of(d));
+
+        when(deliveryRepository.findAll()).thenReturn(List.of(d));
 
         mockMvc.perform(get("/api/deliveries"))
                 .andExpect(status().isOk())
@@ -66,9 +76,8 @@ public class DeliveryControllerTest {
         delivery.setWaybillNo("WB-001");
         delivery.setWoodType("Oak");
         delivery.setArrivalDate(OffsetDateTime.now());
-        delivery.setLogLengthCm(new BigDecimal("300"));
-        delivery.setLogDiameterCm(new BigDecimal("50"));
-        delivery.setTotalVolumeM3(new BigDecimal("15.5"));
+        delivery.setTotalVolumeTm(new BigDecimal("15.5"));
+
 
         Delivery saved = new Delivery();
         saved.setId(UUID.randomUUID());
@@ -80,7 +89,7 @@ public class DeliveryControllerTest {
         mockMvc.perform(post("/api/deliveries")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(delivery)))
-                .andExpect(status().isCreated());
+                .andExpect(status().isOk());
 
         // verify service was called
         verify(deliveryService).save(any(Delivery.class));
