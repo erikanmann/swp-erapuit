@@ -104,3 +104,6 @@ yarn-error.log*
 !**/src/test/**/out/
 !**/src/main/**/bin/
 !**/src/test/**/bin/
+
+backend/src/main/resources/application.properties
+backend/src/main/resources/application.yml
