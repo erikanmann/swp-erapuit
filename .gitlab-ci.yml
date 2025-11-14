@@ -16,22 +16,34 @@ backend-build:
       - backend/build/libs/*.jar
     expire_in: 1 week
 
-# --- Backend Tests (placeholder) ---
 # --- Backend Tests ---
 backend-test:
   stage: test
   image: gradle:8.3-jdk17
+
   services:
     - name: postgres:17
-      alias: postgres
+      alias: db
+      command: ["postgres"]
+
   variables:
-    SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/erapuit_test
+    POSTGRES_DB: erapuit_test
+    POSTGRES_USER: postgres
+    POSTGRES_PASSWORD: postgres
+
+    SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/erapuit_test
     SPRING_DATASOURCE_USERNAME: postgres
     SPRING_DATASOURCE_PASSWORD: postgres
+
+    SPRING_FLYWAY_URL: jdbc:postgresql://db:5432/erapuit_test
+    SPRING_FLYWAY_USER: postgres
+    SPRING_FLYWAY_PASSWORD: postgres
+
   script:
     - cd backend
     - chmod +x gradlew
     - ./gradlew test --no-daemon
+
   artifacts:
     when: always
     paths:
@@ -51,7 +63,7 @@ frontend-build:
       - frontend/build
     expire_in: 1 week
 
-# --- Frontend Tests (placeholder) ---
+# --- Frontend Tests ---
 frontend-test:
   stage: test
   image: node:lts
@@ -59,7 +71,7 @@ frontend-test:
     - echo "No frontend tests yet"
   allow_failure: true
 
-# --- Deploy Stage ---
+# --- Deploy ---
 deploy-job:
   stage: deploy
   script:
