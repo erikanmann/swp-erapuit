@@ -9,9 +9,7 @@ function ProductionUsagePage() {
     const navigate = useNavigate();
 
     const [stockItems, setStockItems] = useState([]);
-    const [woodTypes, setWoodTypes] = useState([]);
-
-    const [selectedWoodType, setSelectedWoodType] = useState("");
+    const [selectedDeliveryId, setSelectedDeliveryId] = useState(""); // CHANGED
     const [usage, setUsage] = useState("");
 
     const [result, setResult] = useState(null);
@@ -21,10 +19,6 @@ function ProductionUsagePage() {
         getStockItems()
             .then((items) => {
                 setStockItems(items);
-                const types = Array.from(
-                    new Set(items.map((i) => (i.woodType || "").trim()).filter(Boolean))
-                );
-                setWoodTypes(types);
             })
             .catch(() =>
                 setError("Lao kirjete laadimine ebaõnnestus. Palun proovi hiljem uuesti.")
@@ -36,8 +30,8 @@ function ProductionUsagePage() {
         setError("");
         setResult(null);
 
-        if (!selectedWoodType) {
-            setError("Palun vali puiduliik.");
+        if (!selectedDeliveryId) {
+            setError("Palun vali laopartii.");
             return;
         }
 
@@ -48,7 +42,10 @@ function ProductionUsagePage() {
         }
 
         try {
-            const updated = await sendMaterialToProduction(selectedWoodType, usageValue);
+            const updated = await sendMaterialToProduction(
+                selectedDeliveryId,
+                usageValue
+            );
             setResult(updated);
         } catch (err) {
             setError(
@@ -76,17 +73,17 @@ function ProductionUsagePage() {
                     <h2>Materjali kasutamine tootmises</h2>
 
                     <label>
-                        <span>Vali materjal laost (puiduliik):</span>
+                        <span>Vali laopartii (ID + puiduliik):</span>
                         <select
-                            value={selectedWoodType}
-                            onChange={(e) => setSelectedWoodType(e.target.value)}
+                            value={selectedDeliveryId}
+                            onChange={(e) => setSelectedDeliveryId(e.target.value)}
                             required
                             className="dropdown"
                         >
-                            <option value="">-- Vali puiduliik --</option>
-                            {woodTypes.map((type) => (
-                                <option key={type} value={type}>
-                                    {type}
+                            <option value="">-- Vali laopartii --</option>
+                            {stockItems.map((item) => (
+                                <option key={item.id} value={item.id}>
+                                    {item.id} – {item.woodType} – {item.usableVolume} m³
                                 </option>
                             ))}
                         </select>
@@ -114,8 +111,8 @@ function ProductionUsagePage() {
 
                 {result && (
                     <div className="success">
-                        Uuendatud laoseis: {result.woodType} materjalil on nüüd{" "}
-                        {result.usableVolume.toFixed(2)} m³ alles.
+                        Laopartii uuendatud: kasutatav kogus on nüüd{" "}
+                        {result.usableVolume.toFixed(2)} m³.
                     </div>
                 )}
             </div>
