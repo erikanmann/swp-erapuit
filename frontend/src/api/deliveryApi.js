@@ -47,3 +47,24 @@ export const getIncomingMaterials = async (period = 'all') => {
     if (!response.ok) throw new Error('Failed to fetch incoming materials');
     return response.json();
 };
+
+export const getEvrIncoming = async () => {
+  const res = await fetch("http://localhost:8080/api/deliveries/evr-incoming");
+  if (!res.ok) throw new Error("Failed to fetch EVR incoming loads");
+  return res.json();
+};
+
+export const importFromEvr = async (waybillDto) => {
+  const res = await fetch("http://localhost:8080/api/deliveries/from-evr", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(waybillDto),
+  });
+
+  if (!res.ok) {
+    const t = await res.text();
+    throw new Error("EVR import failed: " + t);
+  }
+
+  return res.json();
+};

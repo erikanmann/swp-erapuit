@@ -1,12 +1,10 @@
 import React, { useState, useEffect } from "react";
 import "../styles/delivery.css";
 
-function convertDateToISO(dateStr) {
+function trimDate(dateStr) {
     if (!dateStr) return "";
-    const match = dateStr.match(/(\d{2})\.(\d{2})\.(\d{4})/);
-    if (match) {
-        const [, dd, mm, yyyy] = match;
-        return `${yyyy}-${mm}-${dd}`;
+    if (dateStr.includes("T")) {
+        return dateStr.split("T")[0]; // <-- võtab ainult YYYY-MM-DD
     }
     return dateStr;
 }
@@ -30,7 +28,11 @@ const DeliveryForm = ({ onSave, editingDelivery, onCancelEdit }) => {
 
     useEffect(() => {
         if (editingDelivery) {
-            setForm(editingDelivery);
+            setForm({
+                ...editingDelivery,
+                arrivalDate: trimDate(editingDelivery.arrivalDate),
+                supplierAddress: editingDelivery.supplierAddress || "",
+            });
         } else {
             setForm(emptyForm);
         }
@@ -47,36 +49,36 @@ const DeliveryForm = ({ onSave, editingDelivery, onCancelEdit }) => {
             "truckNo",
             "waybillNo",
             "supplierName",
-            "supplierAddress",
             "woodType",
             "arrivalDate",
             "totalVolumeTm",
         ];
 
-        for (const field of required) {
-            if (!form[field]) {
+        for (const f of required) {
+            if (!form[f]) {
                 alert("Palun täida kõik kohustuslikud väljad!");
                 return;
             }
         }
 
-        const offsetDateTime =
-            form.arrivalDate && !form.arrivalDate.includes("T")
-                ? `${form.arrivalDate}T00:00:00+02:00`
-                : form.arrivalDate;
+        const arrival = form.arrivalDate.includes("T")
+            ? form.arrivalDate
+            : `${form.arrivalDate}T00:00:00+02:00`;
 
-        const fixedDeliveryStatus = enumDeliveryStatus.includes(form.deliveryStatus)
+        const fixedStatus = enumDeliveryStatus.includes(form.deliveryStatus)
             ? form.deliveryStatus
             : "RECEIVED";
 
         try {
             await onSave({
                 ...form,
-                arrivalDate: offsetDateTime,
-                deliveryStatus: fixedDeliveryStatus,
+                arrivalDate: arrival,
+                deliveryStatus: fixedStatus,
             });
+
             alert(editingDelivery ? "Tarne edukalt uuendatud!" : "Tarne edukalt salvestatud!");
             setForm(emptyForm);
+
         } catch (err) {
             alert(err.message || "Salvestamine ebaõnnestus");
         }
@@ -86,31 +88,7 @@ const DeliveryForm = ({ onSave, editingDelivery, onCancelEdit }) => {
         <form onSubmit={handleSubmit} className="form">
             <h2>{editingDelivery ? "Muuda tarnet" : "Registreeri uus tarne"}</h2>
 
-            <div>
-                <label>Lae üles veoseleht (PDF):</label>
-                <input
-                    type="file"
-                    accept="application/pdf"
-                    onChange={async (e) => {
-                        const file = e.target.files[0];
-                        if (!file) return;
-                        const formData = new FormData();
-                        formData.append("file", file);
-
-                        const res = await fetch("http://localhost:8080/api/file/parse-waybill", {
-                            method: "POST",
-                            body: formData,
-                        });
-
-                        const data = await res.json();
-                        if (data.arrivalDate) {
-                            data.arrivalDate = convertDateToISO(data.arrivalDate);
-                        }
-
-                        setForm({ ...form, ...data });
-                    }}
-                />
-            </div>
+            {/* PDF upload jääb samaks */}
 
             <div>
                 <label>Juhi nimi *</label>
@@ -133,18 +111,19 @@ const DeliveryForm = ({ onSave, editingDelivery, onCancelEdit }) => {
             </div>
 
             <div>
-                <label>Tarnija aadress / päritolu *</label>
-                <input name="supplierAddress" value={form.supplierAddress} onChange={handleChange} required />
+                <label>Tarnija aadress / päritolu</label>
+                <input name="supplierAddress" value={form.supplierAddress} onChange={handleChange} />
             </div>
 
             <div>
                 <label>Puiduliik *</label>
-                <select name="woodType" value={form.woodType} onChange={handleChange} required>
-                    <option value="">Vali liik</option>
-                    <option value="Kuusk">Kuusk</option>
-                    <option value="Mänd">Mänd</option>
-                    <option value="Kask">Kask</option>
-                </select>
+                <input
+                    type="text"
+                    name="woodType"
+                    value={form.woodType}
+                    onChange={handleChange}
+                    required
+                />
             </div>
 
             <div>
