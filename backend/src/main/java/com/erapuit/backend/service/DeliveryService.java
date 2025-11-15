@@ -8,6 +8,7 @@ import com.erapuit.backend.model.StockItem;
 import com.erapuit.backend.repository.DeliveryRepository;
 import com.erapuit.backend.repository.StockRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.OffsetDateTime;
@@ -57,13 +58,15 @@ public class DeliveryService {
     }
 
     // --- DELETE ---
+    @Transactional
     public boolean deleteById(UUID id) {
-        if (!repo.existsById(id)) {
-            return false;
-        }
-        repo.deleteById(id);
-        return true;
+        return repo.findById(id).map(delivery -> {
+            stockRepository.deleteByDeliveryId(delivery.getId().toString());
+            repo.delete(delivery);
+            return true;
+        }).orElse(false);
     }
+
 
     // --- PUT / uuendamine ---
     public Delivery update(UUID id, Delivery updatedDelivery) {

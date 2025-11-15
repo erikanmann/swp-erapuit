@@ -11,4 +11,8 @@ public interface StockRepository extends JpaRepository<StockItem, Long> {
     // StockRepository.java
     @Query("SELECT s FROM StockItem s WHERE LOWER(s.woodType) = LOWER(:woodType)")
     List<StockItem> findByWoodTypeIgnoreCase(@Param("woodType") String woodType);
+
+    List<StockItem> findByDeliveryId(String deliveryId);
+
+    void deleteByDeliveryId(String deliveryId);
 }

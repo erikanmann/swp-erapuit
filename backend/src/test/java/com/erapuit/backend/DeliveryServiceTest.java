@@ -9,6 +9,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
 import java.util.Optional;
+import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.*;
@@ -27,7 +28,11 @@ class DeliveryServiceTest {
         delivery.setSupplierName("RMK");
         delivery.setWaybillNo("WB-001");
 
-        when(repo.save(any(Delivery.class))).thenReturn(delivery);
+        when(repo.save(any(Delivery.class))).thenAnswer(inv -> {
+            Delivery d = inv.getArgument(0);
+            d.setId(UUID.randomUUID());  // <<< IMPORTANT FIX
+            return d;
+        });
 
         Delivery saved = service.save(delivery);
 
@@ -56,4 +61,26 @@ class DeliveryServiceTest {
                 () -> service.save(newDelivery)
         );
     }
+
+    @Test
+    void deleteDeliveryAlsoRemovesStock() {
+        DeliveryRepository repo = mock(DeliveryRepository.class);
+        StockRepository stockRepo = mock(StockRepository.class);
+        EvrApiClient evrApi = mock(EvrApiClient.class);
+
+        DeliveryService service = new DeliveryService(repo, evrApi, stockRepo);
+
+        UUID id = UUID.randomUUID();
+        Delivery d = new Delivery();
+        d.setId(id);
+
+        when(repo.findById(id)).thenReturn(Optional.of(d));
+
+        boolean result = service.deleteById(id);
+
+        assertThat(result).isTrue();
+        verify(stockRepo).deleteByDeliveryId(id.toString());
+        verify(repo).delete(d);
+    }
+
 }
