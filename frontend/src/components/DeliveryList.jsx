@@ -1,10 +1,19 @@
 import React from "react";
+import { useNavigate } from "react-router-dom";
 import "../styles/delivery.css";
 
 const DeliveryList = ({ deliveries, onDelete, onEdit }) => {
+
+    const navigate = useNavigate();
+
+    const goToDetails = (id) => {
+        navigate(`/deliveries/${id}`);
+    };
+
     return (
         <div className="list">
             <h2>Registreeritud tarnete nimekiri</h2>
+
             {deliveries.length === 0 ? (
                 <p>Veoselehti pole veel lisatud.</p>
             ) : (
@@ -34,8 +43,12 @@ const DeliveryList = ({ deliveries, onDelete, onEdit }) => {
                             </td>
                             <td>{d.totalVolumeTm}</td>
                             <td>
-                                <button onClick={() => onEdit(d)}>Muuda</button>
-                                <button onClick={() => onDelete(d.id)}>Kustuta</button>
+                                <button onClick={() => goToDetails(d.id)}>
+                                    Vaata
+                                </button>
+                                <button onClick={() => onDelete(d.id)}>
+                                    Kustuta
+                                </button>
                             </td>
                         </tr>
                     ))}

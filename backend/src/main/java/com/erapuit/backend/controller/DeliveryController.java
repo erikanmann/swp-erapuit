@@ -61,6 +61,29 @@ public class DeliveryController {
         return deliveryRepository.findAll();
     }
 
+    // --- GET: üks delivery ID järgi ---
+    @GetMapping("/{id}")
+    public ResponseEntity<Delivery> getById(@PathVariable UUID id) {
+        return deliveryRepository.findById(id)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
+    }
+
+    // --- GET: pakkide loetelu delivery kohta ---
+    @GetMapping("/{id}/packages")
+    public ResponseEntity<?> getDeliveryPackages(@PathVariable UUID id) {
+
+        // Kontrollime, kas tarne üldse eksisteerib
+        return deliveryRepository.findById(id)
+                .map(delivery -> {
+                    var packages = service.getPackagesForDelivery(id);
+                    return ResponseEntity.ok(packages);
+                })
+                .orElseGet(() -> ResponseEntity.notFound().build());
+    }
+
+
+
     // --- POST: käsitsi sisestatud delivery ---
     @PostMapping
     public ResponseEntity<Delivery> create(@RequestBody Delivery delivery) {

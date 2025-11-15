@@ -3,6 +3,7 @@ package com.erapuit.backend.service;
 import com.erapuit.backend.dto.IncomingWaybillDto;
 import com.erapuit.backend.evr.EvrApiClient;
 import com.erapuit.backend.model.Delivery;
+import com.erapuit.backend.model.DeliveryPackage;
 import com.erapuit.backend.model.DeliveryStatus;
 import com.erapuit.backend.model.StockItem;
 import com.erapuit.backend.repository.DeliveryRepository;
@@ -14,6 +15,7 @@ import java.math.BigDecimal;
 import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.UUID;
+import java.util.ArrayList;
 
 @Service
 public class DeliveryService {
@@ -21,14 +23,18 @@ public class DeliveryService {
     private final DeliveryRepository repo;
     private final EvrApiClient evrApiClient;
     private final StockRepository stockRepository;
+    private final DeliveryPackageService deliveryPackageService;
 
     public DeliveryService(DeliveryRepository repo,
                            EvrApiClient evrApiClient,
-                           StockRepository stockRepository) {
+                           StockRepository stockRepository,
+                           DeliveryPackageService deliveryPackageService) {
         this.repo = repo;
         this.evrApiClient = evrApiClient;
         this.stockRepository = stockRepository;
+        this.deliveryPackageService = deliveryPackageService;
     }
+
 
     // --- GET kõik tarneid ---
     public List<Delivery> getAll() {
@@ -109,12 +115,17 @@ public class DeliveryService {
         double totalTm = 0.0;
         String woodType = null;
 
-        // 2) Loe pakkide info (shipments → items)
+        // --- Pakkide kogumiseks (delivery_package jaoks) ---
+        List<ParsedWaybillRow> parsedRows = new ArrayList<>();
+        int autoPackageNo = 0;
+
+// 2) Loe pakkide info (shipments → items)
         if (detail != null && detail.shipments != null) {
             for (var shipment : detail.shipments) {
                 if (shipment.items != null) {
                     for (var item : shipment.items) {
 
+                        // TM kogus (kokku delivery peale)
                         if ("tm".equalsIgnoreCase(item.unitCode)) {
                             totalTm += item.amount != null ? item.amount : 0.0;
 
@@ -122,6 +133,24 @@ public class DeliveryService {
                                 woodType = item.assortment.name;
                             }
                         }
+
+                        // --- LOOME ParsedWaybillRow objekti ---
+                        autoPackageNo++;
+                        ParsedWaybillRow row = new ParsedWaybillRow();
+
+                        row.setPackageNo(autoPackageNo);
+                        row.setWoodType(item.assortment != null ? item.assortment.name : null);
+                        row.setAssortment(item.assortment != null ? item.assortment.name : null);
+                        row.setVolume(item.amount != null ? item.amount : 0.0);
+
+
+                        // EVR API EI ANNA mõõte ega trailer infot
+                        row.setLength(null);
+                        row.setWidth(null);
+                        row.setHeight(null);
+                        row.setTrailer(false);
+
+                        parsedRows.add(row);
                     }
                 }
             }
@@ -132,7 +161,7 @@ public class DeliveryService {
             totalTm = dto.getMass();
         }
 
-        // 3) Määra saabumisaeg:
+        // --- Saabumisaeg ---
         OffsetDateTime arrival = null;
         if (detail != null) {
             if (detail.unloadingTime != null) {
@@ -145,7 +174,7 @@ public class DeliveryService {
             arrival = OffsetDateTime.now();
         }
 
-        // 4) Supplier name
+        // --- Tarnija andmed ---
         String supplierName = dto.getWoodOwnerName();
 
         if (supplierName == null || supplierName.isBlank()) {
@@ -158,17 +187,17 @@ public class DeliveryService {
             supplierName = "Tundmatu tarnija";
         }
 
-        // 5) Supplier address (optional)
+        // --- Tarnija aadress ---
         String supplierAddress = null;
         if (detail != null && detail.owner != null && detail.owner.address != null) {
             var a = detail.owner.address;
             supplierAddress =
-                    (a.street != null ? a.street : "")
-                            + (a.city != null ? ", " + a.city : "")
-                            + (a.county != null ? ", " + a.county : "");
+                    (a.street != null ? a.street : "") +
+                            (a.city != null ? ", " + a.city : "") +
+                            (a.county != null ? ", " + a.county : "");
         }
 
-        // 6) Loo Delivery objekt
+        // --- Delivery objekti loomine ---
         Delivery delivery = new Delivery();
         delivery.setWaybillNo(dto.getWaybillNumber());
         delivery.setDriverName(dto.getDriverName());
@@ -183,11 +212,15 @@ public class DeliveryService {
 
         Delivery saved = repo.save(delivery);
 
-        // 7) Loo ka StockItem
+        // --- LOOME STOCK KIRJE (originaalloogika) ---
         createStockFromDelivery(saved);
+
+        // --- LOOME PAKID DELIVERY_PACKAGE TABELISSE ---
+        deliveryPackageService.savePackages(saved.getId(), parsedRows);
 
         return saved;
     }
+
 
     // --- abimeetod StockItem loomiseks ---
     private void createStockFromDelivery(Delivery saved) {
@@ -210,4 +243,9 @@ public class DeliveryService {
 
         stockRepository.save(stock);
     }
+
+    public List<DeliveryPackage> getPackagesForDelivery(UUID deliveryId) {
+        return deliveryPackageService.getPackagesForDelivery(deliveryId);
+    }
+
 }

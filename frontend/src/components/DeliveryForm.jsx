@@ -1,15 +1,5 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import "../styles/delivery.css";
-
-function trimDate(dateStr) {
-    if (!dateStr) return "";
-    if (dateStr.includes("T")) {
-        return dateStr.split("T")[0]; // <-- võtab ainult YYYY-MM-DD
-    }
-    return dateStr;
-}
-
-const enumDeliveryStatus = ["RECEIVED", "UNLOADED", "IN_STOCK", "REJECTED"];
 
 const emptyForm = {
     driverName: "",
@@ -23,20 +13,9 @@ const emptyForm = {
     deliveryStatus: "RECEIVED",
 };
 
-const DeliveryForm = ({ onSave, editingDelivery, onCancelEdit }) => {
-    const [form, setForm] = useState(emptyForm);
+function DeliveryForm({ onSave }) {
 
-    useEffect(() => {
-        if (editingDelivery) {
-            setForm({
-                ...editingDelivery,
-                arrivalDate: trimDate(editingDelivery.arrivalDate),
-                supplierAddress: editingDelivery.supplierAddress || "",
-            });
-        } else {
-            setForm(emptyForm);
-        }
-    }, [editingDelivery]);
+    const [form, setForm] = useState(emptyForm);
 
     const handleChange = (e) =>
         setForm({ ...form, [e.target.name]: e.target.value });
@@ -61,22 +40,15 @@ const DeliveryForm = ({ onSave, editingDelivery, onCancelEdit }) => {
             }
         }
 
-        const arrival = form.arrivalDate.includes("T")
-            ? form.arrivalDate
-            : `${form.arrivalDate}T00:00:00+02:00`;
-
-        const fixedStatus = enumDeliveryStatus.includes(form.deliveryStatus)
-            ? form.deliveryStatus
-            : "RECEIVED";
+        const arrival = form.arrivalDate + "T00:00:00+02:00";
 
         try {
             await onSave({
                 ...form,
-                arrivalDate: arrival,
-                deliveryStatus: fixedStatus,
+                arrivalDate: arrival
             });
 
-            alert(editingDelivery ? "Tarne edukalt uuendatud!" : "Tarne edukalt salvestatud!");
+            alert("Tarne edukalt salvestatud!");
             setForm(emptyForm);
 
         } catch (err) {
@@ -86,9 +58,8 @@ const DeliveryForm = ({ onSave, editingDelivery, onCancelEdit }) => {
 
     return (
         <form onSubmit={handleSubmit} className="form">
-            <h2>{editingDelivery ? "Muuda tarnet" : "Registreeri uus tarne"}</h2>
 
-            {/* PDF upload jääb samaks */}
+            <h2>Registreeri uus tarne</h2>
 
             <div>
                 <label>Juhi nimi *</label>
@@ -117,47 +88,22 @@ const DeliveryForm = ({ onSave, editingDelivery, onCancelEdit }) => {
 
             <div>
                 <label>Puiduliik *</label>
-                <input
-                    type="text"
-                    name="woodType"
-                    value={form.woodType}
-                    onChange={handleChange}
-                    required
-                />
+                <input type="text" name="woodType" value={form.woodType} onChange={handleChange} required />
             </div>
 
             <div>
                 <label>Saabumiskuupäev *</label>
-                <input
-                    type="date"
-                    name="arrivalDate"
-                    value={form.arrivalDate}
-                    onChange={handleChange}
-                    required
-                />
+                <input type="date" name="arrivalDate" value={form.arrivalDate} onChange={handleChange} required />
             </div>
 
             <div>
                 <label>Kogukogus (tm) *</label>
-                <input
-                    type="number"
-                    name="totalVolumeTm"
-                    min="0"
-                    step="0.001"
-                    value={form.totalVolumeTm}
-                    onChange={handleChange}
-                    required
-                />
+                <input type="number" name="totalVolumeTm" min="0" step="0.001" value={form.totalVolumeTm} onChange={handleChange} required />
             </div>
 
             <div>
                 <label>Tarne staatus *</label>
-                <select
-                    name="deliveryStatus"
-                    value={form.deliveryStatus || "RECEIVED"}
-                    onChange={handleChange}
-                    required
-                >
+                <select name="deliveryStatus" value={form.deliveryStatus} onChange={handleChange}>
                     <option value="RECEIVED">Saabunud</option>
                     <option value="UNLOADED">Mahalaaditud</option>
                     <option value="IN_STOCK">Lattu lisatud</option>
@@ -165,26 +111,10 @@ const DeliveryForm = ({ onSave, editingDelivery, onCancelEdit }) => {
                 </select>
             </div>
 
-            <div style={{ display: "flex", gap: "1rem" }}>
-                <button type="submit">
-                    {editingDelivery ? "Uuenda tarnet" : "Salvesta tarne"}
-                </button>
+            <button type="submit">Salvesta tarne</button>
 
-                {editingDelivery && (
-                    <button
-                        type="button"
-                        onClick={() => {
-                            setForm(emptyForm);
-                            onCancelEdit?.();
-                        }}
-                        style={{ backgroundColor: "#ccc" }}
-                    >
-                        Tühista
-                    </button>
-                )}
-            </div>
         </form>
     );
-};
+}
 
 export default DeliveryForm;

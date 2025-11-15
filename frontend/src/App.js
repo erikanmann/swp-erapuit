@@ -7,6 +7,7 @@ import './styles/main.css';
 import WarehouseDashboard from './pages/WarehouseDashboard';
 import ProductionUsagePage from './pages/ProductionUsagePage';
 import OutboundShippingPage from "./pages/OutboundShippingPage";
+import DeliveryDetailPage from "./pages/DeliveryDetailPage";
 
 function App() {
     return (
@@ -16,6 +17,7 @@ function App() {
                     <Route path="/" element={<MainPage />} />
                     <Route path="/home" element={<HomePage />} />
                     <Route path="/register-delivery" element={<RegisterDeliveryPage />} />
+                    <Route path="/deliveries/:id" element={<DeliveryDetailPage />} />
                     <Route path="/warehouse" element={<WarehouseDashboard />} />
                     <Route path="/production-usage" element={<ProductionUsagePage />} />
                     <Route path="/outbound-shipping" element={<OutboundShippingPage />} />

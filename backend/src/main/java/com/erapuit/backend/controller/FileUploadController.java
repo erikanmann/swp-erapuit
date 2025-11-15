@@ -12,6 +12,20 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+
+
+/**
+ * ================================================================
+ *   PDF File Upload Controller (LEGACY)
+ *
+ *   THIS CONTROLLER IS NOT USED ANYMORE.
+ *   The project has switched to EVR API imports instead of reading
+ *   volumes from PDFs manually.
+ *
+ *   Keep this file in the codebase for reference only.
+ *   All PDF-based parsing logic is deprecated.
+ * ================================================================
+ */
 @RestController
 @RequestMapping("/api/file")
 @CrossOrigin(origins = "http://localhost:3000")

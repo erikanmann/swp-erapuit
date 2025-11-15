@@ -68,3 +68,38 @@ export const importFromEvr = async (waybillDto) => {
 
   return res.json();
 };
+
+// --- GET: üks delivery ID järgi ---
+export const getDeliveryById = async (id) => {
+  const res = await fetch(`${BASE}/${id}`);
+  if (!res.ok) {
+    const text = await res.text();
+    throw new Error(`Failed to fetch delivery: ${res.status} ${text}`);
+  }
+  return res.json();
+};
+
+// --- GET: pakkide loetelu delivery kohta ---
+export const getDeliveryPackages = async (id) => {
+  const res = await fetch(`${BASE}/${id}/packages`);
+  if (!res.ok) {
+    const text = await res.text();
+    throw new Error(`Failed to fetch delivery packages: ${res.status} ${text}`);
+  }
+  return res.json();
+};
+
+export const updateDeliveryPackage = async (id, data) => {
+  const res = await fetch(`http://localhost:8080/api/delivery-packages/${id}`, {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data),
+  });
+
+  if (!res.ok) {
+    const txt = await res.text();
+    throw new Error("Package update failed: " + txt);
+  }
+
+  return res.json();
+};
