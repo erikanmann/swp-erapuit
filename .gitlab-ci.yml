@@ -21,23 +21,16 @@ backend-test:
   stage: test
   image: gradle:8.3-jdk17
 
-  services:
-    - name: postgres:17
-      alias: db
-      command: ["postgres"]
+  services: []   # disable postgres
 
   variables:
-    POSTGRES_DB: erapuit_test
-    POSTGRES_USER: postgres
-    POSTGRES_PASSWORD: postgres
+    # Force H2 for CI test
+    SPRING_DATASOURCE_URL: "jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1;MODE=PostgreSQL;DATABASE_TO_LOWER=TRUE"
+    SPRING_DATASOURCE_USERNAME: "sa"
+    SPRING_DATASOURCE_PASSWORD: ""
 
-    SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/erapuit_test
-    SPRING_DATASOURCE_USERNAME: postgres
-    SPRING_DATASOURCE_PASSWORD: postgres
-
-    SPRING_FLYWAY_URL: jdbc:postgresql://db:5432/erapuit_test
-    SPRING_FLYWAY_USER: postgres
-    SPRING_FLYWAY_PASSWORD: postgres
+    SPRING_JPA_HIBERNATE_DDL_AUTO: "create-drop"
+    SPRING_FLYWAY_ENABLED: "false"
 
   script:
     - cd backend
