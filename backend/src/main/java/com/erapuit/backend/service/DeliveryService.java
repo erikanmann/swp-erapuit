@@ -94,10 +94,10 @@ public class DeliveryService {
     public Delivery createFromEvr(IncomingWaybillDto dto) {
 
         // Kontrolli duplikaate
-        repo.findByWaybillNo(dto.getWaybillNumber())
-                .ifPresent(existing -> {
-                    throw new IllegalArgumentException("Selle veoselehega tarne on juba süsteemis olemas.");
-                });
+        var existing = repo.findByWaybillNo(dto.getWaybillNumber());
+        if (existing.isPresent()) {
+            return existing.get();
+        }
 
         // 1) Võta detailandmed EVR-ist
         EvrApiClient.WaybillDetail detail =

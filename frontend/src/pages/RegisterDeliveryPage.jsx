@@ -72,13 +72,22 @@ const RegisterDeliveryPage = () => {
                 return;
             }
 
+
+            const existingWaybills = new Set(deliveries.map(d => d.waybillNo));
+            const newLoads = loads.filter(l => !existingWaybills.has(l.waybillNumber));
+
+            if (newLoads.length === 0) {
+                alert("Kõik koormad on juba süsteemis olemas.");
+                return;
+            }
+
             if (!window.confirm(
-                `Kas soovid importida ${loads.length} EVR koormat lattu?`
+                `Kas soovid importida ${newLoads.length} uut EVR koormat?`
             )) {
                 return;
             }
 
-            for (const load of loads) {
+            for (const load of newLoads) {
                 try {
                     await importFromEvr(load);
                 } catch (err) {
@@ -88,13 +97,13 @@ const RegisterDeliveryPage = () => {
 
             const updated = await getDeliveries();
             setDeliveries(updated);
-
-            alert("Kõik EVR koormad edukalt lattu lisatud!");
+            alert("Kõik uued EVR koormad edukalt lattu lisatud!");
 
         } catch (err) {
             alert("EVR import ebaõnnestus: " + err.message);
         }
     };
+
 
     return (
         <div className="delivery-page">
