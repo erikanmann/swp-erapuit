@@ -20,6 +20,8 @@ import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.math.BigDecimal;
+import java.time.OffsetDateTime;
 import java.util.List;
 
 import static org.mockito.ArgumentMatchers.eq;
@@ -47,7 +49,13 @@ class StockControllerTest {
 
     @Test
     void getStockByWoodType_returnsList() throws Exception {
-        StockItem item = new StockItem("1", "Tarnija", "Kuusk", "2025-11-13", 10, 10);
+        StockItem item = new StockItem();
+        item.setWoodType("Kuusk");
+        item.setSupplier("Tarnija");
+        item.setArrivalDate(OffsetDateTime.now());
+        item.setTotalVolume(BigDecimal.valueOf(10));
+        item.setUsableVolume(BigDecimal.valueOf(10));
+
         when(stockService.getByWoodType("Kuusk")).thenReturn(List.of(item));
 
         mockMvc.perform(get("/api/stock/by-wood-type?woodType=Kuusk"))

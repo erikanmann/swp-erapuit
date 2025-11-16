@@ -14,6 +14,8 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.math.BigDecimal;
+
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
@@ -34,13 +36,16 @@ class ProductionControllerTest {
 
     @Test
     void useMaterial_returnsUpdatedStockItem() throws Exception {
-        StockItem updated = new StockItem("1", "Tarnija", "Kuusk", "2025-11-13", 10, 8);
+        StockItem updated = new StockItem();
+        updated.setWoodType("Kuusk");
+        updated.setUsableVolume(BigDecimal.valueOf(8.0));
+
         when(stockService.useForProductionByType(eq("Kuusk"), eq(2.0)))
                 .thenReturn(updated);
 
         Production prod = new Production();
         prod.setWoodType("Kuusk");
-        prod.setUsage(2);
+        prod.setUsage(2.0);
 
         mockMvc.perform(put("/api/production/use-material")
                         .contentType(MediaType.APPLICATION_JSON)
