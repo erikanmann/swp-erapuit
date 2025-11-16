@@ -1,6 +1,9 @@
 package com.erapuit.backend.model;
 
 import jakarta.persistence.*;
+import java.math.BigDecimal;
+import java.time.OffsetDateTime;
+import java.util.UUID;
 
 @Entity
 @Table(name = "stockitems")
@@ -10,36 +13,61 @@ public class StockItem {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String deliveryId;
+    // Viide tarnele
+    @Column(name = "delivery_id", nullable = false)
+    private UUID deliveryId;
+
+    // Viide konkreetsele pakile
+    @Column(name = "delivery_package_id")
+    private UUID deliveryPackageId;
+
+    // Paki kood (1-1, 2-3 jne)
+    @Column(name = "package_code")
+    private String packageCode;
+
     private String supplier;
+
     private String woodType;
-    private String arrivalDate;
-    private double totalVolume;
-    private double usableVolume;
 
-    public StockItem() {
-    }
+    @Column(name = "arrival_date")
+    private OffsetDateTime arrivalDate;
 
-    public StockItem(String deliveryId, String supplier, String woodType,
-                     String arrivalDate, double totalVolume, double usableVolume) {
-        this.deliveryId = deliveryId;
-        this.supplier = supplier;
-        this.woodType = woodType;
-        this.arrivalDate = arrivalDate;
-        this.totalVolume = totalVolume;
-        this.usableVolume = usableVolume;
-    }
+    @Column(name = "total_volume")
+    private BigDecimal totalVolume;
+
+    @Column(name = "usable_volume")
+    private BigDecimal usableVolume;
+
+    public StockItem() {}
+
+    // --- GETTERID JA SETTERID ---
 
     public Long getId() {
         return id;
     }
 
-    public String getDeliveryId() {
+    public UUID getDeliveryId() {
         return deliveryId;
     }
 
-    public void setDeliveryId(String deliveryId) {
+    public void setDeliveryId(UUID deliveryId) {
         this.deliveryId = deliveryId;
+    }
+
+    public UUID getDeliveryPackageId() {
+        return deliveryPackageId;
+    }
+
+    public void setDeliveryPackageId(UUID deliveryPackageId) {
+        this.deliveryPackageId = deliveryPackageId;
+    }
+
+    public String getPackageCode() {
+        return packageCode;
+    }
+
+    public void setPackageCode(String packageCode) {
+        this.packageCode = packageCode;
     }
 
     public String getSupplier() {
@@ -58,27 +86,27 @@ public class StockItem {
         this.woodType = woodType;
     }
 
-    public String getArrivalDate() {
+    public OffsetDateTime getArrivalDate() {
         return arrivalDate;
     }
 
-    public void setArrivalDate(String arrivalDate) {
+    public void setArrivalDate(OffsetDateTime arrivalDate) {
         this.arrivalDate = arrivalDate;
     }
 
-    public double getTotalVolume() {
+    public BigDecimal getTotalVolume() {
         return totalVolume;
     }
 
-    public void setTotalVolume(double totalVolume) {
+    public void setTotalVolume(BigDecimal totalVolume) {
         this.totalVolume = totalVolume;
     }
 
-    public double getUsableVolume() {
+    public BigDecimal getUsableVolume() {
         return usableVolume;
     }
 
-    public void setUsableVolume(double usableVolume) {
+    public void setUsableVolume(BigDecimal usableVolume) {
         this.usableVolume = usableVolume;
     }
 }

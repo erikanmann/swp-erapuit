@@ -199,33 +199,24 @@ const HomePage = () => {
                 <table className="materials-table">
                     <thead>
                     <tr>
-                        <th>Saatelehe nr</th>
-                        <th>Kuupäev</th>
-                        <th>Klient</th>
-                        <th>Transpordifirma</th>
-                        <th>Reg-nr</th>
+                        <th>Veoselehe number</th>
+                        <th>Tarnija nimi</th>
+                        <th>Saabumiskuupäev</th>
+                        <th>Kogukogus (tm)</th>
                     </tr>
                     </thead>
                     <tbody>
-                    {filteredShipments.length === 0 ? (
-                        <tr>
-                            <td colSpan={5}>Väljasaadetud tellimusi ei leitud.</td>
+                    {materials.map(item => (
+                        <tr key={item.id}>
+                            <td>{item.waybillNo}</td>
+                            <td>{item.supplierName}</td>
+                            <td>{new Date(item.arrivalDate).toLocaleDateString("et-EE")}</td>
+                            <td>{item.totalVolumeTm?.toFixed(3)}</td>
                         </tr>
-                    ) : (
-                        filteredShipments.map((sh) => (
-                            <tr key={sh.id}>
-                                <td>{sh.deliveryNoteNo || "—"}</td>
-                                <td>
-                                    {new Date(sh.dateSent).toLocaleDateString("et-EE")}
-                                </td>
-                                <td>{sh.customer || "—"}</td>
-                                <td>{sh.transportCompany || "—"}</td>
-                                <td>{sh.vehicleNo || "—"}</td>
-                            </tr>
-                        ))
-                    )}
+                    ))}
                     </tbody>
                 </table>
+
             )}
         </div>
     );

@@ -13,9 +13,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.OffsetDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
-import java.util.ArrayList;
 
 @Service
 public class DeliveryService {
@@ -25,23 +25,25 @@ public class DeliveryService {
     private final StockRepository stockRepository;
     private final DeliveryPackageService deliveryPackageService;
 
-    public DeliveryService(DeliveryRepository repo,
-                           EvrApiClient evrApiClient,
-                           StockRepository stockRepository,
-                           DeliveryPackageService deliveryPackageService) {
+    public DeliveryService(
+            DeliveryRepository repo,
+            EvrApiClient evrApiClient,
+            StockRepository stockRepository,
+            DeliveryPackageService deliveryPackageService
+    ) {
         this.repo = repo;
         this.evrApiClient = evrApiClient;
         this.stockRepository = stockRepository;
         this.deliveryPackageService = deliveryPackageService;
     }
 
-
-    // --- GET kõik tarneid ---
     public List<Delivery> getAll() {
         return repo.findAll();
     }
 
-    // --- POST / salvestamine (tavaline käsitsi sisestus) ---
+    // ---------------------------------------------------------
+    // KÄSITSI SISSESTATUD TARNE
+    // ---------------------------------------------------------
     public Delivery save(Delivery delivery) {
 
         repo.findByWaybillNo(delivery.getWaybillNo())
@@ -58,23 +60,31 @@ public class DeliveryService {
 
         Delivery saved = repo.save(delivery);
 
-        createStockFromDelivery(saved);
+        // Käsitsi sisestus → tekitame ühe vaikimisi paki
+        DeliveryPackage pkg = deliveryPackageService.createAutomaticPackage(saved);
+
+        // Loo stockitems selle paki alusel
+        createStockForPackages(saved, List.of(pkg));
 
         return saved;
     }
 
-    // --- DELETE ---
+    // ---------------------------------------------------------
+    // DELETE TARNE
+    // ---------------------------------------------------------
     @Transactional
     public boolean deleteById(UUID id) {
         return repo.findById(id).map(delivery -> {
-            stockRepository.deleteByDeliveryId(delivery.getId().toString());
+            // Kustutab kõik stockitems read, mis viitavad antud tarne ID-le
+            stockRepository.deleteByDeliveryId(delivery.getId());
             repo.delete(delivery);
             return true;
         }).orElse(false);
     }
 
-
-    // --- PUT / uuendamine ---
+    // ---------------------------------------------------------
+    // UPDATE TARNE
+    // ---------------------------------------------------------
     public Delivery update(UUID id, Delivery updatedDelivery) {
         Delivery existing = repo.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Delivery not found with id: " + id));
@@ -94,61 +104,49 @@ public class DeliveryService {
         return repo.save(existing);
     }
 
-    // --- EVR: koormate päise info ---
+    // ---------------------------------------------------------
+    // EVR: PÄIS
+    // ---------------------------------------------------------
     public List<IncomingWaybillDto> getIncomingFromEvr() {
         return evrApiClient.getIncomingLoads();
     }
 
-    // --- EVR: uue Delivery loomine detailinfo põhjal ---
+    // ---------------------------------------------------------
+    // EVR: TÄISIMPORT
+    // ---------------------------------------------------------
     public Delivery createFromEvr(IncomingWaybillDto dto) {
 
-        // Kontrolli duplikaate
         var existing = repo.findByWaybillNo(dto.getWaybillNumber());
         if (existing.isPresent()) {
             return existing.get();
         }
 
-        // 1) Võta detailandmed EVR-ist
-        EvrApiClient.WaybillDetail detail =
-                evrApiClient.getWaybillDetail(dto.getWaybillNumber());
+        EvrApiClient.WaybillDetail detail = evrApiClient.getWaybillDetail(dto.getWaybillNumber());
 
         double totalTm = 0.0;
         String woodType = null;
-
-        // --- Pakkide kogumiseks (delivery_package jaoks) ---
         List<ParsedWaybillRow> parsedRows = new ArrayList<>();
         int autoPackageNo = 0;
 
-// 2) Loe pakkide info (shipments → items)
+        // EVR read → paki loend
         if (detail != null && detail.shipments != null) {
             for (var shipment : detail.shipments) {
                 if (shipment.items != null) {
                     for (var item : shipment.items) {
 
-                        // TM kogus (kokku delivery peale)
                         if ("tm".equalsIgnoreCase(item.unitCode)) {
                             totalTm += item.amount != null ? item.amount : 0.0;
-
                             if (woodType == null && item.assortment != null) {
                                 woodType = item.assortment.name;
                             }
                         }
 
-                        // --- LOOME ParsedWaybillRow objekti ---
                         autoPackageNo++;
                         ParsedWaybillRow row = new ParsedWaybillRow();
-
                         row.setPackageNo(autoPackageNo);
                         row.setWoodType(item.assortment != null ? item.assortment.name : null);
                         row.setAssortment(item.assortment != null ? item.assortment.name : null);
                         row.setVolume(item.amount != null ? item.amount : 0.0);
-
-
-                        // EVR API EI ANNA mõõte ega trailer infot
-                        row.setLength(null);
-                        row.setWidth(null);
-                        row.setHeight(null);
-                        row.setTrailer(false);
 
                         parsedRows.add(row);
                     }
@@ -156,38 +154,26 @@ public class DeliveryService {
             }
         }
 
-        // Kui kogus tuli detailist 0, kasuta päise massi fallbackina
         if (totalTm == 0.0 && dto.getMass() != null) {
             totalTm = dto.getMass();
         }
 
-        // --- Saabumisaeg ---
         OffsetDateTime arrival = null;
         if (detail != null) {
-            if (detail.unloadingTime != null) {
-                arrival = detail.unloadingTime;
-            } else if (detail.departureTime != null) {
-                arrival = detail.departureTime;
-            }
+            arrival = (detail.unloadingTime != null) ? detail.unloadingTime : detail.departureTime;
         }
         if (arrival == null) {
             arrival = OffsetDateTime.now();
         }
 
-        // --- Tarnija andmed ---
         String supplierName = dto.getWoodOwnerName();
-
-        if (supplierName == null || supplierName.isBlank()) {
-            if (detail != null && detail.owner != null && detail.owner.name != null) {
-                supplierName = detail.owner.name;
-            }
+        if ((supplierName == null || supplierName.isBlank()) && detail != null && detail.owner != null) {
+            supplierName = detail.owner.name;
         }
-
         if (supplierName == null || supplierName.isBlank()) {
             supplierName = "Tundmatu tarnija";
         }
 
-        // --- Tarnija aadress ---
         String supplierAddress = null;
         if (detail != null && detail.owner != null && detail.owner.address != null) {
             var a = detail.owner.address;
@@ -197,7 +183,6 @@ public class DeliveryService {
                             (a.county != null ? ", " + a.county : "");
         }
 
-        // --- Delivery objekti loomine ---
         Delivery delivery = new Delivery();
         delivery.setWaybillNo(dto.getWaybillNumber());
         delivery.setDriverName(dto.getDriverName());
@@ -212,40 +197,42 @@ public class DeliveryService {
 
         Delivery saved = repo.save(delivery);
 
-        // --- LOOME STOCK KIRJE (originaalloogika) ---
-        createStockFromDelivery(saved);
+        // Loo pakkide read
+        List<DeliveryPackage> packages = deliveryPackageService.savePackages(saved.getId(), parsedRows);
 
-        // --- LOOME PAKID DELIVERY_PACKAGE TABELISSE ---
-        deliveryPackageService.savePackages(saved.getId(), parsedRows);
+        // Loo stockitems iga pakiga
+        createStockForPackages(saved, packages);
 
         return saved;
     }
 
+    // ---------------------------------------------------------
+    // STOCKITEMI LOOMINE PAKKIDE PÕHJAL
+    // ---------------------------------------------------------
+    private void createStockForPackages(Delivery saved, List<DeliveryPackage> packages) {
 
-    // --- abimeetod StockItem loomiseks ---
-    private void createStockFromDelivery(Delivery saved) {
-        StockItem stock = new StockItem();
-        stock.setDeliveryId(saved.getId().toString());
-        stock.setSupplier(saved.getSupplierName());
-        stock.setWoodType(saved.getWoodType());
-        stock.setArrivalDate(
-                saved.getArrivalDate() != null
-                        ? saved.getArrivalDate().toString()
-                        : OffsetDateTime.now().toString()
-        );
+        for (DeliveryPackage pkg : packages) {
 
-        double total = saved.getTotalVolumeTm() != null
-                ? saved.getTotalVolumeTm().doubleValue()
-                : 0.0;
+            StockItem stock = new StockItem();
 
-        stock.setTotalVolume(total);
-        stock.setUsableVolume(total);
+            stock.setDeliveryId(saved.getId());
+            stock.setDeliveryPackageId(pkg.getId());
+            stock.setPackageCode(pkg.getFinalCode());
 
-        stockRepository.save(stock);
+            stock.setSupplier(saved.getSupplierName());
+            stock.setWoodType(pkg.getWoodType() != null ? pkg.getWoodType() : saved.getWoodType());
+            stock.setArrivalDate(saved.getArrivalDate());
+
+            BigDecimal total = pkg.getVolumeTm() != null ? pkg.getVolumeTm() : BigDecimal.ZERO;
+
+            stock.setTotalVolume(total);
+            stock.setUsableVolume(total);
+
+            stockRepository.save(stock);
+        }
     }
 
     public List<DeliveryPackage> getPackagesForDelivery(UUID deliveryId) {
         return deliveryPackageService.getPackagesForDelivery(deliveryId);
     }
-
 }
