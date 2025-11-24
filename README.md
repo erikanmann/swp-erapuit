@@ -44,7 +44,7 @@ A custom web application developed for the university course “Software Project
         spring.flyway.enabled=true
         spring.flyway.locations=classpath:db/migration
         evr.base-url=https://evr.veoseleht.ee
-        evr.secret-key=
+        evr.secret-key=C8wuDbD2vQWmwqX7ufThihfW8jk3iPkXYRz6LAVINXlkgtADnpNB7qg3Ctte
         evr.receiver-code=10136315
         evr.place-of-delivery-code=Erap
         ```
