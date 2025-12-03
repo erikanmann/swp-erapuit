@@ -26,7 +26,7 @@ public class PackageController {
     @GetMapping("/{id}")
     public Package getPackage(@PathVariable UUID id) {
         return packageRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Package not found: " + id));
+                .orElseThrow(() -> new IllegalArgumentException("Package not found"));
     }
 
 
@@ -51,7 +51,7 @@ public class PackageController {
                     existing.setLocation(updated.getLocation());
                     return packageRepository.save(existing);
                 })
-                .orElseThrow(() -> new RuntimeException("Package not found"));
+                .orElseThrow(() -> new IllegalArgumentException("Package not found"));
     }
 
     @DeleteMapping("/{id}")

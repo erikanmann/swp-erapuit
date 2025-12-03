@@ -87,7 +87,7 @@ public class FileUploadController {
             }
 
         } catch (IOException e) {
-            return ResponseEntity.badRequest().body(Map.of("error", "Failed to read PDF: " + e.getMessage()));
+            return ResponseEntity.badRequest().body(Map.of("error", "Failed to read PDF file."));
         }
 
         return ResponseEntity.ok(data);

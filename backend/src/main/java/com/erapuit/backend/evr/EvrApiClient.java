@@ -32,7 +32,14 @@ public class EvrApiClient {
     @Value("${evr.place-of-delivery-code}")
     private String placeOfDeliveryCode;
 
-    private final RestTemplate restTemplate = new RestTemplate();
+    private final RestTemplate restTemplate;
+
+    public EvrApiClient() {
+        var factory = new org.springframework.http.client.SimpleClientHttpRequestFactory();
+        factory.setConnectTimeout(5000); // 5s connection timeout
+        factory.setReadTimeout(5000);    // 5s response timeout
+        this.restTemplate = new RestTemplate(factory);
+    }
 
     // ========================================================================
     // 1) WAYBILL LIST (päise info)
@@ -40,36 +47,41 @@ public class EvrApiClient {
 
     public List<IncomingWaybillDto> getIncomingLoads() {
 
-        OffsetDateTime createdAfter = OffsetDateTime.now(ZoneOffset.UTC).minusDays(30);
-        OffsetDateTime createdBefore = OffsetDateTime.now(ZoneOffset.UTC);
+        try {
+            OffsetDateTime createdAfter = OffsetDateTime.now(ZoneOffset.UTC).minusDays(30);
+            OffsetDateTime createdBefore = OffsetDateTime.now(ZoneOffset.UTC);
 
-        String url = UriComponentsBuilder
-                .fromHttpUrl(baseUrl + "/api/waybills")
-                .queryParam("receiver_code", receiverCode)
-                .queryParam("place_of_delivery_code", placeOfDeliveryCode)
-                .queryParam("created_after", createdAfter.toString())
-                .queryParam("created_before", createdBefore.toString())
-                .queryParam("page_size", 200)
-                .toUriString();
+            String url = UriComponentsBuilder
+                    .fromHttpUrl(baseUrl + "/api/waybills")
+                    .queryParam("receiver_code", receiverCode)
+                    .queryParam("place_of_delivery_code", placeOfDeliveryCode)
+                    .queryParam("created_after", createdAfter.toString())
+                    .queryParam("created_before", createdBefore.toString())
+                    .queryParam("page_size", 200)
+                    .toUriString();
 
-        HttpHeaders headers = new HttpHeaders();
-        headers.set("EVR-APIKEY", secretKey);
-        headers.set("EVR-LANGUAGE", "et");
+            HttpHeaders headers = new HttpHeaders();
+            headers.set("EVR-APIKEY", secretKey);
+            headers.set("EVR-LANGUAGE", "et");
 
-        HttpEntity<Void> entity = new HttpEntity<>(headers);
+            HttpEntity<Void> entity = new HttpEntity<>(headers);
 
-        ResponseEntity<WaybillPage> response =
-                restTemplate.exchange(url, HttpMethod.GET, entity, WaybillPage.class);
+            ResponseEntity<WaybillPage> response =
+                    restTemplate.exchange(url, HttpMethod.GET, entity, WaybillPage.class);
 
-        WaybillPage body = response.getBody();
+            WaybillPage body = response.getBody();
 
-        if (body == null || body.pageResult == null) {
+            if (body == null || body.pageResult == null) {
+                return Collections.emptyList();
+            }
+
+            return body.pageResult.stream()
+                    .map(Waybill::toIncomingDto)
+                    .collect(Collectors.toList());
+        } catch (Exception ex){
+            ex.printStackTrace();
             return Collections.emptyList();
         }
-
-        return body.pageResult.stream()
-                .map(Waybill::toIncomingDto)
-                .collect(Collectors.toList());
     }
 
     // ========================================================================
@@ -77,20 +89,26 @@ public class EvrApiClient {
     // ========================================================================
 
     public WaybillDetail getWaybillDetail(String number) {
+        try {
+            String url = baseUrl + "/api/waybills/" + number;
 
-        String url = baseUrl + "/api/waybills/" + number;
+            HttpHeaders headers = new HttpHeaders();
+            headers.set("EVR-APIKEY", secretKey);
+            headers.set("EVR-LANGUAGE", "et");
 
-        HttpHeaders headers = new HttpHeaders();
-        headers.set("EVR-APIKEY", secretKey);
-        headers.set("EVR-LANGUAGE", "et");
+            HttpEntity<Void> entity = new HttpEntity<>(headers);
 
-        HttpEntity<Void> entity = new HttpEntity<>(headers);
+            ResponseEntity<WaybillDetail> response =
+                    restTemplate.exchange(url, HttpMethod.GET, entity, WaybillDetail.class);
 
-        ResponseEntity<WaybillDetail> response =
-                restTemplate.exchange(url, HttpMethod.GET, entity, WaybillDetail.class);
+            return response.getBody();
 
-        return response.getBody();
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            return null; // DeliveryService already handles null safely
+        }
     }
+
 
     // ========================================================================
     // DTO classes for EVR API

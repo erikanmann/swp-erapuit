@@ -121,11 +121,6 @@ public class DeliveryController {
         }
     }
 
-    @ExceptionHandler(IllegalArgumentException.class)
-    public ResponseEntity<String> handleDuplicateReference(IllegalArgumentException ex) {
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
-    }
-
     // --- EVR: koormate päise info ---
     @GetMapping("/evr-incoming")
     public List<IncomingWaybillDto> getIncomingEvrLoads() {

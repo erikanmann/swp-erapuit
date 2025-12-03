@@ -67,15 +67,15 @@ public class StockService {
     // UC2: US 2.3 – usable volume update
     public StockItem update(Long id, StockItem updated) {
         StockItem existing = stockRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Stock item not found"));
+                .orElseThrow(() -> new IllegalArgumentException("Stock item not found"));
 
         BigDecimal newUsable = updated.getUsableVolume();
 
         if (newUsable.compareTo(BigDecimal.ZERO) < 0) {
-            throw new RuntimeException("Usable volume cannot be negative");
+            throw new IllegalArgumentException("Usable volume cannot be negative");
         }
         if (newUsable.compareTo(existing.getTotalVolume()) > 0) {
-            throw new RuntimeException("Usable volume cannot be greater than total volume");
+            throw new IllegalArgumentException("Usable volume cannot be greater than total volume");
         }
 
         existing.setUsableVolume(newUsable);
@@ -122,13 +122,13 @@ public class StockService {
     public StockItem useForProductionByType(String woodType, double usage) {
 
         if (usage <= 0) {
-            throw new RuntimeException("Usage must be positive");
+            throw new IllegalArgumentException("Usage must be positive");
         }
 
         List<StockItem> items = stockRepository.findByWoodTypeIgnoreCase(woodType);
 
         if (items.isEmpty()) {
-            throw new RuntimeException("Material not found: " + woodType);
+            throw new IllegalArgumentException("Material not found: " + woodType);
         }
 
         BigDecimal required = BigDecimal.valueOf(usage);
