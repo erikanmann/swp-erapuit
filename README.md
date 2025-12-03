@@ -43,6 +43,10 @@ A custom web application developed for the university course “Software Project
         spring.jpa.hibernate.ddl-auto=validate
         spring.flyway.enabled=true
         spring.flyway.locations=classpath:db/migration
+        evr.base-url=https://evr.veoseleht.ee
+        evr.secret-key=C8wuDbD2vQWmwqX7ufThihfW8jk3iPkXYRz6LAVINXlkgtADnpNB7qg3Ctte
+        evr.receiver-code=10136315
+        evr.place-of-delivery-code=Erap
         ```
     Flyway will automatically run the migration scripts on first startup and create all required tables and views.
 
@@ -81,11 +85,13 @@ swp-erapuit/
 │
 ├── backend/                     # Spring Boot application
 │   ├── src/main/java/com/erapuit/backend/
+│   │   ├── config/              # App configuration (CORS, etc.)
 │   │   ├── controller/          # REST API controllers
-│   │   ├── service/             # Business logic
+│   │   ├── dto/                 # data transfer objects
+│   │   ├── evr/                 # Spring service class
 │   │   ├── model/               # Entity models
 │   │   ├── repository/          # JPA repositories
-│   │   └── config/              # App configuration (CORS, etc.)
+│   │   ├── service/             # Business logic
 │   └── src/main/resources/db/migration/   # Flyway migration scripts
 │
 ├── frontend/                    # React application
