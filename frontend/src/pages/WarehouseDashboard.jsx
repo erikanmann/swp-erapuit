@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback  } from "react";
 import "../styles/delivery.css";
 import "../styles/main.css";
 import "../styles/warehouse.css";
@@ -59,11 +59,9 @@ const WarehouseDashboard = () => {
     // ------------------------------------------------------
     // STOCK LAADIMINE
     // ------------------------------------------------------
-    useEffect(() => {
-        loadStock();
-    }, []);
 
-    const loadStock = async (page = 0, size = 200) => {
+
+    const loadStock = useCallback(async (page = 0, size = 200) => {
         try {
             const data = await getStockPaged(page, size, {
                 woodType: woodTypeFilter,
@@ -87,16 +85,18 @@ const WarehouseDashboard = () => {
         } catch (err) {
             console.error("Stock load failed:", err);
         }
-    };
+    }, [woodTypeFilter, supplierFilter, fromDateFilter]);
+
 
     // ------------------------------------------------------
     // FILTRID
     // ------------------------------------------------------
     useEffect(() => {
-        loadStock(0);   // alati alustame lehelt 0, kui filter muutub
-    }, [woodTypeFilter, supplierFilter, fromDateFilter]);
+        loadStock(0);   // laeme page 0 koos aktiivsete filtritega
+    }, [loadStock]);
 
 
+    if (!pageData) return <p>Laadin...</p>;
     // ------------------------------------------------------
     // STATISTIKA
     // ------------------------------------------------------
