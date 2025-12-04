@@ -12,6 +12,24 @@ export const getStockItems = async () => {
     return res.json();
 };
 
+export const getStockPaged = async (page = 0, size = 200, filters = {}) => {
+    const params = new URLSearchParams();
+    params.append("page", page);
+    params.append("size", size);
+
+    if (filters.woodType) params.append("woodType", filters.woodType);
+    if (filters.supplier) params.append("supplier", filters.supplier);
+    if (filters.fromDate) params.append("fromDate", filters.fromDate);
+
+    const res = await fetch(`${STOCK_BASE}/paged-fast?${params.toString()}`);
+
+    if (!res.ok) throw new Error("Failed to fetch paged stock");
+
+    return res.json();
+};
+
+
+
 /**
  * Filtreerimine: woodType / supplier / fromDate
  */

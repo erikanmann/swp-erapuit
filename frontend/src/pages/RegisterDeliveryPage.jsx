@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import {
-    getDeliveries,
+    getDeliveriesPaged,
     addDelivery,
     deleteDelivery,
     updateDelivery,
@@ -17,18 +17,29 @@ import "../styles/warehouse.css";
 
 import { useNavigate } from "react-router-dom";
 
+const PAGE_SIZE = 200;
+
 const RegisterDeliveryPage = () => {
     const navigate = useNavigate();
 
-    const [deliveries, setDeliveries] = useState([]);
+    const [pageData, setPageData] = useState(null);
     const [editingDelivery, setEditingDelivery] = useState(null);
 
-    // Lae algsed tarned
+    // ---------------------------
+    // LOAD PAGINATED PAGE
+    // ---------------------------
+    const loadPage = async (page = 0) => {
+        const data = await getDeliveriesPaged(page, PAGE_SIZE);
+        setPageData(data);
+    };
+
     useEffect(() => {
-        getDeliveries().then(setDeliveries);
+        loadPage(0);
     }, []);
 
-    // Salvesta / uuenda tarnet
+    // ---------------------------
+    // SAVE / UPDATE DELIVERY
+    // ---------------------------
     const handleSave = async (data) => {
         try {
             if (editingDelivery) {
@@ -37,24 +48,35 @@ const RegisterDeliveryPage = () => {
             } else {
                 await addDelivery(data);
             }
-            const updated = await getDeliveries();
-            setDeliveries(updated);
+
+            await loadPage(pageData.number); // reload current page
         } catch (err) {
             alert(err.message || "Salvestamine ebaõnnestus");
         }
     };
 
-    // Kustuta tarne
+    // ---------------------------
+    // DELETE DELIVERY
+    // ---------------------------
     const handleDelete = async (id) => {
         try {
-            const updated = await deleteDelivery(id);
-            setDeliveries(updated);
+            await deleteDelivery(id);
+
+            // Reload same page or previous if the last item is gone
+            const nextPage =
+                pageData.content.length === 1 && pageData.number > 0
+                    ? pageData.number - 1
+                    : pageData.number;
+
+            await loadPage(nextPage);
         } catch (err) {
             alert(err.message || "Kustutamine ebaõnnestus");
         }
     };
 
-    // Muuda tarne → ava vormis
+    // ---------------------------
+    // EDIT DELIVERY
+    // ---------------------------
     const handleEdit = (delivery) => {
         setEditingDelivery(delivery);
         window.scrollTo({ top: 0, behavior: "smooth" });
@@ -62,7 +84,9 @@ const RegisterDeliveryPage = () => {
 
     const handleCancelEdit = () => setEditingDelivery(null);
 
-    // 🟧 EVR MASSIMPORT
+    // ---------------------------
+    // EVR MASS IMPORT
+    // ---------------------------
     const handleImportAllEvrLoads = async () => {
         try {
             const loads = await getEvrIncoming();
@@ -72,8 +96,7 @@ const RegisterDeliveryPage = () => {
                 return;
             }
 
-
-            const existingWaybills = new Set(deliveries.map(d => d.waybillNo));
+            const existingWaybills = new Set(pageData.content.map(d => d.waybillNo));
             const newLoads = loads.filter(l => !existingWaybills.has(l.waybillNumber));
 
             if (newLoads.length === 0) {
@@ -81,9 +104,7 @@ const RegisterDeliveryPage = () => {
                 return;
             }
 
-            if (!window.confirm(
-                `Kas soovid importida ${newLoads.length} uut EVR koormat?`
-            )) {
+            if (!window.confirm(`Kas soovid importida ${newLoads.length} uut EVR koormat?`)) {
                 return;
             }
 
@@ -95,8 +116,7 @@ const RegisterDeliveryPage = () => {
                 }
             }
 
-            const updated = await getDeliveries();
-            setDeliveries(updated);
+            await loadPage(pageData.number);
             alert("Kõik uued EVR koormad edukalt lattu lisatud!");
 
         } catch (err) {
@@ -104,26 +124,19 @@ const RegisterDeliveryPage = () => {
         }
     };
 
-
     return (
         <div className="delivery-page">
 
-            {/* Ülemine navigeerimisriba */}
             <div className="warehouse-tabs">
                 <button onClick={() => navigate("/home")}>Avaleht</button>
                 <button className="active-tab">Tarne registreerimine</button>
                 <button onClick={() => navigate("/warehouse")}>Lao ülevaade</button>
-                <button onClick={() => navigate("/production-usage")}>
-                    Tootmise kasutus
-                </button>
-                <button onClick={() => navigate("/outbound-shipping")}>
-                    Väljaminev kaup
-                </button>
+                <button onClick={() => navigate("/production-usage")}>Tootmise kasutus</button>
+                <button onClick={() => navigate("/outbound-shipping")}>Väljaminev kaup</button>
             </div>
 
             <h1>Tarne registreerimine</h1>
 
-            {/* 🟩 EVR massimport nupp */}
             <button
                 onClick={handleImportAllEvrLoads}
                 style={{
@@ -140,16 +153,16 @@ const RegisterDeliveryPage = () => {
                 Laadi kõik EVR koormad lattu
             </button>
 
-            {/* Käsitsi registreerimise vorm */}
             <DeliveryForm
                 onSave={handleSave}
                 editingDelivery={editingDelivery}
                 onCancelEdit={handleCancelEdit}
             />
 
-            {/* Tarnete tabel */}
+            {/* Tarne tabel + pagination */}
             <DeliveryList
-                deliveries={deliveries}
+                pageData={pageData}
+                onPageChange={loadPage}
                 onDelete={handleDelete}
                 onEdit={handleEdit}
             />

@@ -6,6 +6,15 @@ export const getDeliveries = async () => {
   return res.json();
 };
 
+
+export const getDeliveriesPaged = async (page = 0, size = 200) => {
+  const res = await fetch(`${BASE}/paged-fast?page=${page}&size=${size}`);
+  if (!res.ok) throw new Error("Failed to fetch paged deliveries");
+  return res.json();
+};
+
+
+
 export const addDelivery = async (delivery) => {
   const res = await fetch(BASE, {
     method: "POST",
@@ -26,7 +35,8 @@ export const deleteDelivery = async (id) => {
     throw new Error(`Delete failed: ${res.status} ${text}`);
   }
 
-  return getDeliveries();
+  // ÄRA lae kõiki tarneid tagasi!
+  return true;
 };
 
 export const updateDelivery = async (id, data) => {

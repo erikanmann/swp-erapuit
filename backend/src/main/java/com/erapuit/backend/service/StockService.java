@@ -10,6 +10,11 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.math.BigDecimal;
 
+import com.erapuit.backend.dto.StockListDto;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.PageRequest;
+
 @Service
 public class StockService {
 
@@ -160,4 +165,18 @@ public class StockService {
 
         return stockRepository.save(item);
     }
+
+    // ---------------------------------------------------------
+    // PAGINATION FOR PERFORMANCE (returns full StockItem objects)
+    // ---------------------------------------------------------
+    public org.springframework.data.domain.Page<StockItem> getPagedStock(int page, int size) {
+        var pageable = org.springframework.data.domain.PageRequest.of(page, size);
+        return stockRepository.findAll(pageable);
+    }
+
+    public Page<StockListDto> getPagedFast(int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        return stockRepository.findAllSlim(pageable);
+    }
+
 }

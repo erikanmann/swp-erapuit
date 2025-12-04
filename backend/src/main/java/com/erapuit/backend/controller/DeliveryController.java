@@ -133,4 +133,21 @@ public class DeliveryController {
         Delivery saved = service.createFromEvr(dto);
         return ResponseEntity.ok(saved);
     }
+
+    @GetMapping("/paged")
+    public ResponseEntity<?> getPagedDeliveries(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "200") int size
+    ) {
+        return ResponseEntity.ok(service.getPagedDeliveries(page, size));
+    }
+    // --- GET: optimeeritud paginated delivery list (kiire JMeteri jaoks) ---
+    @GetMapping("/paged-fast")
+    public ResponseEntity<?> getPagedFast(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "200") int size
+    ) {
+        return ResponseEntity.ok(service.getPagedFast(page, size));
+    }
+
 }
