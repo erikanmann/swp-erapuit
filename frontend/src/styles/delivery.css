@@ -88,6 +88,8 @@
     background-color: #fffefc;
     border-radius: 6px;
     overflow: hidden;
+    display: block;
+    overflow-x: auto;
 }
 
 .list th,
@@ -97,11 +99,33 @@
     color: #2b2b2b;
 }
 
+.list td.actions,
+.list th.actions {
+    min-width: 140px;
+}
+
 .list th {
     text-align: left;
     background-color: #e9e3d7;
     color: #2b2b2b;
     font-weight: 600;
+}
+
+.action-buttons {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.required {
+    color: red;
+    margin-left: 4px;
+}
+
+.error-msg {
+    color: #b71c1c;
+    font-size: 0.85rem;
+    margin-top: 4px;
 }
 
 /* --- Reuse the same fade-in animation as global --- */
@@ -118,6 +142,12 @@
 
 /* --- Responsive layout adjustments --- */
 @media (max-width: 768px) {
+    .delivery-page {
+        padding: 1rem;
+        border-radius: 0.75rem;
+        margin: 0.5rem;
+    }
+
     .form, .list {
         padding: 1rem;
     }
@@ -130,7 +160,26 @@
     .form button {
         width: 100%;
     }
+
+    .filter-input {
+        width: 100% !important;
+        max-width: 100% !important;
+        box-sizing: border-box;
+        margin: 0 auto 12px auto;
+        display: block;
+    }
+
+    .list {
+        overflow-x: auto;
+        padding: 0.5rem !important;
+    }
+
+    .list table {
+        min-width: 650px;
+    }
 }
+
+
 .form select,
 .form input {
     width: 100%;

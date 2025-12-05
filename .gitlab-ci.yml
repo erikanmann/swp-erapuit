@@ -61,8 +61,15 @@ frontend-test:
   stage: test
   image: node:lts
   script:
-    - echo "No frontend tests yet"
-  allow_failure: true
+    - cd frontend
+    - npm ci --prefer-offline --no-audit
+    - npm test -- --watch=false
+  artifacts:
+    when: always
+    paths:
+      - frontend/coverage
+    expire_in: 1 week
+  allow_failure: false
 
 # --- Deploy ---
 deploy-job:

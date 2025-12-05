@@ -72,13 +72,16 @@ function ProductionUsagePage() {
                 <form onSubmit={handleSubmit} className="form">
                     <h2>Materjali kasutamine tootmises</h2>
 
+                    {/* SELECT FIELD */}
                     <label>
-                        <span>Vali laopartii (ID + puiduliik):</span>
+                        <span>Vali laopartii (ID + puiduliik) <span className="required">*</span></span>
                         <select
                             value={selectedDeliveryId}
-                            onChange={(e) => setSelectedDeliveryId(e.target.value)}
-                            required
-                            className="dropdown"
+                            onChange={(e) => {
+                                setSelectedDeliveryId(e.target.value);
+                                setError("");     // clear error on change
+                            }}
+                            className={`dropdown ${error && !selectedDeliveryId ? "input-error" : ""}`}
                         >
                             <option value="">-- Vali laopartii --</option>
                             {stockItems.map((item) => (
@@ -87,19 +90,31 @@ function ProductionUsagePage() {
                                 </option>
                             ))}
                         </select>
+
+                        {/* Custom error message */}
+                        {error && !selectedDeliveryId && (
+                            <p className="error-msg">Palun vali laopartii.</p>
+                        )}
                     </label>
 
+                    {/* USAGE FIELD */}
                     <label>
-                        <span>Sisesta kogus tootmisse (m³):</span>
+                        <span>Sisesta kogus tootmisse (m³) <span className="required">*</span></span>
                         <input
                             type="number"
                             value={usage}
                             min="0"
                             step="0.01"
-                            onChange={(e) => setUsage(e.target.value)}
-                            required
-                            className="input"
+                            onChange={(e) => {
+                                setUsage(e.target.value);
+                                setError("");     // clear error on change
+                            }}
+                            className={`input ${error && (!usage || usage <= 0) ? "input-error" : ""}`}
                         />
+
+                        {error && (!usage || usage <= 0) && (
+                            <p className="error-msg">Kogus peab olema positiivne number.</p>
+                        )}
                     </label>
 
                     <button type="submit" className="main-button">

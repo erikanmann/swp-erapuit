@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
+import DeliveryForm from "../components/DeliveryForm";
 import {
     getDeliveryById,
     getDeliveryPackages,
@@ -15,7 +16,6 @@ const DeliveryDetailPage = () => {
     const [packages, setPackages] = useState([]);
 
     const [editMode, setEditMode] = useState(false);
-    const [form, setForm] = useState({});
     const [loading, setLoading] = useState(true);
 
     // package edit
@@ -31,17 +31,6 @@ const DeliveryDetailPage = () => {
                 setDelivery(d);
                 setPackages(p);
 
-                setForm({
-                    driverName: d.driverName,
-                    truckNo: d.truckNo,
-                    waybillNo: d.waybillNo,
-                    supplierName: d.supplierName,
-                    supplierAddress: d.supplierAddress ?? "",
-                    woodType: d.woodType,
-                    arrivalDate: d.arrivalDate?.split("T")[0],
-                    totalVolumeTm: d.totalVolumeTm,
-                    deliveryStatus: d.deliveryStatus,
-                });
 
             } finally {
                 setLoading(false);
@@ -50,18 +39,10 @@ const DeliveryDetailPage = () => {
         load();
     }, [id]);
 
-    const handleChange = (e) =>
-        setForm({ ...form, [e.target.name]: e.target.value });
-
-    const saveEdit = async () => {
-        const result = await updateDelivery(id, {
-            ...form,
-            arrivalDate: form.arrivalDate + "T00:00:00+02:00"
-        });
-
+    const saveEdit = async (updatedData) => {
+        const result = await updateDelivery(id, updatedData);
         setDelivery(result);
         setEditMode(false);
-
         alert("Tarne edukalt uuendatud!");
     };
 
@@ -88,7 +69,14 @@ const DeliveryDetailPage = () => {
 
             <h2>Tarne detailid</h2>
 
-            {!editMode ? (
+            {editMode ? (
+                <DeliveryForm
+                    initialValues={delivery}
+                    mode="edit"
+                    onSave={saveEdit}
+                    onCancelEdit={() => setEditMode(false)}
+                />
+            ) : (
                 <>
                     {/* ---------- READ ONLY VIEW ---------- */}
                     <div className="card">
@@ -106,54 +94,6 @@ const DeliveryDetailPage = () => {
                     <button onClick={() => setEditMode(true)} style={{ marginTop: "15px" }}>
                         Muuda andmeid
                     </button>
-                </>
-            ) : (
-                <>
-                    {/* ---------- EDIT MODE FORM ---------- */}
-                    <div className="card">
-                        <h3>Muuda tarnet</h3>
-
-                        <label>Juht *</label>
-                        <input name="driverName" value={form.driverName} onChange={handleChange} />
-
-                        <label>Veoki number *</label>
-                        <input name="truckNo" value={form.truckNo} onChange={handleChange} />
-
-                        <label>Veoselehe nr *</label>
-                        <input name="waybillNo" value={form.waybillNo} onChange={handleChange} />
-
-                        <label>Tarnija *</label>
-                        <input name="supplierName" value={form.supplierName} onChange={handleChange} />
-
-                        <label>Aadress</label>
-                        <input name="supplierAddress" value={form.supplierAddress} onChange={handleChange} />
-
-                        <label>Puiduliik *</label>
-                        <input name="woodType" value={form.woodType} onChange={handleChange} />
-
-                        <label>Saabumiskuupäev *</label>
-                        <input type="date" name="arrivalDate" value={form.arrivalDate} onChange={handleChange} />
-
-                        <label>Kogus (tm) *</label>
-                        <input name="totalVolumeTm" type="number" step="0.001"
-                               value={form.totalVolumeTm}
-                               onChange={handleChange} />
-
-                        <label>Staatus *</label>
-                        <select name="deliveryStatus" value={form.deliveryStatus} onChange={handleChange}>
-                            <option value="RECEIVED">Saabunud</option>
-                            <option value="UNLOADED">Mahalaaditud</option>
-                            <option value="IN_STOCK">Lattu lisatud</option>
-                            <option value="REJECTED">Tagasi lükatud</option>
-                        </select>
-
-                        <div style={{ marginTop: "15px" }}>
-                            <button onClick={saveEdit}>Salvesta</button>
-                            <button onClick={() => setEditMode(false)} style={{ marginLeft: "10px" }}>
-                                Loobu
-                            </button>
-                        </div>
-                    </div>
                 </>
             )}
 

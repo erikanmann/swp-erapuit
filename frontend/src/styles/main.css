@@ -179,13 +179,16 @@ th {
 }
 
 .filter-input {
+    width: 100%;
+    max-width: 420px;
     margin-bottom: 10px;
     padding: 6px 10px;
-    width: 250px;
     border-radius: 6px;
     border: 1px solid #ccc;
     outline: none;
+    box-sizing: border-box;
 }
+
 .filter-input:focus {
     border-color: #d4a24c;
     box-shadow: 0 0 4px rgba(212, 162, 76, 0.5);
@@ -210,4 +213,26 @@ th {
     margin-top: 8px;
     width: fit-content;
     font-weight: 500;
+}
+
+@media (max-width: 768px) {
+    table,
+    .warehouse-table,
+    .list table {
+        display: block;
+        width: 100%;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    th, td {
+        white-space: nowrap;
+    }
+
+    .filter-input {
+        width: 100% !important;
+        max-width: 100% !important;
+        box-sizing: border-box !important;
+        margin: 0 0 12px 0 !important;
+    }
 }

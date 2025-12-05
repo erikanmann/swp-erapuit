@@ -23,6 +23,9 @@ const RegisterDeliveryPage = () => {
     const [deliveries, setDeliveries] = useState([]);
     const [editingDelivery, setEditingDelivery] = useState(null);
 
+    const [search, setSearch] = useState("");
+
+
     // Lae algsed tarned
     useEffect(() => {
         getDeliveries().then(setDeliveries);
@@ -104,6 +107,19 @@ const RegisterDeliveryPage = () => {
         }
     };
 
+    const filteredDeliveries = deliveries.filter((d) => {
+        const text = search.toLowerCase();
+
+        return (
+            d.waybillNo?.toLowerCase().includes(text) ||
+            d.driverName?.toLowerCase().includes(text) ||
+            d.truckNo?.toLowerCase().includes(text) ||
+            d.supplierName?.toLowerCase().includes(text) ||
+            d.woodType?.toLowerCase().includes(text) ||
+            d.arrivalDate?.split("T")[0].includes(text)
+        );
+    });
+
 
     return (
         <div className="delivery-page">
@@ -143,13 +159,29 @@ const RegisterDeliveryPage = () => {
             {/* Käsitsi registreerimise vorm */}
             <DeliveryForm
                 onSave={handleSave}
-                editingDelivery={editingDelivery}
+                initialValues={editingDelivery}
+                mode={editingDelivery ? "edit" : "create"}
                 onCancelEdit={handleCancelEdit}
+            />
+
+            <input
+                type="text"
+                placeholder="Otsi tarnete seast (veoseleht, juht, veok, tarnija, puiduliik...)"
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                style={{
+                    width: "100%",
+                    padding: "10px",
+                    margin: "20px 0",
+                    fontSize: "16px",
+                    borderRadius: "6px",
+                    border: "1px solid #ccc"
+                }}
             />
 
             {/* Tarnete tabel */}
             <DeliveryList
-                deliveries={deliveries}
+                deliveries={filteredDeliveries}
                 onDelete={handleDelete}
                 onEdit={handleEdit}
             />

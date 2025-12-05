@@ -1,9 +1,11 @@
 /* --- Warehouse Dashboard Layout --- */
+/* --- Warehouse Dashboard Layout --- */
 .warehouse-tabs {
     display: flex;
     justify-content: center;
     gap: 1rem;
     margin-bottom: 2rem;
+    flex-wrap: wrap;
 }
 
 .warehouse-tabs button {
@@ -160,4 +162,30 @@
     font-style: italic;
     padding: 1rem;
     text-align: center;
+}
+
+/* --- Responsive tweaks for small screens --- */
+@media (max-width: 768px) {
+    .warehouse-tabs {
+        gap: 0.5rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .warehouse-tabs button {
+        padding: 8px 14px;
+        font-size: 0.9rem;
+    }
+
+    .warehouse-section {
+        padding: 1rem;
+        overflow-x: auto !important;
+    }
+
+    .warehouse-stats {
+        flex-direction: column;
+    }
+
+    .warehouse-table {
+        min-width: 650px !important;
+    }
 }

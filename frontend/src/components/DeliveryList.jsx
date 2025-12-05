@@ -26,7 +26,7 @@ const DeliveryList = ({ deliveries, onDelete, onEdit }) => {
                         <th>Tarnija</th>
                         <th>Saabumiskuupäev</th>
                         <th>Kogukogus (tm)</th>
-                        <th>Tegevus</th>
+                        <th className="actions">Tegevus</th>
                     </tr>
                     </thead>
                     <tbody>
@@ -42,13 +42,11 @@ const DeliveryList = ({ deliveries, onDelete, onEdit }) => {
                                     : ""}
                             </td>
                             <td>{d.totalVolumeTm}</td>
-                            <td>
-                                <button onClick={() => goToDetails(d.id)}>
-                                    Vaata
-                                </button>
-                                <button onClick={() => onDelete(d.id)}>
-                                    Kustuta
-                                </button>
+                            <td className="actions">
+                                <div className="action-buttons">
+                                    <button onClick={() => goToDetails(d.id)}>Vaata</button>
+                                    <button onClick={() => onDelete(d.id)}>Kustuta</button>
+                                </div>
                             </td>
                         </tr>
                     ))}
