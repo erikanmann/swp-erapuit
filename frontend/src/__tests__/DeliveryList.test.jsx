@@ -10,12 +10,22 @@ describe("DeliveryList", () => {
                 truckNo: "TRUCK123",
                 waybillNo: "WB-001",
                 supplierName: "RMK",
-                arrivalDate: "2025-11-12",
+                arrivalDate: "2025-11-12T00:00:00",
                 totalVolumeTm: 10
             }
         ];
 
-        render(<DeliveryList deliveries={deliveries} onDelete={() => {}} />);
+        render(
+            <DeliveryList
+                pageData={{
+                    content: deliveries,
+                    number: 0,
+                    totalPages: 1
+                }}
+                onPageChange={() => {}}
+                onDelete={() => {}}
+            />
+        );
 
         expect(screen.getByText(/Driver X/i)).toBeInTheDocument();
         expect(screen.getByText(/WB-001/i)).toBeInTheDocument();
@@ -23,7 +33,18 @@ describe("DeliveryList", () => {
     });
 
     test("shows empty message when no deliveries", () => {
-        render(<DeliveryList deliveries={[]} onDelete={() => {}} />);
-        expect(screen.getByText(/pole veel lisatud/i)).toBeInTheDocument();
+        render(
+            <DeliveryList
+                pageData={{
+                    content: [],
+                    number: 0,
+                    totalPages: 1
+                }}
+                onPageChange={() => {}}
+                onDelete={() => {}}
+            />
+        );
+
+        expect(screen.getByText(/Veoselehti pole veel lisatud/i)).toBeInTheDocument();
     });
 });
