@@ -100,7 +100,8 @@
 
 .list td.actions,
 .list th.actions {
-    min-width: 140px;
+    width: 180px;
+    min-width: 180px;
 }
 
 .list th {
@@ -174,7 +175,7 @@
     }
 
     .list table {
-        min-width: 650px;
+        overflow: visible;
     }
 }
 

@@ -1,5 +1,6 @@
 package com.erapuit.backend.service;
 
+import com.erapuit.backend.dto.DeliveryListDto;
 import com.erapuit.backend.dto.IncomingWaybillDto;
 import com.erapuit.backend.evr.EvrApiClient;
 import com.erapuit.backend.model.Delivery;
@@ -10,6 +11,10 @@ import com.erapuit.backend.repository.DeliveryRepository;
 import com.erapuit.backend.repository.StockRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.PageRequest;
 
 import java.math.BigDecimal;
 import java.time.OffsetDateTime;
@@ -235,4 +240,18 @@ public class DeliveryService {
     public List<DeliveryPackage> getPackagesForDelivery(UUID deliveryId) {
         return deliveryPackageService.getPackagesForDelivery(deliveryId);
     }
+
+    // ---------------------------------------------------------
+    // PAGINATION FOR PERFORMANCE (returns full Delivery objects)
+    // ---------------------------------------------------------
+    public org.springframework.data.domain.Page<Delivery> getPagedDeliveries(int page, int size) {
+        var pageable = org.springframework.data.domain.PageRequest.of(page, size);
+        return repo.findAll(pageable);
+    }
+
+    public Page<DeliveryListDto> getPagedFast(int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        return repo.findAllSlim(pageable);
+    }
+
 }

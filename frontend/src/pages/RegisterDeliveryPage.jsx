@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import {
-    getDeliveries,
+    getDeliveriesPaged,
     addDelivery,
     deleteDelivery,
     updateDelivery,
@@ -17,21 +17,30 @@ import "../styles/warehouse.css";
 
 import { useNavigate } from "react-router-dom";
 
+const PAGE_SIZE = 200;
+
 const RegisterDeliveryPage = () => {
     const navigate = useNavigate();
 
-    const [deliveries, setDeliveries] = useState([]);
+    const [pageData, setPageData] = useState(null);
     const [editingDelivery, setEditingDelivery] = useState(null);
-
     const [search, setSearch] = useState("");
 
+    // ---------------------------
+    // LOAD PAGINATED PAGE
+    // ---------------------------
+    const loadPage = async (page = 0) => {
+        const data = await getDeliveriesPaged(page, PAGE_SIZE);
+        setPageData(data);
+    };
 
-    // Lae algsed tarned
     useEffect(() => {
-        getDeliveries().then(setDeliveries);
+        loadPage(0);
     }, []);
 
-    // Salvesta / uuenda tarnet
+    // ---------------------------
+    // SAVE / UPDATE DELIVERY
+    // ---------------------------
     const handleSave = async (data) => {
         try {
             if (editingDelivery) {
@@ -40,24 +49,34 @@ const RegisterDeliveryPage = () => {
             } else {
                 await addDelivery(data);
             }
-            const updated = await getDeliveries();
-            setDeliveries(updated);
+
+            await loadPage(pageData.number);
         } catch (err) {
             alert(err.message || "Salvestamine ebaõnnestus");
         }
     };
 
-    // Kustuta tarne
+    // ---------------------------
+    // DELETE DELIVERY
+    // ---------------------------
     const handleDelete = async (id) => {
         try {
-            const updated = await deleteDelivery(id);
-            setDeliveries(updated);
+            await deleteDelivery(id);
+
+            const nextPage =
+                pageData.content.length === 1 && pageData.number > 0
+                    ? pageData.number - 1
+                    : pageData.number;
+
+            await loadPage(nextPage);
         } catch (err) {
             alert(err.message || "Kustutamine ebaõnnestus");
         }
     };
 
-    // Muuda tarne → ava vormis
+    // ---------------------------
+    // EDIT DELIVERY
+    // ---------------------------
     const handleEdit = (delivery) => {
         setEditingDelivery(delivery);
         window.scrollTo({ top: 0, behavior: "smooth" });
@@ -65,7 +84,9 @@ const RegisterDeliveryPage = () => {
 
     const handleCancelEdit = () => setEditingDelivery(null);
 
-    // 🟧 EVR MASSIMPORT
+    // ---------------------------
+    // EVR MASS IMPORT
+    // ---------------------------
     const handleImportAllEvrLoads = async () => {
         try {
             const loads = await getEvrIncoming();
@@ -75,8 +96,7 @@ const RegisterDeliveryPage = () => {
                 return;
             }
 
-
-            const existingWaybills = new Set(deliveries.map(d => d.waybillNo));
+            const existingWaybills = new Set(pageData.content.map(d => d.waybillNo));
             const newLoads = loads.filter(l => !existingWaybills.has(l.waybillNumber));
 
             if (newLoads.length === 0) {
@@ -84,9 +104,7 @@ const RegisterDeliveryPage = () => {
                 return;
             }
 
-            if (!window.confirm(
-                `Kas soovid importida ${newLoads.length} uut EVR koormat?`
-            )) {
+            if (!window.confirm(`Kas soovid importida ${newLoads.length} uut EVR koormat?`)) {
                 return;
             }
 
@@ -98,8 +116,7 @@ const RegisterDeliveryPage = () => {
                 }
             }
 
-            const updated = await getDeliveries();
-            setDeliveries(updated);
+            await loadPage(pageData.number);
             alert("Kõik uued EVR koormad edukalt lattu lisatud!");
 
         } catch (err) {
@@ -107,39 +124,39 @@ const RegisterDeliveryPage = () => {
         }
     };
 
-    const filteredDeliveries = deliveries.filter((d) => {
-        const text = search.toLowerCase();
-
-        return (
-            d.waybillNo?.toLowerCase().includes(text) ||
-            d.driverName?.toLowerCase().includes(text) ||
-            d.truckNo?.toLowerCase().includes(text) ||
-            d.supplierName?.toLowerCase().includes(text) ||
-            d.woodType?.toLowerCase().includes(text) ||
-            d.arrivalDate?.split("T")[0].includes(text)
-        );
-    });
-
+    // ---------------------------
+    // SEARCH (filters only client-side page content)
+    // ---------------------------
+    const filteredPageData = pageData
+        ? {
+            ...pageData,
+            content: pageData.content.filter((d) => {
+                const t = search.toLowerCase();
+                return (
+                    d.driverName?.toLowerCase().includes(t) ||
+                    d.truckNo?.toLowerCase().includes(t) ||
+                    d.waybillNo?.toLowerCase().includes(t) ||
+                    d.supplierName?.toLowerCase().includes(t) ||
+                    d.woodType?.toLowerCase().includes(t) ||
+                    d.arrivalDate?.split("T")[0].includes(t)
+                );
+            }),
+        }
+        : null;
 
     return (
         <div className="delivery-page">
 
-            {/* Ülemine navigeerimisriba */}
             <div className="warehouse-tabs">
                 <button onClick={() => navigate("/home")}>Avaleht</button>
                 <button className="active-tab">Tarne registreerimine</button>
                 <button onClick={() => navigate("/warehouse")}>Lao ülevaade</button>
-                <button onClick={() => navigate("/production-usage")}>
-                    Tootmise kasutus
-                </button>
-                <button onClick={() => navigate("/outbound-shipping")}>
-                    Väljaminev kaup
-                </button>
+                <button onClick={() => navigate("/production-usage")}>Tootmise kasutus</button>
+                <button onClick={() => navigate("/outbound-shipping")}>Väljaminev kaup</button>
             </div>
 
             <h1>Tarne registreerimine</h1>
 
-            {/* 🟩 EVR massimport nupp */}
             <button
                 onClick={handleImportAllEvrLoads}
                 style={{
@@ -156,7 +173,6 @@ const RegisterDeliveryPage = () => {
                 Laadi kõik EVR koormad lattu
             </button>
 
-            {/* Käsitsi registreerimise vorm */}
             <DeliveryForm
                 onSave={handleSave}
                 initialValues={editingDelivery}
@@ -164,9 +180,10 @@ const RegisterDeliveryPage = () => {
                 onCancelEdit={handleCancelEdit}
             />
 
+            {/* 🟦 SEARCH FIELD */}
             <input
                 type="text"
-                placeholder="Otsi tarnete seast (veoseleht, juht, veok, tarnija, puiduliik...)"
+                placeholder="Otsi tarnete seast..."
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 style={{
@@ -179,9 +196,10 @@ const RegisterDeliveryPage = () => {
                 }}
             />
 
-            {/* Tarnete tabel */}
+            {/* LIST + PAGINATION (WITH SEARCH APPLIED) */}
             <DeliveryList
-                deliveries={filteredDeliveries}
+                pageData={filteredPageData}
+                onPageChange={loadPage}
                 onDelete={handleDelete}
                 onEdit={handleEdit}
             />

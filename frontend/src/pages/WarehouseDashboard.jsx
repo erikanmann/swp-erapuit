@@ -1,15 +1,15 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback  } from "react";
 import "../styles/delivery.css";
 import "../styles/main.css";
 import "../styles/warehouse.css";
 import { useNavigate } from "react-router-dom";
 
 import {
-    getStockItems,
-    filterStock,
+    getStockPaged,
     updateUsableVolume,
     sendMaterialToProduction,
 } from "../api/stockApi";
+
 
 import {
     getPackageById,
@@ -36,7 +36,7 @@ const formatDate = (iso) => {
 const WarehouseDashboard = () => {
     const navigate = useNavigate();
 
-    const [stock, setStock] = useState([]);
+    const [pageData, setPageData] = useState(null);
     const [woodTypes, setWoodTypes] = useState([]);
 
     const [woodTypeFilter, setWoodTypeFilter] = useState("");
@@ -59,83 +59,63 @@ const WarehouseDashboard = () => {
     // ------------------------------------------------------
     // STOCK LAADIMINE
     // ------------------------------------------------------
-    useEffect(() => {
-        loadStock();
-    }, []);
 
-    const loadStock = () => {
-        getStockItems()
-            .then((items) => {
-                const converted = items.map((i) => ({
-                    ...i,
-                    totalVolume: toNum(i.totalVolume),
-                    usableVolume: toNum(i.usableVolume),
-                }));
-                setStock(converted);
 
-                const types = Array.from(
-                    new Set(
-                        converted
-                            .map((i) => (i.woodType || "").trim())
-                            .filter(Boolean)
-                    )
-                );
-                setWoodTypes(types);
-            })
-            .catch((err) => console.error(err));
-    };
+    const loadStock = useCallback(async (page = 0, size = 200) => {
+        try {
+            const data = await getStockPaged(page, size, {
+                woodType: woodTypeFilter,
+                supplier: supplierFilter,
+                fromDate: fromDateFilter
+            });
+
+            const converted = data.content.map(i => ({
+                ...i,
+                totalVolume: toNum(i.totalVolume),
+                usableVolume: toNum(i.usableVolume),
+            }));
+
+            setPageData({ ...data, content: converted });
+
+            const types = Array.from(new Set(
+                converted.map(i => i.woodType).filter(Boolean)
+            ));
+            setWoodTypes(types);
+
+        } catch (err) {
+            console.error("Stock load failed:", err);
+        }
+    }, [woodTypeFilter, supplierFilter, fromDateFilter]);
+
 
     // ------------------------------------------------------
     // FILTRID
     // ------------------------------------------------------
     useEffect(() => {
-        const params = {};
+        loadStock(0);   // laeme page 0 koos aktiivsete filtritega
+    }, [loadStock]);
 
-        if (woodTypeFilter) params.woodType = woodTypeFilter;
-        if (supplierFilter) params.supplier = supplierFilter;
-        if (fromDateFilter) params.fromDate = fromDateFilter;
 
-        if (Object.keys(params).length === 0) {
-            loadStock();
-            return;
-        }
-
-        filterStock(params)
-            .then((items) => {
-                const converted = items.map((i) => ({
-                    ...i,
-                    totalVolume: toNum(i.totalVolume),
-                    usableVolume: toNum(i.usableVolume),
-                }));
-                setStock(converted);
-            })
-            .catch((err) => console.error("Filtreerimine ebaõnnestus:", err));
-    }, [woodTypeFilter, supplierFilter, fromDateFilter]);
-
+    if (!pageData) return <p>Laadin...</p>;
     // ------------------------------------------------------
     // STATISTIKA
     // ------------------------------------------------------
-    const totalStock = stock.reduce((sum, s) => sum + toNum(s.totalVolume), 0);
-    const usableStock = stock.reduce((sum, s) => sum + toNum(s.usableVolume), 0);
-    const usedPercent =
-        totalStock > 0
-            ? (((totalStock - usableStock) / totalStock) * 100).toFixed(1)
-            : 0;
+    const totalStock = pageData.content.reduce((sum, s) => sum + toNum(s.totalVolume), 0);
+    const usableStock = pageData.content.reduce((sum, s) => sum + toNum(s.usableVolume), 0);
+    const usedPercent = totalStock > 0
+        ? (((totalStock - usableStock) / totalStock) * 100).toFixed(1)
+        : 0;
+
 
     // ------------------------------------------------------
     // USABLE VOLUME UPDATE
     // ------------------------------------------------------
     const handleUsableVolumeChange = async (id, newVal) => {
         try {
-            const updated = await updateUsableVolume(id, parseFloat(newVal));
+            await updateUsableVolume(id, parseFloat(newVal));
 
-            setStock((prev) =>
-                prev.map((item) =>
-                    item.id === id
-                        ? { ...item, usableVolume: toNum(updated.usableVolume) }
-                        : item
-                )
-            );
+            // pärast uuendust laeme sama page uuesti backendist
+            await loadStock(pageData.number);
 
             setMessage("Kasutatav kogus edukalt uuendatud.");
             setError("");
@@ -144,6 +124,7 @@ const WarehouseDashboard = () => {
             setMessage("");
         }
     };
+
 
     // ------------------------------------------------------
     // PAKI MODAL AVAMINE
@@ -194,6 +175,7 @@ const WarehouseDashboard = () => {
             setError(err.message);
         }
     };
+    if (!pageData) return <p>Laadin...</p>;
 
     // ------------------------------------------------------
     // RENDER
@@ -285,7 +267,7 @@ const WarehouseDashboard = () => {
                     </tr>
                     </thead>
                     <tbody>
-                    {stock.map((item) => (
+                    {pageData.content.map((item) => (
                         <tr key={item.id}>
                             <td>{item.deliveryId}</td>
                             <td>{item.packageCode || "-"}</td>
@@ -439,6 +421,26 @@ const WarehouseDashboard = () => {
                     </div>
                 </div>
             )}
+
+            <div className="pagination-controls">
+                <button
+                    disabled={pageData.number === 0}
+                    onClick={() => loadStock(pageData.number - 1)}
+                >
+                    ⬅ Eelmine
+                </button>
+
+                <span>
+                    Leht {pageData.number + 1} / {pageData.totalPages}
+                </span>
+
+                <button
+                    disabled={pageData.number + 1 >= pageData.totalPages}
+                    onClick={() => loadStock(pageData.number + 1)}
+                >
+                    Järgmine ➡
+                </button>
+            </div>
 
             <div style={{ marginTop: "1.5rem" }}>
                 <button onClick={() => setShowProductionModal(true)}>
