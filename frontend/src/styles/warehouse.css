@@ -1,163 +1,212 @@
 /* --- Warehouse Dashboard Layout --- */
 .warehouse-tabs {
     display: flex;
+    flex-wrap: wrap;
     justify-content: center;
-    gap: 1rem;
-    margin-bottom: 2rem;
+    gap: 10px;
+    margin: 0 0 24px;
 }
 
 .warehouse-tabs button {
-    background: #f4f1eb;
-    color: #333;
-    border: 1px solid #ddd0b8;
-    border-radius: 20px;
-    padding: 10px 20px;
-    font-weight: 500;
-    cursor: pointer;
-    transition: 0.2s;
+    background: #f5efe2;
+    color: #4a4336;
+    border: 1px solid #e6d9bf;
+    border-radius: 999px;
+    padding: 10px 18px;
+    box-shadow: none;
 }
 
 .warehouse-tabs .active-tab {
-    background-color: #d6a03b;
-    color: white;
-    border-color: #b98722;
+    background: linear-gradient(120deg, var(--accent), var(--accent-strong));
+    color: #fffefc;
+    border-color: transparent;
 }
 
 .warehouse-tabs button:hover:not(.active-tab):not(:disabled) {
-    background-color: #e9e3d7;
+    border-color: var(--accent);
+    color: #2f281a;
 }
 
 /* --- Stats cards --- */
 .warehouse-stats {
-    display: flex;
-    gap: 1rem;
-    justify-content: space-between;
-    flex-wrap: wrap;
-    margin-bottom: 2rem;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 14px;
+    margin-bottom: 24px;
 }
 
 .stat-card {
-    flex: 1;
-    min-width: 200px;
     background: #fffefc;
-    border-radius: 10px;
-    padding: 1rem;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
-    text-align: center;
+    border: 1px solid #eadfc7;
+    border-radius: var(--radius);
+    padding: 16px;
+    box-shadow: var(--shadow);
+    position: relative;
+    overflow: hidden;
+}
+
+.stat-card::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle at 20% 20%, rgba(214, 160, 59, 0.12), transparent 40%);
+    pointer-events: none;
 }
 
 .stat-card h4 {
     margin: 0;
-    color: #444;
-    font-weight: 600;
+    color: #2f281a;
 }
 
 .stat-card p {
-    margin-top: 8px;
-    font-size: 1rem;
-    color: #222;
+    margin: 8px 0 0;
+    font-size: 1.15rem;
+    color: #6a5f50;
 }
 
 /* --- Sections --- */
 .warehouse-section {
-    background: #f4f1eb;
-    padding: 1.5rem;
-    border-radius: 12px;
-    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);
-    margin-bottom: 2rem;
+    background: #f8f3e8;
+    border: 1px solid #eadfc7;
+    border-radius: var(--radius-lg);
+    padding: 18px 18px 12px;
+    box-shadow: var(--shadow);
+    margin-bottom: 24px;
 }
 
 .section-subtitle {
-    color: #666;
-    font-size: 0.9rem;
-    margin-top: -0.4rem;
+    color: #6a5f50;
+    margin-top: -2px;
 }
 
 /* --- Filter bar --- */
 .filter-bar {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 10px;
+    margin: 16px 0;
     align-items: center;
-    display: flex;
-    gap: 0.8rem;
-    margin: 1rem 0;
 }
 
-.filter-bar input {
-    flex: 1;
-    padding: 8px 10px;
-    border-radius: 6px;
-    border: 1px solid #ccc;
+.filter-bar label {
+    color: #4a4336;
+    font-weight: 600;
+    font-size: 0.95rem;
 }
 
-.filter-bar select,
-.filter-bar button {
-    padding: 8px 12px;
-    border-radius: 6px;
-    border: 1px solid #ccc;
-    background: #fff;
-    cursor: pointer;
-}
+.filter-bar input,
 .filter-bar select,
 .warehouse-select {
-    background: #f4f1eb;
-    color: #222;
-    border: 1px solid #ddd0b8;
-    border-radius: 8px;
-    padding: 10px 16px;
-    font-size: 1rem;
-    font-weight: 500;
-    transition: border-color 0.15s;
-}
-.filter-bar select:focus {
-    border-color: #d6a03b;
+    width: 100%;
+    padding: 10px 12px;
+    border-radius: var(--radius-sm);
+    border: 1px solid #d6c7aa;
+    background: #fffefc;
+    color: #2b2b2b;
     outline: none;
-}
-.filter-bar label {
-    font-weight: 500;
-    color: #333;
-    margin-right: 0.5rem;
-    font-size: 1rem;
+    transition: border-color 0.2s ease, background 0.2s ease, box-shadow 0.2s ease;
 }
 
-/* --- Empty box --- */
-.empty-box {
-    text-align: center;
-    color: #777;
-    padding: 2rem;
-    background: #fffefc;
-    border: 1px dashed #ccc;
-    border-radius: 8px;
+.filter-bar input:focus,
+.filter-bar select:focus,
+.warehouse-select:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(214, 160, 59, 0.2);
 }
+
+/* --- Empty box and empty message styling --- */
+.empty-box,
+.empty-message {
+    text-align: center;
+    color: #6a5f50;
+    padding: 18px;
+    background: #f9f4ea;
+    border: 1px dashed #e6d9bf;
+    border-radius: var(--radius);
+}
+
 /* --- Warehouse Table --- */
 .warehouse-table {
     width: 100%;
     border-collapse: collapse;
-    margin-top: 1rem;
-    background-color: #fffefc;
-    border-radius: 6px;
+    margin-top: 14px;
+    background: #fffefc;
+    border-radius: var(--radius);
     overflow: hidden;
 }
 
 .warehouse-table th,
 .warehouse-table td {
-    padding: 10px;
-    border-bottom: 1px solid #e0d8cc;
-    color: #2b2b2b;
+    padding: 11px 12px;
+    border-bottom: 1px solid #e6ddcf;
+    color: #2e2a22;
 }
 
 .warehouse-table th {
-    background-color: #e9e3d7;
+    background: #f3e8d6;
+    font-weight: 700;
+    letter-spacing: 0.01em;
+}
+
+.warehouse-table tr:hover td {
+    background: #fff7eb;
+}
+
+.warehouse-table input {
+    width: 100%;
+    padding: 8px 10px;
+    border-radius: var(--radius-sm);
+    border: 1px solid #d6c7aa;
+    background: #fffefc;
+    color: #2b2b2b;
+}
+
+.modal-bg {
+    position: fixed;
+    inset: 0;
+    background: rgba(15, 15, 15, 0.38);
+    display: grid;
+    place-items: center;
+    padding: 14px;
+    z-index: 10;
+    backdrop-filter: blur(6px);
+}
+
+.modal-card {
+    width: min(480px, 100%);
+    background: #fffefc;
+    border: 1px solid #eadfc7;
+    border-radius: var(--radius-lg);
+    padding: 20px 18px;
+    box-shadow: var(--shadow);
+    animation: floatIn 0.4s ease;
+}
+
+.modal-card label {
+    color: #4a4336;
     font-weight: 600;
-    text-align: left;
+    display: block;
+    margin: 10px 0 6px;
 }
 
-.warehouse-table tr:hover {
-    background-color: #f7f4ef;
+.modal-card input,
+.modal-card select {
+    width: 100%;
+    padding: 10px 12px;
+    border-radius: var(--radius-sm);
+    border: 1px solid #d6c7aa;
+    background: #fffefc;
+    color: #2b2b2b;
+    outline: none;
 }
 
-/* Empty message styling */
-.empty-message {
-    color: #333;
-    font-style: italic;
-    padding: 1rem;
-    text-align: center;
+.modal-card button {
+    margin-top: 12px;
+    width: 100%;
+}
+
+@media (max-width: 768px) {
+    .warehouse-tabs { gap: 8px; }
+    .warehouse-section { padding: 16px; }
+    .warehouse-table th, .warehouse-table td { font-size: 14px; }
 }
