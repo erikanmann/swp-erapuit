@@ -24,8 +24,9 @@ public class Delivery {
     @Column(name = "supplier_reg_code")
     private String supplierRegCode;
 
-    @Column(name = "supplier_address")
+    @Column(name = "supplier_address", nullable = true)
     private String supplierAddress;
+
 
     @Column(name = "driver_name", nullable = false)
     private String driverName;

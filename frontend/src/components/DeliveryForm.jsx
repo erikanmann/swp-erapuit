@@ -1,17 +1,6 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import "../styles/delivery.css";
-
-function convertDateToISO(dateStr) {
-    if (!dateStr) return "";
-    const match = dateStr.match(/(\d{2})\.(\d{2})\.(\d{4})/);
-    if (match) {
-        const [, dd, mm, yyyy] = match;
-        return `${yyyy}-${mm}-${dd}`;
-    }
-    return dateStr;
-}
-
-const enumDeliveryStatus = ["RECEIVED", "UNLOADED", "IN_STOCK", "REJECTED"];
+import { validateIsoDateYear } from "../utils/dateValidation";
 
 const emptyForm = {
     driverName: "",
@@ -25,159 +14,211 @@ const emptyForm = {
     deliveryStatus: "RECEIVED",
 };
 
-const DeliveryForm = ({ onSave, editingDelivery, onCancelEdit }) => {
+export default function DeliveryForm({
+                                         onSave,
+                                         initialValues = null,
+                                         mode = "create",
+                                         onCancelEdit = null
+                                     }) {
     const [form, setForm] = useState(emptyForm);
+    const [errors, setErrors] = useState({});
 
     useEffect(() => {
-        if (editingDelivery) {
-            setForm(editingDelivery);
+        if (initialValues) {
+            setForm({
+                driverName: initialValues.driverName,
+                truckNo: initialValues.truckNo,
+                waybillNo: initialValues.waybillNo,
+                supplierName: initialValues.supplierName,
+                supplierAddress: initialValues.supplierAddress ?? "",
+                woodType: initialValues.woodType,
+                arrivalDate: initialValues.arrivalDate?.split("T")[0] || "",
+                totalVolumeTm: initialValues.totalVolumeTm,
+                deliveryStatus: initialValues.deliveryStatus ?? "RECEIVED",
+            });
         } else {
             setForm(emptyForm);
         }
-    }, [editingDelivery]);
+        setErrors({});
+    }, [initialValues]);
 
-    const handleChange = (e) =>
-        setForm({ ...form, [e.target.name]: e.target.value });
+    const setField = (name, value) => {
+        setForm({ ...form, [name]: value });
+        setErrors({ ...errors, [name]: null });
+    };
 
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-
+    const validateForm = () => {
+        const newErrors = {};
         const required = [
             "driverName",
             "truckNo",
             "waybillNo",
             "supplierName",
-            "supplierAddress",
             "woodType",
             "arrivalDate",
             "totalVolumeTm",
         ];
 
-        for (const field of required) {
-            if (!form[field]) {
-                alert("Palun täida kõik kohustuslikud väljad!");
-                return;
-            }
+        required.forEach((f) => {
+            if (!form[f]) newErrors[f] = "See väli on kohustuslik.";
+        });
+
+        const dateErr = validateIsoDateYear(form.arrivalDate);
+        if (dateErr) newErrors.arrivalDate = dateErr;
+
+        return newErrors;
+    };
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+
+        const newErrors = validateForm();
+        if (Object.keys(newErrors).length > 0) {
+            setErrors(newErrors);
+            return;
         }
 
-        const offsetDateTime =
-            form.arrivalDate && !form.arrivalDate.includes("T")
-                ? `${form.arrivalDate}T00:00:00+02:00`
-                : form.arrivalDate;
+        await onSave({
+            ...form,
+            arrivalDate: form.arrivalDate + "T00:00:00+02:00",
+        });
 
-        const fixedDeliveryStatus = enumDeliveryStatus.includes(form.deliveryStatus)
-            ? form.deliveryStatus
-            : "RECEIVED";
-
-        try {
-            await onSave({
-                ...form,
-                arrivalDate: offsetDateTime,
-                deliveryStatus: fixedDeliveryStatus,
-            });
-            alert(editingDelivery ? "Tarne edukalt uuendatud!" : "Tarne edukalt salvestatud!");
+        if (mode === "create") {
             setForm(emptyForm);
-        } catch (err) {
-            alert(err.message || "Salvestamine ebaõnnestus");
+            alert("Tarne edukalt salvestatud!");
         }
     };
 
     return (
         <form onSubmit={handleSubmit} className="form">
-            <h2>{editingDelivery ? "Muuda tarnet" : "Registreeri uus tarne"}</h2>
 
+            <h2>{mode === "create" ? "Registreeri uus tarne" : "Muuda tarnet"}</h2>
+
+            {/* DRIVER */}
             <div>
-                <label>Lae üles veoseleht (PDF):</label>
+                <label htmlFor="driverName">
+                    Juhi nimi <span className="required">*</span>
+                </label>
                 <input
-                    type="file"
-                    accept="application/pdf"
-                    onChange={async (e) => {
-                        const file = e.target.files[0];
-                        if (!file) return;
-                        const formData = new FormData();
-                        formData.append("file", file);
+                    id="driverName"
+                    name="driverName"
+                    value={form.driverName}
+                    onChange={(e) => setField("driverName", e.target.value)}
+                />
+                {errors.driverName && <p className="error-msg">{errors.driverName}</p>}
+            </div>
 
-                        const res = await fetch("http://localhost:8080/api/file/parse-waybill", {
-                            method: "POST",
-                            body: formData,
-                        });
+            {/* TRUCK */}
+            <div>
+                <label htmlFor="truckNo">
+                    Veoki nr <span className="required">*</span>
+                </label>
+                <input
+                    id="truckNo"
+                    name="truckNo"
+                    value={form.truckNo}
+                    onChange={(e) => setField("truckNo", e.target.value)}
+                />
+                {errors.truckNo && <p className="error-msg">{errors.truckNo}</p>}
+            </div>
 
-                        const data = await res.json();
-                        if (data.arrivalDate) {
-                            data.arrivalDate = convertDateToISO(data.arrivalDate);
-                        }
+            {/* WAYBILL */}
+            <div>
+                <label htmlFor="waybillNo">
+                    Veoselehe nr <span className="required">*</span>
+                </label>
+                <input
+                    id="waybillNo"
+                    name="waybillNo"
+                    value={form.waybillNo}
+                    onChange={(e) => setField("waybillNo", e.target.value)}
+                />
+                {errors.waybillNo && <p className="error-msg">{errors.waybillNo}</p>}
+            </div>
 
-                        setForm({ ...form, ...data });
-                    }}
+            {/* SUPPLIER NAME */}
+            <div>
+                <label htmlFor="supplierName">
+                    Tarnija nimi <span className="required">*</span>
+                </label>
+                <input
+                    id="supplierName"
+                    name="supplierName"
+                    value={form.supplierName}
+                    onChange={(e) => setField("supplierName", e.target.value)}
+                />
+                {errors.supplierName && <p className="error-msg">{errors.supplierName}</p>}
+            </div>
+
+            {/* SUPPLIER ADDRESS */}
+            <div>
+                <label htmlFor="supplierAddress">
+                    Tarnija aadress / päritolu
+                </label>
+                <input
+                    id="supplierAddress"
+                    name="supplierAddress"
+                    value={form.supplierAddress}
+                    onChange={(e) => setField("supplierAddress", e.target.value)}
                 />
             </div>
 
+            {/* WOOD TYPE */}
             <div>
-                <label>Juhi nimi *</label>
-                <input name="driverName" value={form.driverName} onChange={handleChange} required />
-            </div>
-
-            <div>
-                <label>Veoki registrinumber *</label>
-                <input name="truckNo" value={form.truckNo} onChange={handleChange} required />
-            </div>
-
-            <div>
-                <label>Veoselehe number *</label>
-                <input name="waybillNo" value={form.waybillNo} onChange={handleChange} required />
-            </div>
-
-            <div>
-                <label>Tarnija nimi *</label>
-                <input name="supplierName" value={form.supplierName} onChange={handleChange} required />
-            </div>
-
-            <div>
-                <label>Tarnija aadress / päritolu *</label>
-                <input name="supplierAddress" value={form.supplierAddress} onChange={handleChange} required />
-            </div>
-
-            <div>
-                <label>Puiduliik *</label>
-                <select name="woodType" value={form.woodType} onChange={handleChange} required>
-                    <option value="">Vali liik</option>
-                    <option value="Kuusk">Kuusk</option>
-                    <option value="Mänd">Mänd</option>
-                    <option value="Kask">Kask</option>
-                </select>
-            </div>
-
-            <div>
-                <label>Saabumiskuupäev *</label>
+                <label htmlFor="woodType">
+                    Puiduliik <span className="required">*</span>
+                </label>
                 <input
+                    id="woodType"
+                    name="woodType"
+                    value={form.woodType}
+                    onChange={(e) => setField("woodType", e.target.value)}
+                />
+                {errors.woodType && <p className="error-msg">{errors.woodType}</p>}
+            </div>
+
+            {/* ARRIVAL DATE */}
+            <div>
+                <label htmlFor="arrivalDate">
+                    Saabumiskuupäev <span className="required">*</span>
+                </label>
+                <input
+                    id="arrivalDate"
                     type="date"
                     name="arrivalDate"
                     value={form.arrivalDate}
-                    onChange={handleChange}
-                    required
+                    onChange={(e) => setField("arrivalDate", e.target.value)}
                 />
+                {errors.arrivalDate && <p className="error-msg">{errors.arrivalDate}</p>}
             </div>
 
+            {/* TOTAL VOLUME */}
             <div>
-                <label>Kogukogus (tm) *</label>
+                <label htmlFor="totalVolumeTm">
+                    Kogus (tm) <span className="required">*</span>
+                </label>
                 <input
+                    id="totalVolumeTm"
                     type="number"
-                    name="totalVolumeTm"
                     min="0"
                     step="0.001"
+                    name="totalVolumeTm"
                     value={form.totalVolumeTm}
-                    onChange={handleChange}
-                    required
+                    onChange={(e) => setField("totalVolumeTm", e.target.value)}
                 />
+                {errors.totalVolumeTm && <p className="error-msg">{errors.totalVolumeTm}</p>}
             </div>
 
+            {/* STATUS */}
             <div>
-                <label>Tarne staatus *</label>
+                <label htmlFor="deliveryStatus">
+                    Tarne staatus <span className="required">*</span>
+                </label>
                 <select
+                    id="deliveryStatus"
                     name="deliveryStatus"
-                    value={form.deliveryStatus || "RECEIVED"}
-                    onChange={handleChange}
-                    required
+                    value={form.deliveryStatus}
+                    onChange={(e) => setField("deliveryStatus", e.target.value)}
                 >
                     <option value="RECEIVED">Saabunud</option>
                     <option value="UNLOADED">Mahalaaditud</option>
@@ -186,26 +227,22 @@ const DeliveryForm = ({ onSave, editingDelivery, onCancelEdit }) => {
                 </select>
             </div>
 
-            <div style={{ display: "flex", gap: "1rem" }}>
+            {/* BUTTONS */}
+            <div style={{ marginTop: "15px" }}>
                 <button type="submit">
-                    {editingDelivery ? "Uuenda tarnet" : "Salvesta tarne"}
+                    {mode === "create" ? "Salvesta tarne" : "Uuenda tarnet"}
                 </button>
 
-                {editingDelivery && (
+                {mode === "edit" && onCancelEdit && (
                     <button
                         type="button"
-                        onClick={() => {
-                            setForm(emptyForm);
-                            onCancelEdit?.();
-                        }}
-                        style={{ backgroundColor: "#ccc" }}
+                        onClick={onCancelEdit}
+                        style={{ marginLeft: "10px" }}
                     >
-                        Tühista
+                        Loobu
                     </button>
                 )}
             </div>
         </form>
     );
-};
-
-export default DeliveryForm;
+}

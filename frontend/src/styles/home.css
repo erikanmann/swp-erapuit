@@ -48,3 +48,14 @@ h2 {
     opacity: 0.6;
     cursor: not-allowed;
 }
+
+@media (max-width: 768px) {
+    .filter-bar {
+        flex-wrap: wrap;
+    }
+
+    .filter-btn {
+        flex: 1 1 45%;
+        text-align: center;
+    }
+}

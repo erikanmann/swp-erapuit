@@ -199,33 +199,31 @@ const HomePage = () => {
                 <table className="materials-table">
                     <thead>
                     <tr>
-                        <th>Saatelehe nr</th>
-                        <th>Kuupäev</th>
-                        <th>Klient</th>
-                        <th>Transpordifirma</th>
-                        <th>Reg-nr</th>
+                        <th>Kliendi nimi</th>
+                        <th>Veoselehe nr</th>
+                        <th>Väljasaatmise kuupäev</th>
+                        <th>Pakke hulgas</th>
                     </tr>
                     </thead>
                     <tbody>
                     {filteredShipments.length === 0 ? (
                         <tr>
-                            <td colSpan={5}>Väljasaadetud tellimusi ei leitud.</td>
+                            <td colSpan="4">Ühtegi väljasaadetud tellimust ei leitud.</td>
                         </tr>
                     ) : (
-                        filteredShipments.map((sh) => (
-                            <tr key={sh.id}>
-                                <td>{sh.deliveryNoteNo || "—"}</td>
-                                <td>
-                                    {new Date(sh.dateSent).toLocaleDateString("et-EE")}
-                                </td>
-                                <td>{sh.customer || "—"}</td>
-                                <td>{sh.transportCompany || "—"}</td>
-                                <td>{sh.vehicleNo || "—"}</td>
+                        filteredShipments.map((s) => (
+                            <tr key={s.id}>
+                                <td>{s.customer}</td>
+                                <td>{s.deliveryNoteNo}</td>
+                                <td>{new Date(s.dateSent).toLocaleDateString("et-EE")}</td>
+                                <td>{s.packageIds?.length ?? 0}</td>
                             </tr>
                         ))
                     )}
                     </tbody>
+
                 </table>
+
             )}
         </div>
     );

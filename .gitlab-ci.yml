@@ -16,13 +16,32 @@ backend-build:
       - backend/build/libs/*.jar
     expire_in: 1 week
 
-# --- Backend Tests (placeholder) ---
+# --- Backend Tests ---
 backend-test:
   stage: test
   image: gradle:8.3-jdk17
+
+  services: []   # disable postgres
+
+  variables:
+    # Force H2 for CI test
+    SPRING_DATASOURCE_URL: "jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1;MODE=PostgreSQL;DATABASE_TO_LOWER=TRUE"
+    SPRING_DATASOURCE_USERNAME: "sa"
+    SPRING_DATASOURCE_PASSWORD: ""
+
+    SPRING_JPA_HIBERNATE_DDL_AUTO: "create-drop"
+    SPRING_FLYWAY_ENABLED: "false"
+
   script:
-    - echo "No backend tests yet"
-  allow_failure: true
+    - cd backend
+    - chmod +x gradlew
+    - ./gradlew test --no-daemon
+
+  artifacts:
+    when: always
+    paths:
+      - backend/build/reports/tests/test/
+    expire_in: 1 week
 
 # --- Frontend Build ---
 frontend-build:
@@ -37,15 +56,22 @@ frontend-build:
       - frontend/build
     expire_in: 1 week
 
-# --- Frontend Tests (placeholder) ---
+# --- Frontend Tests ---
 frontend-test:
   stage: test
   image: node:lts
   script:
-    - echo "No frontend tests yet"
-  allow_failure: true
+    - cd frontend
+    - npm ci --prefer-offline --no-audit
+    - npm test -- --watch=false
+  artifacts:
+    when: always
+    paths:
+      - frontend/coverage
+    expire_in: 1 week
+  allow_failure: false
 
-# --- Deploy Stage ---
+# --- Deploy ---
 deploy-job:
   stage: deploy
   script:

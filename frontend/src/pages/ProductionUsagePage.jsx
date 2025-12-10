@@ -9,9 +9,7 @@ function ProductionUsagePage() {
     const navigate = useNavigate();
 
     const [stockItems, setStockItems] = useState([]);
-    const [woodTypes, setWoodTypes] = useState([]);
-
-    const [selectedWoodType, setSelectedWoodType] = useState("");
+    const [selectedDeliveryId, setSelectedDeliveryId] = useState(""); // CHANGED
     const [usage, setUsage] = useState("");
 
     const [result, setResult] = useState(null);
@@ -21,10 +19,6 @@ function ProductionUsagePage() {
         getStockItems()
             .then((items) => {
                 setStockItems(items);
-                const types = Array.from(
-                    new Set(items.map((i) => (i.woodType || "").trim()).filter(Boolean))
-                );
-                setWoodTypes(types);
             })
             .catch(() =>
                 setError("Lao kirjete laadimine ebaõnnestus. Palun proovi hiljem uuesti.")
@@ -36,8 +30,8 @@ function ProductionUsagePage() {
         setError("");
         setResult(null);
 
-        if (!selectedWoodType) {
-            setError("Palun vali puiduliik.");
+        if (!selectedDeliveryId) {
+            setError("Palun vali laopartii.");
             return;
         }
 
@@ -48,7 +42,10 @@ function ProductionUsagePage() {
         }
 
         try {
-            const updated = await sendMaterialToProduction(selectedWoodType, usageValue);
+            const updated = await sendMaterialToProduction(
+                selectedDeliveryId,
+                usageValue
+            );
             setResult(updated);
         } catch (err) {
             setError(
@@ -75,34 +72,50 @@ function ProductionUsagePage() {
                 <form onSubmit={handleSubmit} className="form">
                     <h2>Materjali kasutamine tootmises</h2>
 
+                    {/* SELECT FIELD */}
                     <label>
-                        <span>Vali materjal laost (puiduliik):</span>
+                        <span>Vali laopartii (ID + puiduliik) <span className="required">*</span></span>
                         <select
-                            value={selectedWoodType}
-                            onChange={(e) => setSelectedWoodType(e.target.value)}
-                            required
-                            className="dropdown"
+                            value={selectedDeliveryId}
+                            onChange={(e) => {
+                                setSelectedDeliveryId(e.target.value);
+                                setError("");     // clear error on change
+                            }}
+                            className={`dropdown ${error && !selectedDeliveryId ? "input-error" : ""}`}
                         >
-                            <option value="">-- Vali puiduliik --</option>
-                            {woodTypes.map((type) => (
-                                <option key={type} value={type}>
-                                    {type}
+                            <option value="">-- Vali laopartii --</option>
+                            {stockItems.map((item) => (
+                                <option key={item.deliveryPackageId} value={item.deliveryPackageId}>
+                                    {item.packageCode} – {item.woodType} – {item.usableVolume} m³
                                 </option>
+
                             ))}
                         </select>
+
+                        {/* Custom error message */}
+                        {error && !selectedDeliveryId && (
+                            <p className="error-msg">Palun vali laopartii.</p>
+                        )}
                     </label>
 
+                    {/* USAGE FIELD */}
                     <label>
-                        <span>Sisesta kogus tootmisse (m³):</span>
+                        <span>Sisesta kogus tootmisse (m³) <span className="required">*</span></span>
                         <input
                             type="number"
                             value={usage}
                             min="0"
                             step="0.01"
-                            onChange={(e) => setUsage(e.target.value)}
-                            required
-                            className="input"
+                            onChange={(e) => {
+                                setUsage(e.target.value);
+                                setError("");     // clear error on change
+                            }}
+                            className={`input ${error && (!usage || usage <= 0) ? "input-error" : ""}`}
                         />
+
+                        {error && (!usage || usage <= 0) && (
+                            <p className="error-msg">Kogus peab olema positiivne number.</p>
+                        )}
                     </label>
 
                     <button type="submit" className="main-button">
@@ -114,8 +127,8 @@ function ProductionUsagePage() {
 
                 {result && (
                     <div className="success">
-                        Uuendatud laoseis: {result.woodType} materjalil on nüüd{" "}
-                        {result.usableVolume.toFixed(2)} m³ alles.
+                        Laopartii uuendatud: kasutatav kogus on nüüd{" "}
+                        {result.usableVolume.toFixed(2)} m³.
                     </div>
                 )}
             </div>

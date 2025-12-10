@@ -1,14 +1,37 @@
 package com.erapuit.backend.repository;
 
+import com.erapuit.backend.dto.StockListDto;
 import com.erapuit.backend.model.StockItem;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
-
 import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 
 public interface StockRepository extends JpaRepository<StockItem, Long> {
-    // StockRepository.java
-    @Query("SELECT s FROM StockItem s WHERE LOWER(s.woodType) = LOWER(:woodType)")
-    List<StockItem> findByWoodTypeIgnoreCase(@Param("woodType") String woodType);
+
+    // Pagination support (critical for performance)
+    Page<StockItem> findAll(Pageable pageable);
+
+    List<StockItem> findByWoodTypeIgnoreCase(String woodType);
+
+    List<StockItem> findByDeliveryId(UUID deliveryId);
+
+    void deleteByDeliveryId(UUID deliveryId);
+
+    Optional<StockItem> findByDeliveryPackageId(UUID deliveryPackageId);
+
+
+
+    @Query(
+            "SELECT new com.erapuit.backend.dto.StockListDto(" +
+                    " s.id, s.deliveryId, s.deliveryPackageId, s.packageCode, " +
+                    " s.supplier, s.woodType, s.arrivalDate, " +
+                    " s.totalVolume, s.usableVolume" +
+                    ") FROM StockItem s ORDER BY s.arrivalDate DESC"
+    )
+    Page<StockListDto> findAllSlim(Pageable pageable);
+
 }

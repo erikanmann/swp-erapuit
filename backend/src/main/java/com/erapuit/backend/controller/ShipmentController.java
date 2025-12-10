@@ -30,7 +30,7 @@ public class ShipmentController {
     @GetMapping("/{id}")
     public Shipment getShipment(@PathVariable UUID id) {
         return shipmentRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Saadetist ei leitud."));
+                .orElseThrow(() -> new IllegalArgumentException("Saadetist ei leitud."));
     }
 
     // --- 1. Kõik saadetised ---
@@ -46,7 +46,8 @@ public class ShipmentController {
     public Shipment createShipment(@RequestBody Shipment shipment) {
         // kontroll: saatelehe number on kohustuslik
         if (shipment.getDeliveryNoteNo() == null || shipment.getDeliveryNoteNo().isBlank()) {
-            throw new RuntimeException("Saatelehe number on kohustuslik.");
+            throw new IllegalArgumentException("Saatelehe number on kohustuslik.");
+
         }
 
         // kontroll: saadetise kuupäev, kui puudu
@@ -105,7 +106,7 @@ public class ShipmentController {
 
                     return shipmentRepository.save(existing);
                 })
-                .orElseThrow(() -> new RuntimeException("Saadetist ei leitud."));
+                .orElseThrow(() -> new IllegalArgumentException("Saadetist ei leitud."));
     }
 
     // --- 3b. Tagasta saadetisega seotud read ---
