@@ -85,9 +85,10 @@ function ProductionUsagePage() {
                         >
                             <option value="">-- Vali laopartii --</option>
                             {stockItems.map((item) => (
-                                <option key={item.id} value={item.id}>
-                                    {item.id} – {item.woodType} – {item.usableVolume} m³
+                                <option key={item.deliveryPackageId} value={item.deliveryPackageId}>
+                                    {item.packageCode} – {item.woodType} – {item.usableVolume} m³
                                 </option>
+
                             ))}
                         </select>
 

@@ -179,4 +179,24 @@ public class StockService {
         return stockRepository.findAllSlim(pageable);
     }
 
+    public StockItem useForProductionByPackage(String deliveryPackageId, double usage) {
+
+        if (usage <= 0) {
+            throw new IllegalArgumentException("Usage must be positive");
+        }
+
+        StockItem item = stockRepository.findByDeliveryPackageId(UUID.fromString(deliveryPackageId))
+                .orElseThrow(() -> new IllegalArgumentException("Material not found: " + deliveryPackageId));
+
+        if (item.getUsableVolume().compareTo(BigDecimal.valueOf(usage)) < 0) {
+            throw new IllegalArgumentException("Not enough usable volume in this package.");
+        }
+
+        // subtract usage
+        item.setUsableVolume(item.getUsableVolume().subtract(BigDecimal.valueOf(usage)));
+
+        return stockRepository.save(item);
+    }
+
+
 }

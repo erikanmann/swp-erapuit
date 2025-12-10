@@ -5,6 +5,8 @@ import com.erapuit.backend.model.Production;
 import com.erapuit.backend.service.StockService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import java.util.Map;    // <-- PUUDUV IMPORT
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/production")
@@ -26,4 +28,15 @@ public class ProductionController {
         );
         return ResponseEntity.ok(updated);
     }
+
+    @PutMapping("/use-material/{deliveryPackageId}")
+    public ResponseEntity<StockItem> useMaterialFromPackage(
+            @PathVariable String deliveryPackageId,
+            @RequestBody Map<String, Double> body
+    ) {
+        double usage = body.get("usage");
+        StockItem updated = stockService.useForProductionByPackage(deliveryPackageId, usage);
+        return ResponseEntity.ok(updated);
+    }
+
 }

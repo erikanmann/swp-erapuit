@@ -7,6 +7,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 public interface StockRepository extends JpaRepository<StockItem, Long> {
@@ -19,6 +20,9 @@ public interface StockRepository extends JpaRepository<StockItem, Long> {
     List<StockItem> findByDeliveryId(UUID deliveryId);
 
     void deleteByDeliveryId(UUID deliveryId);
+
+    Optional<StockItem> findByDeliveryPackageId(UUID deliveryPackageId);
+
 
 
     @Query(

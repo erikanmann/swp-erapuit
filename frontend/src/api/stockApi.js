@@ -77,11 +77,11 @@ export const updateUsableVolume = async (id, usableVolume) => {
  *   "usage": 10
  * }
  */
-export const sendMaterialToProduction = async (woodType, usage) => {
-    const response = await fetch(`${PROD_BASE}/use-material`, {
+export const sendMaterialToProduction = async (deliveryPackageId, usage) => {
+    const response = await fetch(`${PROD_BASE}/use-material/${deliveryPackageId}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ woodType, usage }),
+        body: JSON.stringify({ usage }),
     });
 
     if (!response.ok) {
@@ -91,6 +91,7 @@ export const sendMaterialToProduction = async (woodType, usage) => {
 
     return response.json();
 };
+
 
 /**
  * Statistika puuliigi kaupa
