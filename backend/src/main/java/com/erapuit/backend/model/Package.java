@@ -3,6 +3,7 @@ package com.erapuit.backend.model;
 import jakarta.persistence.*;
 import java.math.BigDecimal;
 import java.util.UUID;
+import java.time.OffsetDateTime;
 
 @Entity
 @Table(name = "package")
@@ -27,6 +28,10 @@ public class Package {
     @Column(name = "location")
     private String location;
 
+    @Column(name = "created_at", nullable = false)
+    private OffsetDateTime createdAt;
+
+
     // --- Getters ja Setters ---
     public UUID getId() { return id; }
     public void setId(UUID id) { this.id = id; }
@@ -45,4 +50,13 @@ public class Package {
 
     public String getLocation() { return location; }
     public void setLocation(String location) { this.location = location; }
+
+    public OffsetDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(OffsetDateTime createdAt) {
+        this.createdAt = createdAt;
+    }
+
 }

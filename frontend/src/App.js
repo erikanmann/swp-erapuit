@@ -5,9 +5,9 @@ import HomePage from './pages/HomePage';
 import RegisterDeliveryPage from './pages/RegisterDeliveryPage';
 import './styles/main.css';
 import WarehouseDashboard from './pages/WarehouseDashboard';
-import ProductionUsagePage from './pages/ProductionUsagePage';
 import OutboundShippingPage from "./pages/OutboundShippingPage";
 import DeliveryDetailPage from "./pages/DeliveryDetailPage";
+import ProductionPage from "./pages/ProductionPage";
 
 function App() {
     return (
@@ -19,7 +19,7 @@ function App() {
                     <Route path="/register-delivery" element={<RegisterDeliveryPage />} />
                     <Route path="/deliveries/:id" element={<DeliveryDetailPage />} />
                     <Route path="/warehouse" element={<WarehouseDashboard />} />
-                    <Route path="/production-usage" element={<ProductionUsagePage />} />
+                    <Route path="/production-usage" element={<ProductionPage />} />
                     <Route path="/outbound-shipping" element={<OutboundShippingPage />} />
                 </Routes>
             </div>
