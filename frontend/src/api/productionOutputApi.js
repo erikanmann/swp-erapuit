@@ -1,13 +1,27 @@
-const BASE = "http://localhost:8080/api/production-output";
+// src/api/productionOutputApi.js
 
-export const getAvailableProductionOutputs = async () => {
-    const res = await fetch(`${BASE}/available`);
+export async function createProductionOutput(deliveryPackageId, payload) {
+    const res = await fetch(
+        `http://localhost:8080/api/production/process/${deliveryPackageId}`,
+        {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload),
+        }
+    );
 
     if (!res.ok) {
-        const txt = await res.text();
-        console.error("API ERROR:", txt);
-        throw new Error("Failed to load production outputs");
+        const text = await res.text();
+        console.error("Backend error:", text);
+        throw new Error("Tootmisse saatmine ebaõnnestus");
     }
 
     return res.json();
-};
+}
+
+export async function getAvailableProductionOutputs() {
+    const res = await fetch(
+        "http://localhost:8080/api/production-output/available"
+    );
+    return res.json();
+}

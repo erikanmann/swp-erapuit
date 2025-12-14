@@ -19,7 +19,6 @@ public class PackageItem {
 
     @Column(nullable = false)
     private Integer count;
-
     // getters & setters
 
     public UUID getId() {
@@ -53,4 +52,5 @@ public class PackageItem {
     public void setCount(Integer count) {
         this.count = count;
     }
+
 }

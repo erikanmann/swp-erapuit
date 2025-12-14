@@ -13,8 +13,9 @@ public class Package {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private UUID id;
 
-    @Column(name = "product_id")
+    @Column(name = "product_id", nullable = true)
     private UUID productId;
+
 
     @Column(name = "weight_kg")
     private BigDecimal weightKg;
@@ -58,5 +59,10 @@ public class Package {
     public void setCreatedAt(OffsetDateTime createdAt) {
         this.createdAt = createdAt;
     }
+    @PrePersist
+    public void prePersist() {
+        this.createdAt = OffsetDateTime.now();
+    }
+
 
 }

@@ -15,23 +15,20 @@ import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.UUID;
 
-import com.erapuit.backend.repository.ProductRepository;
+
 
 @Service
 public class ProductionOutputService {
 
     private final ProductionOutputRepository repo;
     private final StockRepository stockRepository;
-    private final ProductRepository productRepository;
 
     public ProductionOutputService(
             ProductionOutputRepository repo,
-            StockRepository stockRepository,
-            ProductRepository productRepository
+            StockRepository stockRepository
     ) {
         this.repo = repo;
         this.stockRepository = stockRepository;
-        this.productRepository = productRepository;
     }
     @Transactional
     public ProductionOutput process(String deliveryPackageId, ProductionOutputRequest req) {
@@ -63,20 +60,9 @@ public class ProductionOutputService {
         return repo.save(out);
     }
     public List<ProductionOutputDto> getAvailableOutputs() {
-        return repo.findAll()
-                .stream()
-                .map(po -> {
-                    var product = productRepository
-                            .findById(po.getProductId())
-                            .orElseThrow();
-
-                    return new ProductionOutputDto(
-                            po.getId(),
-                            product.getName()
-                    );
-                })
-                .toList();
+        return repo.findAvailable();
     }
+
 
 
 

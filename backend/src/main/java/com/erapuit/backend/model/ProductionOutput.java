@@ -32,6 +32,9 @@ public class ProductionOutput {
     @Column(name = "produced_at")
     private OffsetDateTime producedAt;
 
+    private boolean packaged = false;
+
+
     // --- GETTERS & SETTERS ---
 
     public UUID getId() {
@@ -84,5 +87,13 @@ public class ProductionOutput {
 
     public void setProducedAt(OffsetDateTime producedAt) {
         this.producedAt = producedAt;
+    }
+
+    public boolean isPackaged() {
+        return packaged;
+    }
+
+    public void setPackaged(boolean packaged) {
+        this.packaged = packaged;
     }
 }

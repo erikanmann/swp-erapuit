@@ -102,17 +102,3 @@ export const getStatsByWoodType = async () => {
     return res.json();
 };
 
-export const createProductionOutput = async (data) => {
-    const res = await fetch(`${PROD_BASE}/output`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
-    });
-
-    if (!res.ok) {
-        const msg = await res.text();
-        throw new Error(msg || "Tootmisväljundi loomine ebaõnnestus");
-    }
-
-    return res.json();
-};
