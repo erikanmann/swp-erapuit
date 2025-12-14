@@ -98,13 +98,12 @@ export default function SendToProduction() {
                     onChange={e => setRecipeId(e.target.value)}
                 >
                     <option value="">-- vali --</option>
-                    {recipes
-                        .filter(r => r.species === selectedStock?.woodType)
-                        .map(r => (
-                            <option key={r.id} value={r.id}>
-                                {r.name}
-                            </option>
-                        ))}
+                    {recipes.map(r => (
+                        <option key={r.id} value={r.id}>
+                            {r.name} ({r.species})
+                        </option>
+                    ))}
+
                 </select>
             </label>
 
