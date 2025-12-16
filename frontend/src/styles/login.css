@@ -1,0 +1,121 @@
+/* Login Page - Erapuit Theme */
+
+.login-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background: radial-gradient(circle at 18% 18%, rgba(214, 160, 59, 0.08), transparent 26%),
+    radial-gradient(circle at 82% 12%, rgba(185, 135, 34, 0.08), transparent 24%),
+    linear-gradient(135deg, #faf6ee, #efe2c9 55%, #f6f0e1);
+  font-family: "Inter", Arial, sans-serif;
+}
+
+.login-card {
+  background: #fffefc;
+  padding: 40px;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  width: 100%;
+  max-width: 400px;
+  border: 1px solid #eadfc7;
+}
+
+.login-card h1 {
+  margin: 0 0 30px 0;
+  color: #2f281a;
+  text-align: center;
+  font-size: 28px;
+  letter-spacing: -0.01em;
+}
+
+.error-message {
+  background-color: #fbe4e4;
+  color: #8b2a2a;
+  padding: 12px;
+  border-radius: var(--radius-sm);
+  margin-bottom: 20px;
+  border-left: 4px solid #e6c8c8;
+}
+
+.form-group {
+  margin-bottom: 20px;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 8px;
+  color: #4a4336;
+  font-weight: 600;
+  font-size: 0.95rem;
+}
+
+.form-group input {
+  width: 100%;
+  padding: 11px 12px;
+  border: 1px solid #d6c7aa;
+  border-radius: var(--radius-sm);
+  font-size: 0.95rem;
+  box-sizing: border-box;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  background: #fffefc;
+  color: #2b2b2b;
+  font-family: inherit;
+}
+
+.form-group input:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(214, 160, 59, 0.22);
+}
+
+.form-group input:disabled {
+  background-color: #f9f4ea;
+  cursor: not-allowed;
+  color: #999;
+}
+
+.login-button {
+  width: 100%;
+  padding: 11px 20px;
+  background: linear-gradient(120deg, var(--accent), var(--accent-strong));
+  color: #fffefc;
+  border: none;
+  border-radius: var(--radius-sm);
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  font-family: inherit;
+}
+
+.login-button:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 15px rgba(214, 160, 59, 0.25);
+}
+
+.login-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.demo-credentials {
+  margin-top: 30px;
+  padding-top: 20px;
+  border-top: 1px solid #eadfc7;
+  color: #6a5f50;
+  font-size: 0.85rem;
+}
+
+.demo-credentials p {
+  margin: 6px 0;
+}
+
+.demo-credentials code {
+  background-color: #f9f4ea;
+  padding: 3px 6px;
+  border-radius: var(--radius-sm);
+  font-family: 'Courier New', monospace;
+  color: #4a4336;
+  border: 1px solid #eadfc7;
+}
