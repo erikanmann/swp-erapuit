@@ -3,6 +3,7 @@ package com.erapuit.backend.model;
 import jakarta.persistence.*;
 import java.math.BigDecimal;
 import java.util.UUID;
+import java.time.OffsetDateTime;
 
 @Entity
 @Table(name = "package")
@@ -12,8 +13,9 @@ public class Package {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private UUID id;
 
-    @Column(name = "product_id")
+    @Column(name = "product_id", nullable = true)
     private UUID productId;
+
 
     @Column(name = "weight_kg")
     private BigDecimal weightKg;
@@ -26,6 +28,10 @@ public class Package {
 
     @Column(name = "location")
     private String location;
+
+    @Column(name = "created_at", nullable = false)
+    private OffsetDateTime createdAt;
+
 
     // --- Getters ja Setters ---
     public UUID getId() { return id; }
@@ -45,4 +51,18 @@ public class Package {
 
     public String getLocation() { return location; }
     public void setLocation(String location) { this.location = location; }
+
+    public OffsetDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(OffsetDateTime createdAt) {
+        this.createdAt = createdAt;
+    }
+    @PrePersist
+    public void prePersist() {
+        this.createdAt = OffsetDateTime.now();
+    }
+
+
 }

@@ -124,3 +124,4 @@ export const getStatsByWoodType = async () => {
     if (!res.ok) throw new Error("Failed to load wood-type statistics");
     return res.json();
 };
+

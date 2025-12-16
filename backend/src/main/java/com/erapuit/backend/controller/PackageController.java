@@ -1,7 +1,10 @@
 package com.erapuit.backend.controller;
 
+import com.erapuit.backend.dto.AvailablePackageDto;
+import com.erapuit.backend.dto.CreatePackageRequest;
+import com.erapuit.backend.dto.CreatePackageWithItemsRequest;
 import com.erapuit.backend.model.Package;
-import com.erapuit.backend.repository.PackageRepository;
+import com.erapuit.backend.service.PackageService;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -12,50 +15,55 @@ import java.util.UUID;
 @CrossOrigin(origins = "http://localhost:3000")
 public class PackageController {
 
-    private final PackageRepository packageRepository;
+    private final PackageService packageService;
 
-    public PackageController(PackageRepository packageRepository) {
-        this.packageRepository = packageRepository;
+    // ⭐ ÕIGE KONSTRUKTOR
+    public PackageController(PackageService packageService) {
+        this.packageService = packageService;
     }
 
+    // Kõik pakid
     @GetMapping
     public List<Package> getAllPackages() {
-        return packageRepository.findAll();
+        return packageService.getAllPackages();
     }
 
+    // Üks pakk
     @GetMapping("/{id}")
     public Package getPackage(@PathVariable UUID id) {
-        return packageRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Package not found"));
+        return packageService.getPackage(id);
     }
 
-
+    //Saadaval pakid (millel puudub ShipmentItem või kuulub antud saadetisele)
     @GetMapping("/available")
-    public List<Package> getAvailablePackages() {
-        return packageRepository.findUnshippedPackages();
+    public List<AvailablePackageDto> getAvailablePackages(
+            @RequestParam(value = "includeShipmentId", required = false) UUID includeShipmentId
+    ) {
+        return packageService.getAvailablePackagesDetailed(includeShipmentId);
     }
 
+    //UUS — Paki loomine DTO kaudu (mitte raw entity)
     @PostMapping
-    public Package createPackage(@RequestBody Package newPackage) {
-        return packageRepository.save(newPackage);
+    public Package createPackage(@RequestBody CreatePackageRequest req) {
+        return packageService.createPackage(req);
     }
 
+    // Paki uuendamine (soovi korral võib samuti teenusesse viia)
     @PutMapping("/{id}")
     public Package updatePackage(@PathVariable UUID id, @RequestBody Package updated) {
-        return packageRepository.findById(id)
-                .map(existing -> {
-                    existing.setProductId(updated.getProductId());
-                    existing.setWeightKg(updated.getWeightKg());
-                    existing.setCount(updated.getCount());
-                    existing.setVolumeM3(updated.getVolumeM3());
-                    existing.setLocation(updated.getLocation());
-                    return packageRepository.save(existing);
-                })
-                .orElseThrow(() -> new IllegalArgumentException("Package not found"));
+        return packageService.updatePackage(id, updated);
     }
 
+    // Paki kustutamine
     @DeleteMapping("/{id}")
     public void deletePackage(@PathVariable UUID id) {
-        packageRepository.deleteById(id);
+        packageService.deletePackage(id);
     }
+    @PostMapping("/with-items")
+    public Package createPackageWithItems(
+            @RequestBody CreatePackageWithItemsRequest req
+    ) {
+        return packageService.createPackageWithItems(req);
+    }
+
 }

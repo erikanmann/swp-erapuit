@@ -1,12 +1,14 @@
 package com.erapuit.backend.controller;
 
+import com.erapuit.backend.dto.ProductionOutputRequest;
 import com.erapuit.backend.model.StockItem;
-import com.erapuit.backend.model.Production;
+import com.erapuit.backend.model.ProductionOutput;
 import com.erapuit.backend.service.StockService;
+import com.erapuit.backend.service.ProductionOutputService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import java.util.Map;    // <-- PUUDUV IMPORT
-import java.util.UUID;
+
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/production")
@@ -14,29 +16,36 @@ import java.util.UUID;
 public class ProductionController {
 
     private final StockService stockService;
+    private final ProductionOutputService productionOutputService;
 
-    public ProductionController(StockService stockService) {
+    public ProductionController(
+            StockService stockService,
+            ProductionOutputService productionOutputService
+    ) {
         this.stockService = stockService;
+        this.productionOutputService = productionOutputService;
     }
 
-    // UC2: US 2.6 ja 2.7 – materjali kasutamine tootmises
-    @PutMapping("/use-material")
-    public ResponseEntity<StockItem> useMaterial(@RequestBody Production production) {
-        StockItem updated = stockService.useForProductionByType(
-                production.getWoodType(),
-                production.getUsage()
-        );
-        return ResponseEntity.ok(updated);
-    }
-
+    // 🔹 Materjali kasutamine tootmises (laoseisu vähendamine)
     @PutMapping("/use-material/{deliveryPackageId}")
     public ResponseEntity<StockItem> useMaterialFromPackage(
             @PathVariable String deliveryPackageId,
             @RequestBody Map<String, Double> body
     ) {
         double usage = body.get("usage");
-        StockItem updated = stockService.useForProductionByPackage(deliveryPackageId, usage);
+        StockItem updated =
+                stockService.useForProductionByPackage(deliveryPackageId, usage);
         return ResponseEntity.ok(updated);
     }
+
+
+    @PostMapping("/process/{deliveryPackageId}")
+    public ProductionOutput processProduction(
+            @PathVariable String deliveryPackageId,
+            @RequestBody ProductionOutputRequest req
+    ) {
+        return productionOutputService.process(deliveryPackageId, req);
+    }
+
 
 }

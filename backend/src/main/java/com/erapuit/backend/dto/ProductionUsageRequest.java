@@ -1,6 +1,6 @@
-package com.erapuit.backend.model;
+package com.erapuit.backend.dto;
 
-public class Production {
+public class ProductionUsageRequest {
     private String woodType;
     private double usage;
 
