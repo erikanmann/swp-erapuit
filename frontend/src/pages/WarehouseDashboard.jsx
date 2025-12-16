@@ -3,6 +3,7 @@ import "../styles/delivery.css";
 import "../styles/main.css";
 import "../styles/warehouse.css";
 import { useNavigate } from "react-router-dom";
+import Navbar from "../components/Navbar";
 
 import {
     getStockPaged,
@@ -130,8 +131,6 @@ const WarehouseDashboard = () => {
     // PAKI MODAL AVAMINE
     // ------------------------------------------------------
     const openPackageView = async (deliveryPackageId, deliveryId) => {
-        console.log("openPackageView:", deliveryPackageId, deliveryId);
-
         if (!deliveryPackageId || !deliveryId) {
             setError("Paki ID puudub.");
             return;
@@ -145,7 +144,6 @@ const WarehouseDashboard = () => {
             setPackageRows(rows);
             setShowPackageModal(true);
         } catch (err) {
-            console.error(err);
             setError("Paki andmete laadimine ebaõnnestus.");
         }
     };
@@ -181,20 +179,9 @@ const WarehouseDashboard = () => {
     // RENDER
     // ------------------------------------------------------
     return (
-        <div className="delivery-page">
-            <div className="warehouse-tabs">
-                <button onClick={() => navigate("/home")}>Avaleht</button>
-                <button onClick={() => navigate("/register-delivery")}>
-                    Tarne registreerimine
-                </button>
-                <button className="active-tab">Lao ülevaade</button>
-                <button onClick={() => navigate("/production-usage")}>
-                    Tootmise kasutus
-                </button>
-                <button onClick={() => navigate("/outbound-shipping")}>
-                    Väljaminev kaup
-                </button>
-            </div>
+        <>
+            <Navbar />
+            <div className="delivery-page">
 
             <h2>Lao ülevaade ja jälgimine</h2>
 
@@ -447,7 +434,8 @@ const WarehouseDashboard = () => {
                     Kasuta materjali tootmises
                 </button>
             </div>
-        </div>
+            </div>
+        </>
     );
 };
 

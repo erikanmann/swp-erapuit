@@ -2,6 +2,8 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { getIncomingMaterials } from "../api/deliveryApi";
 import { getShipments } from "../api/shipmentApi";
+import { useUser } from "../context/UserContext";
+import Navbar from "../components/Navbar";
 import "../styles/delivery.css";
 import "../styles/main.css";
 import "../styles/warehouse.css";
@@ -37,6 +39,7 @@ function filterShipmentsByPeriod(shipments, period) {
 
 const HomePage = () => {
     const navigate = useNavigate();
+    const { isLoading: userLoading } = useUser();
 
     const [incomingPeriod, setIncomingPeriod] = useState("week");
     const [outgoingPeriod, setOutgoingPeriod] = useState("week");
@@ -49,40 +52,34 @@ const HomePage = () => {
 
     // Sissetulevad tarned
     useEffect(() => {
+        // Wait for user context to finish loading before fetching data
+        if (userLoading) return;
+        
         setLoading(true);
         getIncomingMaterials(incomingPeriod)
             .then(setMaterials)
             .catch((err) => console.error(err))
             .finally(() => setLoading(false));
-    }, [incomingPeriod]);
+    }, [incomingPeriod, userLoading]);
 
     // Väljaminevad saadetised
     useEffect(() => {
+        // Wait for user context to finish loading before fetching data
+        if (userLoading) return;
+        
         setLoadingShipments(true);
         getShipments()
             .then(setShipments)
             .catch((err) => console.error(err))
             .finally(() => setLoadingShipments(false));
-    }, [outgoingPeriod]);
+    }, [outgoingPeriod, userLoading]);
 
     const filteredShipments = filterShipmentsByPeriod(shipments, outgoingPeriod);
 
     return (
-        <div className="delivery-page">
-            {/* Ülemine navigeerimisriba */}
-            <div className="warehouse-tabs">
-                <button className="active-tab">Avaleht</button>
-                <button onClick={() => navigate("/register-delivery")}>
-                    Tarne registreerimine
-                </button>
-                <button onClick={() => navigate("/warehouse")}>Lao ülevaade</button>
-                <button onClick={() => navigate("/production-usage")}>
-                    Tootmise kasutus
-                </button>
-                <button onClick={() => navigate("/outbound-shipping")}>
-                    Väljaminev kaup
-                </button>
-            </div>
+        <>
+            <Navbar />
+            <div className="delivery-page">
 
             {/* SISSETULEVAD TARNED */}
             <h2>Sissetulevad tarned</h2>
@@ -225,7 +222,8 @@ const HomePage = () => {
                 </table>
 
             )}
-        </div>
+            </div>
+        </>
     );
 };
 

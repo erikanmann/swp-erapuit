@@ -10,6 +10,7 @@ import {
 
 import DeliveryForm from "../components/DeliveryForm";
 import DeliveryList from "../components/DeliveryList";
+import Navbar from "../components/Navbar";
 
 import "../styles/delivery.css";
 import "../styles/main.css";
@@ -145,15 +146,9 @@ const RegisterDeliveryPage = () => {
         : null;
 
     return (
-        <div className="delivery-page">
-
-            <div className="warehouse-tabs">
-                <button onClick={() => navigate("/home")}>Avaleht</button>
-                <button className="active-tab">Tarne registreerimine</button>
-                <button onClick={() => navigate("/warehouse")}>Lao ülevaade</button>
-                <button onClick={() => navigate("/production-usage")}>Tootmise kasutus</button>
-                <button onClick={() => navigate("/outbound-shipping")}>Väljaminev kaup</button>
-            </div>
+        <>
+            <Navbar />
+            <div className="delivery-page">
 
             <h1>Tarne registreerimine</h1>
 
@@ -203,7 +198,8 @@ const RegisterDeliveryPage = () => {
                 onDelete={handleDelete}
                 onEdit={handleEdit}
             />
-        </div>
+            </div>
+        </>
     );
 };
 

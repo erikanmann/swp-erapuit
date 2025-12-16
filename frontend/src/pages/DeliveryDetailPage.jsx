@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import DeliveryForm from "../components/DeliveryForm";
+import Navbar from "../components/Navbar";
 import {
     getDeliveryById,
     getDeliveryPackages,
@@ -61,7 +62,9 @@ const DeliveryDetailPage = () => {
     if (!delivery) return <p>Tarne ei leitud.</p>;
 
     return (
-        <div className="page">
+        <>
+            <Navbar />
+            <div className="page">
 
             <button onClick={() => navigate("/register-delivery")}>
                 ⬅ Tagasi nimekirja
@@ -192,7 +195,8 @@ const DeliveryDetailPage = () => {
                     </table>
                 )}
             </div>
-        </div>
+            </div>
+        </>
     );
 };
 

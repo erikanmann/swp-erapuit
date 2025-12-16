@@ -5,11 +5,13 @@ import {
     deleteShipment,
     updateShipment,
 } from "../api/shipmentApi";
+import { tokenStorage } from "../api/authApi";
 
 import "../styles/delivery.css";
 import "../styles/main.css";
 import "../styles/warehouse.css";
 import { useNavigate } from "react-router-dom";
+import Navbar from "../components/Navbar";
 
 function OutboundShippingPage() {
     const navigate = useNavigate();
@@ -35,7 +37,10 @@ function OutboundShippingPage() {
 
     const loadData = async () => {
         try {
-            const pkgRes = await fetch("http://localhost:8080/api/packages/available");
+            const token = tokenStorage.getToken();
+            const pkgRes = await fetch("http://localhost:8080/api/packages/available", {
+                headers: token ? { 'Authorization': `Bearer ${token}` } : {}
+            });
             const pkgData = await pkgRes.json();
             setPackages(pkgData);
 
@@ -159,16 +164,9 @@ function OutboundShippingPage() {
     );
 
     return (
-        <div className="delivery-page">
-
-            {/* NAVIGATION TABS */}
-            <div className="warehouse-tabs">
-                <button onClick={() => navigate("/home")}>Avaleht</button>
-                <button onClick={() => navigate("/register-delivery")}>Tarne registreerimine</button>
-                <button onClick={() => navigate("/warehouse")}>Lao ülevaade</button>
-                <button onClick={() => navigate("/production-usage")}>Tootmise kasutus</button>
-                <button className="active-tab">Väljaminev kaup</button>
-            </div>
+        <>
+            <Navbar />
+            <div className="delivery-page">
 
             {/* FORM */}
             <div className="form-section">
@@ -331,7 +329,8 @@ function OutboundShippingPage() {
                     </table>
                 )}
             </div>
-        </div>
+            </div>
+        </>
     );
 }
 
