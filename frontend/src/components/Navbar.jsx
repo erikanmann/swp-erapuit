@@ -5,7 +5,6 @@ import { useLocation } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
 import { authApi, tokenStorage } from '../api/authApi';
 import { useUser } from '../context/UserContext';
-import { hasPageAccess } from '../utils/rolePermissions';
 import '../styles/navbar.css';
 
 const pageLinks = [
@@ -75,8 +74,8 @@ export default function Navbar() {
       return allowedPages.includes(pageName);
     }
     
-    // Fall back to role-based permissions if no allowedPages from database
-    return hasPageAccess(userRoles, page.path);
+    // Otherwise allow access (database will override at route level)
+    return true;
   });
 
   return (
