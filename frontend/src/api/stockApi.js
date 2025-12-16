@@ -1,17 +1,26 @@
 // src/api/stockApi.js
 
+import { tokenStorage } from './authApi';
 const STOCK_BASE = "http://localhost:8080/api/stock";
 const PROD_BASE = "http://localhost:8080/api/production";
+
 
 /**
  * Kõigi laoseisu kirjete toomine
  */
 export const getStockItems = async () => {
-    const res = await fetch(STOCK_BASE);
+    const token = tokenStorage.getToken();
+    const res = await fetch(STOCK_BASE, {
+        headers: token ? { 'Authorization': `Bearer ${token}` } : {}
+    });
     if (!res.ok) throw new Error("Failed to fetch stock items");
     return res.json();
 };
 
+
+/**
+ * Paged stock fetch
+ */
 export const getStockPaged = async (page = 0, size = 200, filters = {}) => {
     const params = new URLSearchParams();
     params.append("page", page);
@@ -21,7 +30,10 @@ export const getStockPaged = async (page = 0, size = 200, filters = {}) => {
     if (filters.supplier) params.append("supplier", filters.supplier);
     if (filters.fromDate) params.append("fromDate", filters.fromDate);
 
-    const res = await fetch(`${STOCK_BASE}/paged-fast?${params.toString()}`);
+    const token = tokenStorage.getToken();
+    const res = await fetch(`${STOCK_BASE}/paged-fast?${params.toString()}`, {
+        headers: token ? { 'Authorization': `Bearer ${token}` } : {}
+    });
 
     if (!res.ok) throw new Error("Failed to fetch paged stock");
 
@@ -33,9 +45,16 @@ export const getStockPaged = async (page = 0, size = 200, filters = {}) => {
 /**
  * Filtreerimine: woodType / supplier / fromDate
  */
+
+/**
+ * Filtreerimine: woodType / supplier / fromDate
+ */
 export const filterStock = async (params) => {
     const query = new URLSearchParams(params).toString();
-    const res = await fetch(`${STOCK_BASE}/filter?${query}`);
+    const token = tokenStorage.getToken();
+    const res = await fetch(`${STOCK_BASE}/filter?${query}`, {
+        headers: token ? { 'Authorization': `Bearer ${token}` } : {}
+    });
     if (!res.ok) throw new Error("Failed to filter stock");
     return res.json();
 };
@@ -78,9 +97,13 @@ export const updateUsableVolume = async (id, usableVolume) => {
  * }
  */
 export const sendMaterialToProduction = async (deliveryPackageId, usage) => {
+    const token = tokenStorage.getToken();
     const response = await fetch(`${PROD_BASE}/use-material/${deliveryPackageId}`, {
         method: "PUT",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+            "Content-Type": "application/json",
+            ...(token ? { 'Authorization': `Bearer ${token}` } : {})
+        },
         body: JSON.stringify({ usage }),
     });
 
