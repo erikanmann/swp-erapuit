@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.UUID;
 
 @Repository
-public interface ShipmentItemRepository extends JpaRepository<ShipmentItem, Integer> {
+public interface ShipmentItemRepository extends JpaRepository<ShipmentItem, UUID> {
     List<ShipmentItem> findByPackageId(UUID packageId);
     List<ShipmentItem> findByShipmentId(UUID shipmentId);
 }

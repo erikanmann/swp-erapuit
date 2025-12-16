@@ -64,6 +64,7 @@ public class ShipmentController {
                 ShipmentItem item = new ShipmentItem();
                 item.setShipmentId(saved.getId());
                 item.setPackageId(pkgId);
+                item.setQuantity(1); // DB column is NOT NULL with default 1, set explicitly to avoid constraint violation
                 shipmentItemRepository.save(item);
             }
         }

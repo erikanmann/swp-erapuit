@@ -1,10 +1,11 @@
 package com.erapuit.backend.controller;
 
+import com.erapuit.backend.dto.AvailablePackageDto;
 import com.erapuit.backend.dto.CreatePackageRequest;
+import com.erapuit.backend.dto.CreatePackageWithItemsRequest;
 import com.erapuit.backend.model.Package;
 import com.erapuit.backend.service.PackageService;
 import org.springframework.web.bind.annotation.*;
-import com.erapuit.backend.dto.CreatePackageWithItemsRequest;
 
 import java.util.List;
 import java.util.UUID;
@@ -35,8 +36,8 @@ public class PackageController {
 
     //Saadaval pakid (millel puudub ShipmentItem)
     @GetMapping("/available")
-    public List<Package> getAvailablePackages() {
-        return packageService.getAvailablePackages();
+    public List<AvailablePackageDto> getAvailablePackages() {
+        return packageService.getAvailablePackagesDetailed();
     }
 
     //UUS — Paki loomine DTO kaudu (mitte raw entity)

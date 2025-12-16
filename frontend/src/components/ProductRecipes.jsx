@@ -46,7 +46,7 @@ export default function ProductRecipes({ onCreated }) {
         });
 
         if (!res.ok) {
-            setError("Retsepti loomine ebaõnnestus.");
+            setError("Saekava loomine ebaõnnestus.");
             return;
         }
 
@@ -72,7 +72,7 @@ export default function ProductRecipes({ onCreated }) {
             : null;
 
     const remove = async (id) => {
-        if (!window.confirm("Kas oled kindel, et soovid retsepti kustutada?")) {
+        if (!window.confirm("Kas oled kindel, et soovid saekava kustutada?")) {
             return;
         }
 
@@ -81,7 +81,7 @@ export default function ProductRecipes({ onCreated }) {
         });
 
         if (!res.ok) {
-            setError("Retsepti kustutamine ebaõnnestus.");
+            setError("Saekava kustutamine ebaõnnestus.");
             return;
         }
 
@@ -93,10 +93,10 @@ export default function ProductRecipes({ onCreated }) {
     /* -------- UI -------- */
     return (
         <div className="form" style={{ marginTop: 40 }}>
-            <h2>Retseptide loomine</h2>
+            <h2>Saekava loomine</h2>
 
             <label>
-                <span>Retsepti nimi *</span>
+                <span>Saekava nimi *</span>
                 <input
                     value={name}
                     onChange={e => setName(e.target.value)}
@@ -149,12 +149,12 @@ export default function ProductRecipes({ onCreated }) {
             {error && <div className="error">{error}</div>}
 
             <button type="button" className="main-button" onClick={create}>
-                Salvesta retsept
+                Salvesta saekava
             </button>
 
             {/* -------- LIST -------- */}
             <div style={{ marginTop: 30 }}>
-                <h3>Olemasolevad retseptid</h3>
+                <h3>Olemasolevad saekavad</h3>
 
                 <table style={{ width: "100%", marginTop: 10 }}>
                     <thead>

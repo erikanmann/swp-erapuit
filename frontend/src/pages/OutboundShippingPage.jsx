@@ -35,11 +35,14 @@ function OutboundShippingPage() {
 
     const loadData = async () => {
         try {
-            const pkgRes = await fetch("http://localhost:8080/api/packages/available");
-            const pkgData = await pkgRes.json();
-            setPackages(pkgData);
+            const [pkgRes, shipmentsData] = await Promise.all([
+                fetch("http://localhost:8080/api/packages/available"),
+                getShipments(),
+            ]);
 
-            const shipmentsData = await getShipments();
+            const pkgData = await pkgRes.json();
+
+            setPackages(pkgData);
             setShipments(shipmentsData);
         } catch (err) {
             setSuccess(null);
@@ -75,6 +78,13 @@ function OutboundShippingPage() {
         }
 
         return newErrors;
+    };
+
+    const formatNumber = (val, fraction = 2) => {
+        if (val === null || val === undefined) return "-";
+        const num = typeof val === "number" ? val : parseFloat(val);
+        if (Number.isNaN(num)) return "-";
+        return num.toFixed(fraction);
     };
 
     const handleSubmit = async (e) => {
@@ -236,18 +246,30 @@ function OutboundShippingPage() {
                     {!editingId && (
                         <>
                             <h3>Saadaval pakid</h3>
-                            <div className="package-list">
+                            <div className="package-grid">
                                 {packages.length === 0 ? (
                                     <p>Saadaval pakke ei ole.</p>
                                 ) : (
                                     packages.map((pkg) => (
-                                        <label key={pkg.id} className="package-item">
-                                            <input
-                                                type="checkbox"
-                                                checked={selectedPackages.includes(pkg.id)}
-                                                onChange={() => handlePackageSelect(pkg.id)}
-                                            />
-                                            {pkg.productId || "Pakk"} – {pkg.volumeM3} m³, {pkg.weightKg} kg, {pkg.location}
+                                        <label
+                                            key={pkg.id}
+                                            className="package-card"
+                                        >
+                                            <div className="package-card-row">
+                                                <div className="package-info">
+                                                    <div className="package-name">
+                                                        {pkg.productName || "Saekava puudub"}
+                                                    </div>
+                                                    <div className="package-count">
+                                                        Kogus: {pkg.pieceCount ?? pkg.count ?? 0} tk
+                                                    </div>
+                                                </div>
+                                                <input
+                                                    type="checkbox"
+                                                    checked={selectedPackages.includes(pkg.id)}
+                                                    onChange={() => handlePackageSelect(pkg.id)}
+                                                />
+                                            </div>
                                         </label>
                                     ))
                                 )}
@@ -306,11 +328,11 @@ function OutboundShippingPage() {
                         <tbody>
                         {visibleShipments.map((s) => (
                             <tr key={s.id}>
-                                <td>{s.deliveryNoteNo || "—"}</td>
+                                <td>{s.deliveryNoteNo || "-"}</td>
                                 <td>{new Date(s.dateSent).toLocaleDateString("et-EE")}</td>
-                                <td>{s.customer || "—"}</td>
-                                <td>{s.transportCompany || "—"}</td>
-                                <td>{s.vehicleNo || "—"}</td>
+                                <td>{s.customer || "-"}</td>
+                                <td>{s.transportCompany || "-"}</td>
+                                <td>{s.vehicleNo || "-"}</td>
                                 <td>
                                     <button
                                         className="edit-button"

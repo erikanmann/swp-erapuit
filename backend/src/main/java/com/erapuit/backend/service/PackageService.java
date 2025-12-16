@@ -2,6 +2,7 @@ package com.erapuit.backend.service;
 
 import com.erapuit.backend.dto.CreatePackageRequest;
 import com.erapuit.backend.dto.CreatePackageWithItemsRequest;
+import com.erapuit.backend.dto.AvailablePackageDto;
 import com.erapuit.backend.model.Package;
 import com.erapuit.backend.model.PackageItem;
 import com.erapuit.backend.model.Product;
@@ -14,7 +15,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 @Service
@@ -73,6 +78,100 @@ public class PackageService {
     // --- AVAILABLE ---
     public List<Package> getAvailablePackages() {
         return packageRepository.findUnshippedPackages();
+    }
+
+    // --- AVAILABLE with details for UI ---
+    public List<AvailablePackageDto> getAvailablePackagesDetailed() {
+        List<Package> packages = packageRepository.findUnshippedPackages();
+        if (packages.isEmpty()) {
+            return List.of();
+        }
+
+        List<UUID> packageIds = packages.stream().map(Package::getId).toList();
+        List<PackageItem> allItems = packageItemRepository.findByPackageIdIn(packageIds);
+        Map<UUID, List<PackageItem>> itemsByPackage = new HashMap<>();
+        for (PackageItem item : allItems) {
+            itemsByPackage.computeIfAbsent(item.getPackageId(), k -> new ArrayList<>()).add(item);
+        }
+
+        Map<UUID, ProductionOutput> outputsById = new HashMap<>();
+        allItems.stream()
+                .map(PackageItem::getProductionOutputId)
+                .distinct()
+                .forEach(id -> productionOutputRepository.findById(id).ifPresent(po -> outputsById.put(id, po)));
+
+        Map<UUID, Product> productsById = new HashMap<>();
+
+        List<AvailablePackageDto> result = new ArrayList<>();
+        for (Package pkg : packages) {
+            List<PackageItem> pkgItems = itemsByPackage.getOrDefault(pkg.getId(), List.of());
+
+            UUID productId = pkg.getProductId();
+            if (productId == null) {
+                productId = pkgItems.stream()
+                        .map(item -> outputsById.get(item.getProductionOutputId()))
+                        .filter(po -> po != null && po.getProductId() != null)
+                        .map(ProductionOutput::getProductId)
+                        .findFirst()
+                        .orElse(null);
+            }
+
+            Product product = null;
+            if (productId != null) {
+                product = productsById.computeIfAbsent(
+                        productId,
+                        id -> productRepository.findById(id).orElse(null)
+                );
+            }
+
+            String productName = product != null ? product.getName() : "Saekava puudub";
+
+            int pieceCount = pkgItems.stream()
+                    .map(PackageItem::getCount)
+                    .filter(c -> c != null)
+                    .mapToInt(Integer::intValue)
+                    .sum();
+            if (pieceCount == 0 && pkg.getCount() != null) {
+                pieceCount = pkg.getCount();
+            }
+
+            BigDecimal volume = pkg.getVolumeM3();
+            if (volume == null) {
+                volume = BigDecimal.ZERO;
+                for (PackageItem item : pkgItems) {
+                    ProductionOutput po = outputsById.get(item.getProductionOutputId());
+                    if (po == null || item.getCount() == null) continue;
+
+                    if (po.getVolumeM3() != null) {
+                        BigDecimal perPiece;
+                        if (po.getCount() != null && po.getCount() > 0) {
+                            perPiece = po.getVolumeM3()
+                                    .divide(BigDecimal.valueOf(po.getCount()), 6, RoundingMode.HALF_UP);
+                        } else {
+                            perPiece = po.getVolumeM3();
+                        }
+                        volume = volume.add(perPiece.multiply(BigDecimal.valueOf(item.getCount())));
+                    } else if (product != null) {
+                        volume = volume.add(
+                                product.calculateUnitVolumeM3()
+                                        .multiply(BigDecimal.valueOf(item.getCount()))
+                        );
+                    }
+                }
+            }
+
+            result.add(new AvailablePackageDto(
+                    pkg.getId(),
+                    productId,
+                    productName,
+                    pieceCount,
+                    volume,
+                    pkg.getWeightKg(),
+                    pkg.getLocation()
+            ));
+        }
+
+        return result;
     }
 
     @Transactional

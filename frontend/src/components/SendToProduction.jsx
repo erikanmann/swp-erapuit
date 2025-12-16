@@ -91,7 +91,7 @@ export default function SendToProduction() {
 
             {/* --- RETSEPT --- */}
             <label>
-                <span>Retsept *</span>
+                <span>Saekava *</span>
                 <select
                     value={recipeId}
                     disabled={!selectedStock}
