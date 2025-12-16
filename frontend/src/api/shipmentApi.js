@@ -40,3 +40,12 @@ export const updateShipment = async (id, data) => {
     }
     return res.json();
 };
+
+export const getShipmentItems = async (id) => {
+    const res = await fetch(`${BASE}/${id}/items`);
+    if (!res.ok) {
+        const text = await res.text();
+        throw new Error(`Failed to fetch shipment items: ${res.status} ${text}`);
+    }
+    return res.json();
+};

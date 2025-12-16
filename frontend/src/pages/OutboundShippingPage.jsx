@@ -4,6 +4,7 @@ import {
     getShipments,
     deleteShipment,
     updateShipment,
+    getShipmentItems,
 } from "../api/shipmentApi";
 
 import "../styles/delivery.css";
@@ -33,10 +34,14 @@ function OutboundShippingPage() {
         loadData();
     }, []);
 
-    const loadData = async () => {
+    const loadData = async (shipmentId = null) => {
         try {
+            const url = shipmentId
+                ? `http://localhost:8080/api/packages/available?includeShipmentId=${shipmentId}`
+                : "http://localhost:8080/api/packages/available";
+
             const [pkgRes, shipmentsData] = await Promise.all([
-                fetch("http://localhost:8080/api/packages/available"),
+                fetch(url),
                 getShipments(),
             ]);
 
@@ -107,6 +112,7 @@ function OutboundShippingPage() {
                     customer,
                     transportCompany,
                     vehicleNo,
+                    packageIds: selectedPackages,
                 });
 
                 message = `Saadetis ${deliveryNoteNo} uuendatud.`;
@@ -154,12 +160,21 @@ function OutboundShippingPage() {
         }
     };
 
-    const handleEdit = (s) => {
+    const handleEdit = async (s) => {
         setEditingId(s.id);
         setDeliveryNoteNo(s.deliveryNoteNo || "");
         setCustomer(s.customer || "");
         setTransportCompany(s.transportCompany || "");
         setVehicleNo(s.vehicleNo || "");
+
+        try {
+            const items = await getShipmentItems(s.id);
+            const pkgIds = items.map((it) => it.packageId);
+            setSelectedPackages(pkgIds);
+            await loadData(s.id); // include current packages in available list
+        } catch (err) {
+            setErrors({ global: "Pakkide laadimine ebaõnnestus: " + err.message });
+        }
 
         window.scrollTo({ top: 0, behavior: "smooth" });
     };
@@ -243,39 +258,37 @@ function OutboundShippingPage() {
                     )}
 
                     {/* AVAILABLE PACKAGES */}
-                    {!editingId && (
-                        <>
-                            <h3>Saadaval pakid</h3>
-                            <div className="package-grid">
-                                {packages.length === 0 ? (
-                                    <p>Saadaval pakke ei ole.</p>
-                                ) : (
-                                    packages.map((pkg) => (
-                                        <label
-                                            key={pkg.id}
-                                            className="package-card"
-                                        >
-                                            <div className="package-card-row">
-                                                <div className="package-info">
-                                                    <div className="package-name">
-                                                        {pkg.productName || "Saekava puudub"}
-                                                    </div>
-                                                    <div className="package-count">
-                                                        Kogus: {pkg.pieceCount ?? pkg.count ?? 0} tk
-                                                    </div>
+                    <>
+                        <h3>Saadaval pakid</h3>
+                        <div className="package-grid">
+                            {packages.length === 0 ? (
+                                <p>Saadaval pakke ei ole.</p>
+                            ) : (
+                                packages.map((pkg) => (
+                                    <label
+                                        key={pkg.id}
+                                        className="package-card"
+                                    >
+                                        <div className="package-card-row">
+                                            <div className="package-info">
+                                                <div className="package-name">
+                                                    {pkg.productName || "Saekava puudub"}
                                                 </div>
-                                                <input
-                                                    type="checkbox"
-                                                    checked={selectedPackages.includes(pkg.id)}
-                                                    onChange={() => handlePackageSelect(pkg.id)}
-                                                />
+                                                <div className="package-count">
+                                                    Kogus: {pkg.pieceCount ?? pkg.count ?? 0} tk
+                                                </div>
                                             </div>
-                                        </label>
-                                    ))
-                                )}
-                            </div>
-                        </>
-                    )}
+                                            <input
+                                                type="checkbox"
+                                                checked={selectedPackages.includes(pkg.id)}
+                                                onChange={() => handlePackageSelect(pkg.id)}
+                                            />
+                                        </div>
+                                    </label>
+                                ))
+                            )}
+                        </div>
+                    </>
 
                     {/* BUTTONS */}
                     <div className="button-row">

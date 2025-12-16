@@ -19,4 +19,14 @@ public interface PackageRepository extends JpaRepository<Package, UUID> {
            )
            """)
     List<Package> findUnshippedPackages();
+
+    @Query("""
+           SELECT p FROM Package p
+           WHERE NOT EXISTS (
+               SELECT 1 FROM ShipmentItem si
+               WHERE si.packageId = p.id
+                 AND si.shipmentId <> :shipmentId
+           )
+           """)
+    List<Package> findUnshippedOrBelongingTo(UUID shipmentId);
 }

@@ -34,10 +34,12 @@ public class PackageController {
         return packageService.getPackage(id);
     }
 
-    //Saadaval pakid (millel puudub ShipmentItem)
+    //Saadaval pakid (millel puudub ShipmentItem või kuulub antud saadetisele)
     @GetMapping("/available")
-    public List<AvailablePackageDto> getAvailablePackages() {
-        return packageService.getAvailablePackagesDetailed();
+    public List<AvailablePackageDto> getAvailablePackages(
+            @RequestParam(value = "includeShipmentId", required = false) UUID includeShipmentId
+    ) {
+        return packageService.getAvailablePackagesDetailed(includeShipmentId);
     }
 
     //UUS — Paki loomine DTO kaudu (mitte raw entity)

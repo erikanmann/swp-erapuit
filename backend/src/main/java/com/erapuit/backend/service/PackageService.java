@@ -80,9 +80,16 @@ public class PackageService {
         return packageRepository.findUnshippedPackages();
     }
 
+    public List<Package> getAvailablePackages(UUID includeShipmentId) {
+        if (includeShipmentId == null) {
+            return getAvailablePackages();
+        }
+        return packageRepository.findUnshippedOrBelongingTo(includeShipmentId);
+    }
+
     // --- AVAILABLE with details for UI ---
-    public List<AvailablePackageDto> getAvailablePackagesDetailed() {
-        List<Package> packages = packageRepository.findUnshippedPackages();
+    public List<AvailablePackageDto> getAvailablePackagesDetailed(UUID includeShipmentId) {
+        List<Package> packages = getAvailablePackages(includeShipmentId);
         if (packages.isEmpty()) {
             return List.of();
         }

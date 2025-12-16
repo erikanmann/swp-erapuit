@@ -105,7 +105,42 @@ public class ShipmentController {
                         existing.setDateSent(OffsetDateTime.now());
                     }
 
-                    return shipmentRepository.save(existing);
+                    Shipment saved = shipmentRepository.save(existing);
+
+                    // uuenda seotud paketid, kui packageIds on kaasas
+                    if (updated.getPackageIds() != null) {
+                        List<ShipmentItem> existingItems = shipmentItemRepository.findByShipmentId(id);
+
+                        // eemalda need, mis pole enam valikus
+                        for (ShipmentItem item : existingItems) {
+                            if (!updated.getPackageIds().contains(item.getPackageId())) {
+                                shipmentItemRepository.delete(item);
+                            }
+                        }
+
+                        // lisa uued seosed
+                        for (UUID pkgId : updated.getPackageIds()) {
+                            boolean alreadyLinkedHere = existingItems.stream()
+                                    .anyMatch(it -> it.getPackageId().equals(pkgId));
+                            if (alreadyLinkedHere) continue;
+
+                            // kontrolli, et pakk pole teise saadetisega seotud
+                            List<ShipmentItem> byPackage = shipmentItemRepository.findByPackageId(pkgId);
+                            boolean linkedElsewhere = byPackage.stream()
+                                    .anyMatch(it -> !it.getShipmentId().equals(id));
+                            if (linkedElsewhere) {
+                                throw new IllegalArgumentException("Pakk on juba teises saadetises.");
+                            }
+
+                            ShipmentItem newItem = new ShipmentItem();
+                            newItem.setShipmentId(id);
+                            newItem.setPackageId(pkgId);
+                            newItem.setQuantity(1);
+                            shipmentItemRepository.save(newItem);
+                        }
+                    }
+
+                    return saved;
                 })
                 .orElseThrow(() -> new IllegalArgumentException("Saadetist ei leitud."));
     }
