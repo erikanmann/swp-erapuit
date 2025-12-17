@@ -5,9 +5,11 @@ import "../styles/delivery.css";
 import "../styles/main.css";
 import "../styles/warehouse.css";
 
+import Navbar from "../components/Navbar";
 import SendToProduction from "../components/SendToProduction";
 import ProductRecipes from "../components/ProductRecipes";
 import PackageBuilder from "../components/PackageBuilder";
+import { tokenStorage } from "../api/authApi";
 
 export default function ProductionPage() {
     const navigate = useNavigate();
@@ -16,7 +18,10 @@ export default function ProductionPage() {
 
     // 🔹 LAE RETSEPTID
     const loadRecipes = async () => {
-        const res = await fetch("http://localhost:8080/api/products");
+        const token = tokenStorage.getToken();
+        const res = await fetch("http://localhost:8080/api/products", {
+            headers: token ? { 'Authorization': `Bearer ${token}` } : {}
+        });
         setRecipes(await res.json());
     };
 
@@ -25,24 +30,15 @@ export default function ProductionPage() {
     }, []);
 
     return (
-        <div className="delivery-page">
-            <div className="warehouse-tabs">
-                <button onClick={() => navigate("/home")}>Avaleht</button>
-                <button onClick={() => navigate("/register-delivery")}>
-                    Tarne registreerimine
-                </button>
-                <button onClick={() => navigate("/warehouse")}>Lao ülevaade</button>
-                <button className="active-tab">Tootmine</button>
-                <button onClick={() => navigate("/outbound-shipping")}>
-                    Väljaminev kaup
-                </button>
+        <>
+            <Navbar />
+            <div className="delivery-page">
+                <div className="form-section">
+                    <SendToProduction recipes={recipes} />
+                    <ProductRecipes onCreated={loadRecipes} />
+                    <PackageBuilder />
+                </div>
             </div>
-
-            <div className="form-section">
-                <SendToProduction recipes={recipes} />
-                <ProductRecipes onCreated={loadRecipes} />
-                <PackageBuilder />
-            </div>
-        </div>
+        </>
     );
 }

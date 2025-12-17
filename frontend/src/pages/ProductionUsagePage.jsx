@@ -5,6 +5,8 @@ import "../styles/main.css";
 import "../styles/warehouse.css";
 import { useNavigate } from "react-router-dom";
 import Navbar from "../components/Navbar";
+import ProductRecipes from "../components/ProductRecipes";
+import PackageBuilder from "../components/PackageBuilder";
 
 function ProductionUsagePage() {
     const navigate = useNavigate();
@@ -59,71 +61,75 @@ function ProductionUsagePage() {
         <>
             <Navbar />
             <div className="delivery-page">
+                <div className="form-section">
+                    <form onSubmit={handleSubmit} className="form">
+                        <h2>Materjali kasutamine tootmises</h2>
 
-            <div className="form-section">
-                <form onSubmit={handleSubmit} className="form">
-                    <h2>Materjali kasutamine tootmises</h2>
+                        {/* SELECT FIELD */}
+                        <label>
+                            <span>Vali laopartii (ID + puiduliik) <span className="required">*</span></span>
+                            <select
+                                value={selectedDeliveryId}
+                                onChange={(e) => {
+                                    setSelectedDeliveryId(e.target.value);
+                                    setError("");     // clear error on change
+                                }}
+                                className={`dropdown ${error && !selectedDeliveryId ? "input-error" : ""}`}
+                            >
+                                <option value="">-- Vali laopartii --</option>
+                                {stockItems.map((item) => (
+                                    <option key={item.deliveryPackageId} value={item.deliveryPackageId}>
+                                        {item.packageCode} – {item.woodType} – {item.usableVolume} m³
+                                    </option>
+                                ))}
+                            </select>
 
-                    {/* SELECT FIELD */}
-                    <label>
-                        <span>Vali laopartii (ID + puiduliik) <span className="required">*</span></span>
-                        <select
-                            value={selectedDeliveryId}
-                            onChange={(e) => {
-                                setSelectedDeliveryId(e.target.value);
-                                setError("");     // clear error on change
-                            }}
-                            className={`dropdown ${error && !selectedDeliveryId ? "input-error" : ""}`}
-                        >
-                            <option value="">-- Vali laopartii --</option>
-                            {stockItems.map((item) => (
-                                <option key={item.deliveryPackageId} value={item.deliveryPackageId}>
-                                    {item.packageCode} – {item.woodType} – {item.usableVolume} m³
-                                </option>
+                            {/* Custom error message */}
+                            {error && !selectedDeliveryId && (
+                                <p className="error-msg">Palun vali laopartii.</p>
+                            )}
+                        </label>
 
-                            ))}
-                        </select>
+                        {/* USAGE FIELD */}
+                        <label>
+                            <span>Sisesta kogus tootmisse (m³) <span className="required">*</span></span>
+                            <input
+                                type="number"
+                                value={usage}
+                                min="0"
+                                step="0.01"
+                                onChange={(e) => {
+                                    setUsage(e.target.value);
+                                    setError("");     // clear error on change
+                                }}
+                                className={`input ${error && (!usage || usage <= 0) ? "input-error" : ""}`}
+                            />
 
-                        {/* Custom error message */}
-                        {error && !selectedDeliveryId && (
-                            <p className="error-msg">Palun vali laopartii.</p>
-                        )}
-                    </label>
+                            {error && (!usage || usage <= 0) && (
+                                <p className="error-msg">Kogus peab olema positiivne number.</p>
+                            )}
+                        </label>
 
-                    {/* USAGE FIELD */}
-                    <label>
-                        <span>Sisesta kogus tootmisse (m³) <span className="required">*</span></span>
-                        <input
-                            type="number"
-                            value={usage}
-                            min="0"
-                            step="0.01"
-                            onChange={(e) => {
-                                setUsage(e.target.value);
-                                setError("");     // clear error on change
-                            }}
-                            className={`input ${error && (!usage || usage <= 0) ? "input-error" : ""}`}
-                        />
+                        <button type="submit" className="main-button">
+                            Saada tootmisse
+                        </button>
+                    </form>
 
-                        {error && (!usage || usage <= 0) && (
-                            <p className="error-msg">Kogus peab olema positiivne number.</p>
-                        )}
-                    </label>
+                    {error && <div className="error">{error}</div>}
 
-                    <button type="submit" className="main-button">
-                        Saada tootmisse
-                    </button>
-                </form>
+                    {result && (
+                        <div className="success">
+                            Laopartii uuendatud: kasutatav kogus on nüüd{" "}
+                            {result.usableVolume.toFixed(2)} m³.
+                        </div>
+                    )}
+                </div>
 
-                {error && <div className="error">{error}</div>}
+                <ProductRecipes onCreated={() => {
+                    getStockItems().then(setStockItems);
+                }} />
 
-                {result && (
-                    <div className="success">
-                        Laopartii uuendatud: kasutatav kogus on nüüd{" "}
-                        {result.usableVolume.toFixed(2)} m³.
-                    </div>
-                )}
-            </div>
+                <PackageBuilder />
             </div>
         </>
     );

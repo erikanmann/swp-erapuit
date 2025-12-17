@@ -1,7 +1,9 @@
 import { useEffect, useState } from "react";
+import { tokenStorage } from "../api/authApi";
 
 export default function ProductRecipes({ onCreated }) {
     const [recipes, setRecipes] = useState([]);
+    const [loading, setLoading] = useState(true);
 
     const [name, setName] = useState("");
     const [species, setSpecies] = useState("");
@@ -14,8 +16,26 @@ export default function ProductRecipes({ onCreated }) {
 
     /* -------- LOAD -------- */
     const load = async () => {
-        const res = await fetch("http://localhost:8080/api/products");
-        setRecipes(await res.json());
+        try {
+            setLoading(true);
+            const token = tokenStorage.getToken();
+            const res = await fetch("http://localhost:8080/api/products", {
+                headers: token ? { 'Authorization': `Bearer ${token}` } : {}
+            });
+            if (!res.ok) {
+                setError(`Failed to load recipes: ${res.status}`);
+                setRecipes([]);
+                return;
+            }
+            const data = await res.json();
+            setRecipes(data || []);
+            setError("");
+        } catch (err) {
+            setError(`Error loading recipes: ${err.message}`);
+            setRecipes([]);
+        } finally {
+            setLoading(false);
+        }
     };
 
     useEffect(() => {
@@ -39,9 +59,13 @@ export default function ProductRecipes({ onCreated }) {
             lengthMm: Number(length),
         };
 
+        const token = tokenStorage.getToken();
         const res = await fetch("http://localhost:8080/api/products", {
             method: "POST",
-            headers: { "Content-Type": "application/json" },
+            headers: {
+                "Content-Type": "application/json",
+                ...(token && { 'Authorization': `Bearer ${token}` })
+            },
             body: JSON.stringify(payload),
         });
 
@@ -76,8 +100,10 @@ export default function ProductRecipes({ onCreated }) {
             return;
         }
 
+        const token = tokenStorage.getToken();
         const res = await fetch(`http://localhost:8080/api/products/${id}`, {
             method: "DELETE",
+            headers: token ? { 'Authorization': `Bearer ${token}` } : {}
         });
 
         if (!res.ok) {
@@ -156,36 +182,43 @@ export default function ProductRecipes({ onCreated }) {
             <div style={{ marginTop: 30 }}>
                 <h3>Olemasolevad saekavad</h3>
 
-                <table style={{ width: "100%", marginTop: 10 }}>
-                    <thead>
-                    <tr>
-                        <th align="left">Nimi</th>
-                        <th>Puiduliik</th>
-                        <th>Mõõdud (mm)</th>
-                        <th></th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    {recipes.map(r => (
-                        <tr key={r.id}>
-                            <td>{r.name}</td>
-                            <td align="center">{r.species}</td>
-                            <td align="center">
-                                {r.thicknessMm}×{r.widthMm}×{r.lengthMm}
-                            </td>
-                            <td align="right">
-                                <button
-                                    className="secondary-button"
-                                    onClick={() => remove(r.id)}
-                                >
-                                    Kustuta
-                                </button>
-                            </td>
+                {loading && <p>Laadime saekavade nimekirja...</p>}
+
+                {!loading && recipes.length === 0 && !error && (
+                    <p>Saekavad puuduvad.</p>
+                )}
+
+                {recipes.length > 0 && (
+                    <table style={{ width: "100%", marginTop: 10 }}>
+                        <thead>
+                        <tr>
+                            <th align="left">Nimi</th>
+                            <th>Puiduliik</th>
+                            <th>Mõõdud (mm)</th>
+                            <th></th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {recipes.map(r => (
+                            <tr key={r.id}>
+                                <td>{r.name}</td>
+                                <td align="center">{r.species}</td>
+                                <td align="center">
+                                    {r.thicknessMm}×{r.widthMm}×{r.lengthMm}
+                                </td>
+                                <td align="right">
+                                    <button
+                                        className="secondary-button"
+                                        onClick={() => remove(r.id)}
+                                    >
+                                        Kustuta
+                                    </button>
+                                </td>
                         </tr>
                     ))}
                     </tbody>
-
-                </table>
+                    </table>
+                )}
             </div>
         </div>
     );
