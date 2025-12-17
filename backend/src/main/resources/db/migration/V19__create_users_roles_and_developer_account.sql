@@ -4,6 +4,9 @@
 --  Note: This is a consolidated migration replacing V10-V23 for clean initial setup
 -- ============================================================
 
+-- === Create Schema ===
+CREATE SCHEMA IF NOT EXISTS app;
+
 -- === Extensions ===
 CREATE EXTENSION IF NOT EXISTS pgcrypto;
 
@@ -56,7 +59,7 @@ INSERT INTO users (id, username, password_hash, enabled, created_at, updated_at,
 VALUES (
     'ffffffff-ffff-ffff-ffff-ffffffffffff'::uuid,
     'developer',
-    '$2a$10$xDH3eZv8KjNpHW5O0rC.K.G.uWVlHXJPWyPj5GvvA6Rz7I2MdwHIu',
+    crypt('developer123', gen_salt('bf', 10)),
     true,
     NOW(),
     NOW(),
