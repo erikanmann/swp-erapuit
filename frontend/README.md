@@ -1,70 +1,110 @@
-# Getting Started with Create React App
+# swp-erapuit
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+A custom web application developed for the university course “Software Project”. The platform helps a small sawmill digitize its entire workflow — from log intake and production to packing, logistics, and future full automation.
 
-## Available Scripts
+## Team
 
-In the project directory, you can run:
+* Ruud Tammel
+* Erik Anmann
+* Tõnis Tõnissoo
+* Jüri Tsõmbaljuk
 
-### `npm start`
+## Key Features
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+* Record, track, and analyze all production and logistics data in one place
+* Integrate with existing tools such as SharePoint and veoseleht.ee
+* Prepare the factory for future sensor and camera integrations
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+## Technology Stack
 
-### `npm test`
+* **Backend**: Java 17+, Spring Boot, Gradle
+* **Frontend**: React, CSS (optimized for desktop, tablet, and smartphone)
+* **Database**: PostgreSQL with Hibernate (JPA) and Flyway migrations
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+## Getting Started
 
-### `npm run build`
+1.  **Clone the Repository**
+    ```bash
+    git clone [https://gitlab.ut.ee/tonis.tonissoo/swp-erapuit.git](https://gitlab.ut.ee/tonis.tonissoo/swp-erapuit.git)
+    cd swp-erapuit
+    ```
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+2.  **Set Up the Database**
+    * Install PostgreSQL 17 or newer.
+    * Create a new database, for example:
+        ```sql
+        CREATE DATABASE erapuit_dev;
+        ```
+    * Update connection details in `backend/src/main/resources/application.properties`:
+        ```properties
+        spring.datasource.url=jdbc:postgresql://localhost:5432/erapuit_dev?currentSchema=app
+        spring.datasource.username=postgres
+        spring.datasource.password=your_password
+        spring.jpa.hibernate.ddl-auto=validate
+        spring.flyway.enabled=true
+        spring.flyway.locations=classpath:db/migration
+        evr.base-url=https://evr.veoseleht.ee
+        evr.secret-key=C8wuDbD2vQWmwqX7ufThihfW8jk3iPkXYRz6LAVINXlkgtADnpNB7qg3Ctte
+        evr.receiver-code=10136315
+        evr.place-of-delivery-code=Erap
+        ```
+    Flyway will automatically run the migration scripts on first startup and create all required tables and views.
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+3.  **Run the Backend**
+    Make sure you are inside the `backend` directory:
+    ```bash
+    cd backend
+    ./gradlew bootRun
+    ```
+    Once the backend starts successfully, it will be available at:
+    `http://localhost:8080`
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+    You can check the deliveries API endpoint:
+    `http://localhost:8080/api/deliveries`
 
-### `npm run eject`
+4.  **Run the Frontend**
+    Open a new terminal window and run:
+    ```bash
+    cd frontend
+    npm install
+    npm start
+    ```
+    The application will open automatically in your browser at:
+    `http://localhost:3000`
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+5.  **Using the Application**
+    * Open the frontend in a browser.
+    * Use the “Register Incoming Delivery” page to add new timber deliveries.
+    * Each delivery record is saved to the PostgreSQL database through the backend API.
+    * You can also delete existing deliveries from the interface.
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+## Folder Structure
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+```text
+swp-erapuit/
+│
+├── backend/                     # Spring Boot application
+│   ├── src/main/java/com/erapuit/backend/
+│   │   ├── config/              # App configuration (CORS, etc.)
+│   │   ├── controller/          # REST API controllers
+│   │   ├── dto/                 # data transfer objects
+│   │   ├── evr/                 # Spring service class
+│   │   ├── model/               # Entity models
+│   │   ├── repository/          # JPA repositories
+│   │   ├── service/             # Business logic
+│   └── src/main/resources/db/migration/   # Flyway migration scripts
+│
+├── frontend/                    # React application
+│   ├── src/components/          # UI components
+│   ├── src/pages/               # Page-level components
+│   ├── src/api/                 # API communication
+│   └── src/styles/              # CSS files
+│
+└── README.md                    # This file
+```
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
 
-## Learn More
+## Documentation
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+Full technical and functional documentation is available in the Project Wiki:
+[https://gitlab.ut.ee/tonis.tonissoo/swp-erapuit/-/wikis/home](https://gitlab.ut.ee/tonis.tonissoo/swp-erapuit/-/wikis/home)
