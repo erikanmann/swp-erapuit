@@ -43,10 +43,20 @@ A custom web application developed for the university course “Software Project
         spring.jpa.hibernate.ddl-auto=validate
         spring.flyway.enabled=true
         spring.flyway.locations=classpath:db/migration
+
         evr.base-url=https://evr.veoseleht.ee
         evr.secret-key=C8wuDbD2vQWmwqX7ufThihfW8jk3iPkXYRz6LAVINXlkgtADnpNB7qg3Ctte
         evr.receiver-code=10136315
         evr.place-of-delivery-code=Erap
+
+        # JWT Configuration
+        app.jwt.secret=mySecretKeyThatIsAtLeast32CharactersLongForHS256
+        app.jwt.expiration=86400000
+
+        # CORS
+        spring.web.cors.allowed-origins=*
+        spring.web.cors.allowed-methods=GET,POST,PUT,DELETE,OPTIONS
+        spring.web.cors.allowed-headers=*
         ```
     Flyway will automatically run the migration scripts on first startup and create all required tables and views.
 
@@ -89,8 +99,10 @@ swp-erapuit/
 │   │   ├── controller/          # REST API controllers
 │   │   ├── dto/                 # data transfer objects
 │   │   ├── evr/                 # Spring service class
+│   │   ├── exceptions/          # error handling
 │   │   ├── model/               # Entity models
 │   │   ├── repository/          # JPA repositories
+│   │   ├── security/            # authentication and authorization
 │   │   ├── service/             # Business logic
 │   └── src/main/resources/db/migration/   # Flyway migration scripts
 │
@@ -98,7 +110,10 @@ swp-erapuit/
 │   ├── src/components/          # UI components
 │   ├── src/pages/               # Page-level components
 │   ├── src/api/                 # API communication
+│   ├── src/context/             # global state management
+│   ├── src/utils/               # validation files
 │   └── src/styles/              # CSS files
+
 │
 └── README.md                    # This file
 ```
