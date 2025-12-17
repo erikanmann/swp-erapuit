@@ -11,7 +11,7 @@ const pageLinks = [
   { path: '/home', label: 'Avaleht' },
   { path: '/register-delivery', label: 'Tarne registreerimine' },
   { path: '/warehouse-dashboard', label: 'Lao ülevaade' },
-  { path: '/production-usage', label: 'Tootmise kasutus' },
+  { path: '/production-usage', label: 'Tootmine' },
   { path: '/outbound-shipping', label: 'Väljaminev kaup' },
   { path: '/user-management', label: 'Kasutajahaldus' }
 ];
@@ -112,7 +112,7 @@ export default function Navbar() {
               {showMenu && (
                 <div className="dropdown-content">
                   <button onClick={handleProfileClick} className="dropdown-item">
-                    My Profile
+                    Minu profiil
                   </button>
                   <hr />
                   <button onClick={handleLogout} className="dropdown-item logout">
