@@ -1,14 +1,21 @@
+import { tokenStorage } from './authApi';
 const BASE = "http://localhost:8080/api/deliveries";
 
 export const getDeliveries = async () => {
-  const res = await fetch(BASE);
+  const token = tokenStorage.getToken();
+  const res = await fetch(BASE, {
+    headers: token ? { 'Authorization': `Bearer ${token}` } : {}
+  });
   if (!res.ok) throw new Error("Failed to fetch deliveries");
   return res.json();
 };
 
 
 export const getDeliveriesPaged = async (page = 0, size = 200) => {
-  const res = await fetch(`${BASE}/paged-fast?page=${page}&size=${size}`);
+  const token = tokenStorage.getToken();
+  const res = await fetch(`${BASE}/paged-fast?page=${page}&size=${size}`, {
+    headers: token ? { 'Authorization': `Bearer ${token}` } : {}
+  });
   if (!res.ok) throw new Error("Failed to fetch paged deliveries");
   return res.json();
 };
@@ -16,9 +23,13 @@ export const getDeliveriesPaged = async (page = 0, size = 200) => {
 
 
 export const addDelivery = async (delivery) => {
+  const token = tokenStorage.getToken();
   const res = await fetch(BASE, {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers: {
+      "Content-Type": "application/json",
+      ...(token && { 'Authorization': `Bearer ${token}` })
+    },
     body: JSON.stringify(delivery),
   });
   if (!res.ok) {
@@ -29,7 +40,11 @@ export const addDelivery = async (delivery) => {
 };
 
 export const deleteDelivery = async (id) => {
-  const res = await fetch(`${BASE}/${id}`, { method: "DELETE" });
+  const token = tokenStorage.getToken();
+  const res = await fetch(`${BASE}/${id}`, {
+    method: "DELETE",
+    headers: token ? { 'Authorization': `Bearer ${token}` } : {}
+  });
   if (!res.ok) {
     const text = await res.text();
     throw new Error(`Delete failed: ${res.status} ${text}`);
@@ -40,9 +55,13 @@ export const deleteDelivery = async (id) => {
 };
 
 export const updateDelivery = async (id, data) => {
+  const token = tokenStorage.getToken();
   const res = await fetch(`${BASE}/${id}`, {
     method: "PUT",
-    headers: { "Content-Type": "application/json" },
+    headers: {
+      "Content-Type": "application/json",
+      ...(token && { 'Authorization': `Bearer ${token}` })
+    },
     body: JSON.stringify(data),
   });
   if (!res.ok) {
@@ -53,21 +72,31 @@ export const updateDelivery = async (id, data) => {
 };
 
 export const getIncomingMaterials = async (period = 'all') => {
-    const response = await fetch(`http://localhost:8080/api/deliveries/incoming?period=${period}`);
+    const token = tokenStorage.getToken();
+    const response = await fetch(`http://localhost:8080/api/deliveries/incoming?period=${period}`, {
+      headers: token ? { 'Authorization': `Bearer ${token}` } : {}
+    });
     if (!response.ok) throw new Error('Failed to fetch incoming materials');
     return response.json();
 };
 
 export const getEvrIncoming = async () => {
-  const res = await fetch("http://localhost:8080/api/deliveries/evr-incoming");
+  const token = tokenStorage.getToken();
+  const res = await fetch("http://localhost:8080/api/deliveries/evr-incoming", {
+    headers: token ? { 'Authorization': `Bearer ${token}` } : {}
+  });
   if (!res.ok) throw new Error("Failed to fetch EVR incoming loads");
   return res.json();
 };
 
 export const importFromEvr = async (waybillDto) => {
+  const token = tokenStorage.getToken();
   const res = await fetch("http://localhost:8080/api/deliveries/from-evr", {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers: {
+      "Content-Type": "application/json",
+      ...(token && { 'Authorization': `Bearer ${token}` })
+    },
     body: JSON.stringify(waybillDto),
   });
 
@@ -81,7 +110,10 @@ export const importFromEvr = async (waybillDto) => {
 
 // --- GET: üks delivery ID järgi ---
 export const getDeliveryById = async (id) => {
-  const res = await fetch(`${BASE}/${id}`);
+  const token = tokenStorage.getToken();
+  const res = await fetch(`${BASE}/${id}`, {
+    headers: token ? { 'Authorization': `Bearer ${token}` } : {}
+  });
   if (!res.ok) {
     const text = await res.text();
     throw new Error(`Failed to fetch delivery: ${res.status} ${text}`);

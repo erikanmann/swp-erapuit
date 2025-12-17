@@ -1,15 +1,23 @@
+import { tokenStorage } from './authApi';
 const BASE = 'http://localhost:8080/api/shipments';
 
 export const getShipments = async () => {
-    const res = await fetch(BASE);
+    const token = tokenStorage.getToken();
+    const res = await fetch(BASE, {
+        headers: token ? { 'Authorization': `Bearer ${token}` } : {}
+    });
     if (!res.ok) throw new Error('Failed to fetch shipments');
     return res.json();
 };
 
 export const addShipment = async (shipment) => {
+    const token = tokenStorage.getToken();
     const res = await fetch(BASE, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+            'Content-Type': 'application/json',
+            ...(token && { 'Authorization': `Bearer ${token}` })
+        },
         body: JSON.stringify(shipment),
     });
     if (!res.ok) {
@@ -20,7 +28,11 @@ export const addShipment = async (shipment) => {
 };
 
 export const deleteShipment = async (id) => {
-    const res = await fetch(`${BASE}/${id}`, { method: 'DELETE' });
+    const token = tokenStorage.getToken();
+    const res = await fetch(`${BASE}/${id}`, {
+        method: 'DELETE',
+        headers: token ? { 'Authorization': `Bearer ${token}` } : {}
+    });
     if (!res.ok) {
         const text = await res.text();
         throw new Error(`Delete failed: ${res.status} ${text}`);
@@ -29,9 +41,13 @@ export const deleteShipment = async (id) => {
 };
 
 export const updateShipment = async (id, data) => {
+    const token = tokenStorage.getToken();
     const res = await fetch(`${BASE}/${id}`, {
         method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+            'Content-Type': 'application/json',
+            ...(token && { 'Authorization': `Bearer ${token}` })
+        },
         body: JSON.stringify(data),
     });
     if (!res.ok) {
@@ -42,7 +58,10 @@ export const updateShipment = async (id, data) => {
 };
 
 export const getShipmentItems = async (id) => {
-    const res = await fetch(`${BASE}/${id}/items`);
+    const token = tokenStorage.getToken();
+    const res = await fetch(`${BASE}/${id}/items`, {
+        headers: token ? { 'Authorization': `Bearer ${token}` } : {}
+    });
     if (!res.ok) {
         const text = await res.text();
         throw new Error(`Failed to fetch shipment items: ${res.status} ${text}`);

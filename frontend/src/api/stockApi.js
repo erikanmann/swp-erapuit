@@ -64,7 +64,10 @@ export const filterStock = async (params) => {
  */
 export const getStockByWoodType = async (woodType) => {
     const url = `${STOCK_BASE}/by-wood-type?woodType=${encodeURIComponent(woodType)}`;
-    const res = await fetch(url);
+    const token = tokenStorage.getToken();
+    const res = await fetch(url, {
+        headers: token ? { 'Authorization': `Bearer ${token}` } : {}
+    });
     if (!res.ok) throw new Error("Failed to fetch stock items by wood type");
     return res.json();
 };
@@ -74,9 +77,13 @@ export const getStockByWoodType = async (woodType) => {
  * NB! Backend ootab: { usableVolume: number }
  */
 export const updateUsableVolume = async (id, usableVolume) => {
+    const token = tokenStorage.getToken();
     const res = await fetch(`${STOCK_BASE}/${id}/usable-volume`, {
         method: "PUT",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+            "Content-Type": "application/json",
+            ...(token && { 'Authorization': `Bearer ${token}` })
+        },
         body: JSON.stringify({ usableVolume }),
     });
 
@@ -120,7 +127,10 @@ export const sendMaterialToProduction = async (deliveryPackageId, usage) => {
  * Statistika puuliigi kaupa
  */
 export const getStatsByWoodType = async () => {
-    const res = await fetch(`${STOCK_BASE}/stats/usage-by-wood-type`);
+    const token = tokenStorage.getToken();
+    const res = await fetch(`${STOCK_BASE}/stats/usage-by-wood-type`, {
+        headers: token ? { 'Authorization': `Bearer ${token}` } : {}
+    });
     if (!res.ok) throw new Error("Failed to load wood-type statistics");
     return res.json();
 };
