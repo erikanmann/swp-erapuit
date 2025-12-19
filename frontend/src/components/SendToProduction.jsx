@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { getStockItems } from "../api/stockApi";
 import { createProductionOutput } from "../api/productionOutputApi";
+import { tokenStorage } from "../api/authApi";
 
 export default function SendToProduction() {
     const [stockItems, setStockItems] = useState([]);
@@ -18,9 +19,24 @@ export default function SendToProduction() {
 
     /* ---- load recipes (products) ---- */
     useEffect(() => {
-        fetch("http://localhost:8080/api/products")
-            .then(res => res.json())
-            .then(setRecipes);
+        const token = tokenStorage.getToken();
+
+        fetch("http://localhost:8080/api/products", {
+            headers: token
+                ? { Authorization: `Bearer ${token}` }
+                : {}
+        })
+            .then(res => {
+                if (!res.ok) {
+                    throw new Error("Failed to load products");
+                }
+                return res.json();
+            })
+            .then(setRecipes)
+            .catch(err => {
+                console.error("Product load error:", err);
+                setRecipes([]);
+            });
     }, []);
 
     /* ---- update selected recipe ---- */
@@ -50,7 +66,7 @@ export default function SendToProduction() {
             productId: recipe.id,
             count: calculatedCount,
             volumeM3: Number(usageM3),
-            location: "TOOTMINE"
+            location: "LADU"
         });
 
         // reset

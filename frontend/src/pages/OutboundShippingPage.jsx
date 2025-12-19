@@ -12,6 +12,7 @@ import "../styles/main.css";
 import "../styles/warehouse.css";
 import { useNavigate } from "react-router-dom";
 import Navbar from "../components/Navbar";
+import { tokenStorage } from "../api/authApi";
 
 function OutboundShippingPage() {
     const navigate = useNavigate();
@@ -41,12 +42,24 @@ function OutboundShippingPage() {
                 ? `http://localhost:8080/api/packages/available?includeShipmentId=${shipmentId}`
                 : "http://localhost:8080/api/packages/available";
 
+            const token = tokenStorage.getToken();
+
             const [pkgRes, shipmentsData] = await Promise.all([
-                fetch(url),
+                fetch(url, {
+                    headers: token
+                        ? { Authorization: `Bearer ${token}` }
+                        : {}
+                }),
                 getShipments(),
             ]);
 
+            if (!pkgRes.ok) {
+                const text = await pkgRes.text();
+                throw new Error(text || "Saadaval pakkide laadimine ebaõnnestus");
+            }
+
             const pkgData = await pkgRes.json();
+
 
             setPackages(pkgData);
             setShipments(shipmentsData);

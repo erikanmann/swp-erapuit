@@ -1,138 +1,40 @@
-import React, { useState, useEffect } from "react";
-import { getStockItems, sendMaterialToProduction } from "../api/stockApi";
-import "../styles/delivery.css";
-import "../styles/main.css";
-import "../styles/warehouse.css";
-import { useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
 import Navbar from "../components/Navbar";
+import SendToProduction from "../components/SendToProduction";
 import ProductRecipes from "../components/ProductRecipes";
 import PackageBuilder from "../components/PackageBuilder";
+import { tokenStorage } from "../api/authApi";
 
-function ProductionUsagePage() {
-    const navigate = useNavigate();
+export default function ProductionUsagePage() {
+    const [recipes, setRecipes] = useState([]);
 
-    const [stockItems, setStockItems] = useState([]);
-    const [selectedDeliveryId, setSelectedDeliveryId] = useState(""); // CHANGED
-    const [usage, setUsage] = useState("");
-
-    const [result, setResult] = useState(null);
-    const [error, setError] = useState("");
+    const loadRecipes = async () => {
+        const token = tokenStorage.getToken();
+        const res = await fetch("http://localhost:8080/api/products", {
+            headers: token ? { Authorization: `Bearer ${token}` } : {}
+        });
+        setRecipes(await res.json());
+    };
 
     useEffect(() => {
-        getStockItems()
-            .then((items) => {
-                setStockItems(items);
-            })
-            .catch(() =>
-                setError("Lao kirjete laadimine ebaõnnestus. Palun proovi hiljem uuesti.")
-            );
+        loadRecipes();
     }, []);
-
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-        setError("");
-        setResult(null);
-
-        if (!selectedDeliveryId) {
-            setError("Palun vali laopartii.");
-            return;
-        }
-
-        const usageValue = parseFloat(usage);
-        if (isNaN(usageValue) || usageValue <= 0) {
-            setError("Kogus peab olema positiivne number.");
-            return;
-        }
-
-        try {
-            const updated = await sendMaterialToProduction(
-                selectedDeliveryId,
-                usageValue
-            );
-            setResult(updated);
-        } catch (err) {
-            setError(
-                err.message || "Materjali kasutamise salvestamine ebaõnnestus."
-            );
-        }
-    };
 
     return (
         <>
             <Navbar />
             <div className="delivery-page">
                 <div className="form-section">
-                    <form onSubmit={handleSubmit} className="form">
-                        <h2>Materjali kasutamine tootmises</h2>
+                    {/* ✅ TOOTMINE + SAAEKAVA */}
+                    <SendToProduction recipes={recipes} />
 
-                        {/* SELECT FIELD */}
-                        <label>
-                            <span>Vali laopartii (ID + puiduliik) <span className="required">*</span></span>
-                            <select
-                                value={selectedDeliveryId}
-                                onChange={(e) => {
-                                    setSelectedDeliveryId(e.target.value);
-                                    setError("");     // clear error on change
-                                }}
-                                className={`dropdown ${error && !selectedDeliveryId ? "input-error" : ""}`}
-                            >
-                                <option value="">-- Vali laopartii --</option>
-                                {stockItems.map((item) => (
-                                    <option key={item.deliveryPackageId} value={item.deliveryPackageId}>
-                                        {item.packageCode} – {item.woodType} – {item.usableVolume} m³
-                                    </option>
-                                ))}
-                            </select>
+                    {/* ✅ SAAEKAVA HALDUS */}
+                    <ProductRecipes onCreated={loadRecipes} />
 
-                            {/* Custom error message */}
-                            {error && !selectedDeliveryId && (
-                                <p className="error-msg">Palun vali laopartii.</p>
-                            )}
-                        </label>
-
-                        {/* USAGE FIELD */}
-                        <label>
-                            <span>Sisesta kogus tootmisse (m³) <span className="required">*</span></span>
-                            <input
-                                type="number"
-                                value={usage}
-                                min="0"
-                                step="0.01"
-                                onChange={(e) => {
-                                    setUsage(e.target.value);
-                                    setError("");     // clear error on change
-                                }}
-                                className={`input ${error && (!usage || usage <= 0) ? "input-error" : ""}`}
-                            />
-
-                            {error && (!usage || usage <= 0) && (
-                                <p className="error-msg">Kogus peab olema positiivne number.</p>
-                            )}
-                        </label>
-
-                        <button type="submit" className="main-button">
-                            Saada tootmisse
-                        </button>
-                    </form>
-
-                    {error && <div className="error">{error}</div>}
-
-                    {result && (
-                        <div className="success">
-                            Laopartii uuendatud: kasutatav kogus on nüüd{" "}
-                            {result.usableVolume.toFixed(2)} m³.
-                        </div>
-                    )}
+                    {/* ✅ PAKENDAMINE */}
+                    <PackageBuilder />
                 </div>
-
-                <ProductRecipes onCreated={() => {
-                    getStockItems().then(setStockItems);
-                }} />
-
-                <PackageBuilder />
             </div>
         </>
     );
 }
-
-export default ProductionUsagePage;
