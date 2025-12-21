@@ -197,6 +197,29 @@ tr:hover td {
     width: fit-content;
 }
 
+.pagination-controls {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 30px;
+    margin-top: 20px;
+    padding: 20px 0;
+}
+
+.pagination-controls button {
+    min-width: 140px;
+    min-height: 40px;
+    padding: 10px 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.pagination-controls span {
+    min-width: 100px;
+    text-align: center;
+}
+
 @keyframes floatIn {
     from { opacity: 0; transform: translateY(14px) scale(0.98); }
     to { opacity: 1; transform: translateY(0) scale(1); }
