@@ -32,9 +32,13 @@ public class StockController {
     @GetMapping("/paged-fast")
     public ResponseEntity<?> getPagedFast(
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "200") int size
+            @RequestParam(defaultValue = "200") int size,
+            @RequestParam(required = false) String woodType,
+            @RequestParam(required = false) String supplier,
+            @RequestParam(required = false) String fromDate
+
     ) {
-        return ResponseEntity.ok(stockService.getPagedFast(page, size));
+        return ResponseEntity.ok(stockService.getPagedFastFiltered(page, size, woodType, supplier, fromDate));
     }
 
     // UC2: põhidashboard – kõik laokirjed (old endpoint)

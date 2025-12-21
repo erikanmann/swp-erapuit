@@ -174,9 +174,63 @@ public class StockService {
         return stockRepository.findAll(pageable);
     }
 
-    public Page<StockListDto> getPagedFast(int page, int size) {
-        Pageable pageable = PageRequest.of(page, size);
-        return stockRepository.findAllSlim(pageable);
+    public Page<StockListDto> getPagedFastFiltered(int page, int size, String woodType, String supplier, String fromDate) {
+        Pageable pageable = PageRequest.of(page, size, org.springframework.data.domain.Sort.by("arrivalDate").descending());
+
+        LocalDate fromDateParsed = null;
+        if (fromDate != null && !fromDate.isBlank()) {
+            try {
+                fromDateParsed = LocalDate.parse(fromDate);
+            } catch (Exception ignored) {}
+        }
+
+        // Fetch all data with basic pagination
+        List<StockItem> allItems = stockRepository.findAll();
+
+        // Apply filters in memory
+        LocalDate finalFromDateParsed = fromDateParsed;
+        List<StockItem> filtered = allItems.stream()
+                .filter(item -> {
+                    if (woodType != null && !woodType.isBlank()) {
+                        return item.getWoodType() != null &&
+                                item.getWoodType().equalsIgnoreCase(woodType);
+                    }
+                    return true;
+                })
+                .filter(item -> {
+                    if (supplier != null && !supplier.isBlank()) {
+                        return item.getSupplier() != null &&
+                                item.getSupplier().toLowerCase().contains(supplier.toLowerCase());
+                    }
+                    return true;
+                })
+                .filter(item -> {
+                    if (finalFromDateParsed == null) return true;
+                    if (item.getArrivalDate() == null) return true;
+                    return !item.getArrivalDate().toLocalDate().isBefore(finalFromDateParsed);
+                })
+                .sorted((a, b) -> b.getArrivalDate().compareTo(a.getArrivalDate()))
+                .collect(java.util.stream.Collectors.toList());
+
+        // Convert to DTOs
+        List<StockListDto> dtos = filtered.stream()
+                .map(s -> new com.erapuit.backend.dto.StockListDto(
+                        s.getId(), s.getDeliveryId(), s.getDeliveryPackageId(),
+                        s.getPackageCode(), s.getSupplier(), s.getWoodType(),
+                        s.getArrivalDate(), s.getTotalVolume(), s.getUsableVolume()
+                ))
+                .collect(java.util.stream.Collectors.toList());
+
+        // Implement manual pagination
+        int start = page * size;
+        int end = Math.min(start + size, dtos.size());
+        List<StockListDto> pagedContent = dtos.subList(start, Math.max(start, end));
+
+        return new org.springframework.data.domain.PageImpl<>(
+                pagedContent,
+                pageable,
+                dtos.size()
+        );
     }
 
     public StockItem useForProductionByPackage(String deliveryPackageId, double usage) {
