@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import {
     addShipment,
     getShipments,
@@ -15,7 +15,7 @@ import Navbar from "../components/Navbar";
 import { tokenStorage } from "../api/authApi";
 
 function OutboundShippingPage() {
-    const navigate = useNavigate();
+    const navigate = useNavigate();// eslint-disable-line no-unused-vars
 
     const [packages, setPackages] = useState([]);
     const [selectedPackages, setSelectedPackages] = useState([]);
@@ -32,11 +32,7 @@ function OutboundShippingPage() {
     const [vehicleNo, setVehicleNo] = useState("");
     const [editingId, setEditingId] = useState(null);
 
-    useEffect(() => {
-        loadData();
-    }, []);
-
-    const loadData = async (shipmentId = null) => {
+    const loadData = useCallback(async (shipmentId = null) => {
         try {
             const url = shipmentId
                 ? `http://localhost:8080/api/packages/available?includeShipmentId=${shipmentId}`
@@ -60,14 +56,17 @@ function OutboundShippingPage() {
 
             const pkgData = await pkgRes.json();
 
-
             setPackages(pkgData);
             setShipments(shipmentsData);
         } catch (err) {
             setSuccess(null);
             setErrors({ global: "Andmete laadimine ebaõnnestus: " + err.message });
         }
-    };
+    }, []);
+
+    useEffect(() => {
+        loadData();
+    }, [loadData]);
 
     const handlePackageSelect = (pkgId) => {
         setSelectedPackages((prev) =>
@@ -98,7 +97,7 @@ function OutboundShippingPage() {
 
         return newErrors;
     };
-
+    // eslint-disable-next-line no-unused-vars
     const formatNumber = (val, fraction = 2) => {
         if (val === null || val === undefined) return "-";
         const num = typeof val === "number" ? val : parseFloat(val);

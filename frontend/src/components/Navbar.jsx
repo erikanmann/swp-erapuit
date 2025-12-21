@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
+// eslint-disable-next-line no-unused-vars
 import { authApi, tokenStorage } from '../api/authApi';
 import { useUser } from '../context/UserContext';
 import '../styles/navbar.css';

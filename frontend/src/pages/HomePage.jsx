@@ -38,7 +38,7 @@ function filterShipmentsByPeriod(shipments, period) {
 }
 
 const HomePage = () => {
-    const navigate = useNavigate();
+    const navigate = useNavigate();// eslint-disable-line no-unused-vars
     const { isLoading: userLoading } = useUser();
 
     const [incomingPeriod, setIncomingPeriod] = useState("week");
