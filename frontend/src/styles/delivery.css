@@ -221,6 +221,10 @@
     margin-top: 12px;
 }
 
+.shipments-section .filter-input {
+    margin-bottom: 20px;
+}
+
 @media (max-width: 768px) {
     .delivery-page { padding: 16px 14px; }
     .form { padding: 14px; }
