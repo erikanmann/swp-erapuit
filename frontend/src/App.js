@@ -13,6 +13,7 @@ import DeliveryDetailPage from "./pages/DeliveryDetailPage";
 // eslint-disable-next-line no-unused-vars
 import { tokenStorage } from './api/authApi';
 import { UserProvider } from './context/UserContext';
+import './styles/main.css';
 
 function AppContent() {
     return (

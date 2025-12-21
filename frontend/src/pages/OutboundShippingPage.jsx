@@ -333,7 +333,8 @@ function OutboundShippingPage() {
                 {visibleShipments.length === 0 ? (
                     <p className="no-shipments">Ühtegi saadetist ei leitud.</p>
                 ) : (
-                    <table className="materials-table">
+                    <div className="table-scroll">
+                        <table className="materials-table">
                         <thead>
                         <tr>
                             <th>Saatelehe nr</th>
@@ -369,7 +370,8 @@ function OutboundShippingPage() {
                             </tr>
                         ))}
                         </tbody>
-                    </table>
+                        </table>
+                    </div>
                 )}
             </div>
             </div>

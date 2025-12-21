@@ -200,3 +200,48 @@
     min-width: 140px;
   }
 }
+
+@media (max-width: 900px) {
+  .navbar-container {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+  }
+
+  .navbar-brand {
+    margin-right: 0;
+  }
+
+  .navbar-links {
+    justify-content: flex-start;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    padding-bottom: 6px;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .navbar-link {
+    flex: 0 0 auto;
+    white-space: nowrap;
+  }
+
+  .navbar-menu {
+    width: 100%;
+  }
+
+  .navbar-user {
+    width: 100%;
+    justify-content: space-between;
+  }
+}
+
+@media (max-width: 600px) {
+  .navbar-links {
+    gap: 8px;
+  }
+
+  .navbar-link {
+    padding: 8px 14px;
+    font-size: 0.9rem;
+  }
+}

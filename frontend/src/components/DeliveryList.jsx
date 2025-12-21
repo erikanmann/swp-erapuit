@@ -19,7 +19,8 @@ const DeliveryList = ({ pageData, onPageChange, onDelete }) => {
                 <p>Veoselehti pole veel lisatud.</p>
             ) : (
                 <>
-                    <table>
+                    <div className="table-scroll">
+                        <table>
                         <thead>
                         <tr>
                             <th>Juht</th>
@@ -55,7 +56,8 @@ const DeliveryList = ({ pageData, onPageChange, onDelete }) => {
                             </tr>
                         ))}
                         </tbody>
-                    </table>
+                        </table>
+                    </div>
 
                     {/* Pagination */}
                     <div className="pagination-controls">

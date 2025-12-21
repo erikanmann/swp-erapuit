@@ -121,7 +121,8 @@ const HomePage = () => {
             {loading ? (
                 <p>Laadimine...</p>
             ) : (
-                <table className="materials-table">
+                <div className="table-scroll">
+                    <table className="materials-table">
                     <thead>
                     <tr>
                         <th>Veoselehe number</th>
@@ -150,7 +151,8 @@ const HomePage = () => {
                         ))
                     )}
                     </tbody>
-                </table>
+                    </table>
+                </div>
             )}
 
             {/* VÄLJASAadetud tellimused */}
@@ -193,7 +195,8 @@ const HomePage = () => {
             {loadingShipments ? (
                 <p>Laadimine...</p>
             ) : (
-                <table className="materials-table">
+                <div className="table-scroll">
+                    <table className="materials-table">
                     <thead>
                     <tr>
                         <th>Kliendi nimi</th>
@@ -219,7 +222,8 @@ const HomePage = () => {
                     )}
                     </tbody>
 
-                </table>
+                    </table>
+                </div>
 
             )}
             </div>

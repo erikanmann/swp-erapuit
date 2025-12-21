@@ -107,7 +107,8 @@ const DeliveryDetailPage = () => {
                 {packages.length === 0 ? (
                     <p>Pakke pole.</p>
                 ) : (
-                    <table>
+                    <div className="table-scroll">
+                        <table>
                         <thead>
                         <tr>
                             <th>Paki nr</th>
@@ -192,7 +193,8 @@ const DeliveryDetailPage = () => {
                             </tr>
                         ))}
                         </tbody>
-                    </table>
+                        </table>
+                    </div>
                 )}
             </div>
             </div>

@@ -132,22 +132,24 @@ export default function PackageBuilder() {
                 {items.length === 0 ? (
                     <p style={{ opacity: 0.7 }}>Pakk on hetkel tühi.</p>
                 ) : (
-                    <table style={{ width: "100%", marginTop: 10 }}>
-                        <thead>
-                        <tr>
-                            <th align="left">Toode</th>
-                            <th align="right">Kogus</th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        {items.map((i, idx) => (
-                            <tr key={idx}>
-                                <td>{i.name}</td>
-                                <td align="right">{i.count} tk</td>
+                    <div className="table-scroll">
+                        <table style={{ width: "100%", marginTop: 10 }}>
+                            <thead>
+                            <tr>
+                                <th align="left">Toode</th>
+                                <th align="right">Kogus</th>
                             </tr>
-                        ))}
-                        </tbody>
-                    </table>
+                            </thead>
+                            <tbody>
+                            {items.map((i, idx) => (
+                                <tr key={idx}>
+                                    <td>{i.name}</td>
+                                    <td align="right">{i.count} tk</td>
+                                </tr>
+                            ))}
+                            </tbody>
+                        </table>
+                    </div>
                 )}
             </div>
 

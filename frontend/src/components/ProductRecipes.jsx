@@ -189,7 +189,8 @@ export default function ProductRecipes({ onCreated }) {
                 )}
 
                 {recipes.length > 0 && (
-                    <table style={{ width: "100%", marginTop: 10 }}>
+                    <div className="table-scroll">
+                        <table style={{ width: "100%", marginTop: 10 }}>
                         <thead>
                         <tr>
                             <th align="left">Nimi</th>
@@ -217,7 +218,8 @@ export default function ProductRecipes({ onCreated }) {
                         </tr>
                     ))}
                     </tbody>
-                    </table>
+                        </table>
+                    </div>
                 )}
             </div>
         </div>

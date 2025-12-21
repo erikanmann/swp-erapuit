@@ -209,7 +209,8 @@ const WarehouseDashboard = () => {
             <div className="warehouse-section">
                 <h3>Lao kirjed</h3>
 
-                <table className="warehouse-table">
+                <div className="table-scroll">
+                    <table className="warehouse-table">
                     <thead>
                     <tr>
                         <th>Tarne ID</th>
@@ -267,7 +268,8 @@ const WarehouseDashboard = () => {
                         </tr>
                     ))}
                     </tbody>
-                </table>
+                    </table>
+                </div>
             </div>
 
             {/* --- PAKI MODAL --- */}
@@ -297,7 +299,8 @@ const WarehouseDashboard = () => {
 
                         <h4>Kõik pakid selles tarnes:</h4>
 
-                        <table className="warehouse-table">
+                        <div className="table-scroll">
+                            <table className="warehouse-table">
                             <thead>
                             <tr>
                                 <th>Kood</th>
@@ -320,7 +323,8 @@ const WarehouseDashboard = () => {
                                 </tr>
                             ))}
                             </tbody>
-                        </table>
+                            </table>
+                        </div>
 
                         <button
                             style={{

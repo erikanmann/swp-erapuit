@@ -23,6 +23,14 @@
     box-sizing: border-box;
 }
 
+img,
+svg,
+video,
+canvas {
+    max-width: 100%;
+    height: auto;
+}
+
 /* --- Global base styles and layout (Erapuit Theme) --- */
 body {
     font-family: "Inter", Arial, sans-serif;
@@ -33,6 +41,7 @@ body {
     margin: 0;
     min-height: 100vh;
     padding: 0 0 40px;
+    -webkit-text-size-adjust: 100%;
 }
 
 ::selection {
@@ -229,4 +238,46 @@ tr:hover td {
     .app-container { padding: 16px; }
     table { font-size: 14px; }
     .main-card { padding: 28px 24px; }
+}
+
+.table-scroll {
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+.table-scroll table {
+    width: 100%;
+    min-width: 640px;
+}
+
+@media (max-width: 900px) {
+    .pagination-controls {
+        flex-direction: column;
+        gap: 12px;
+    }
+
+    .pagination-controls button {
+        width: 100%;
+        min-width: 0;
+    }
+}
+
+@media (max-width: 768px) {
+    button,
+    input,
+    select,
+    textarea {
+        font-size: 16px;
+    }
+
+    .table-scroll table {
+        min-width: 520px;
+    }
+}
+
+@media (max-width: 520px) {
+    .table-scroll table {
+        min-width: 460px;
+    }
 }
