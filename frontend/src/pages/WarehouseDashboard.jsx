@@ -8,7 +8,6 @@ import Navbar from "../components/Navbar";
 import {
     getStockPaged,
     updateUsableVolume,
-    sendMaterialToProduction,
 } from "../api/stockApi";
 
 
@@ -43,11 +42,6 @@ const WarehouseDashboard = () => {
     const [woodTypeFilter, setWoodTypeFilter] = useState("");
     const [supplierFilter, setSupplierFilter] = useState("");
     const [fromDateFilter, setFromDateFilter] = useState("");
-
-    // tootmise modal
-    const [showProductionModal, setShowProductionModal] = useState(false);
-    const [selectedWoodType, setSelectedWoodType] = useState("");
-    const [usage, setUsage] = useState("");
 
     // paki modal
     const [showPackageModal, setShowPackageModal] = useState(false);
@@ -148,31 +142,6 @@ const WarehouseDashboard = () => {
         }
     };
 
-    // ------------------------------------------------------
-    // TOOTMINE
-    // ------------------------------------------------------
-    const handleSendToProduction = async () => {
-        setError("");
-        setMessage("");
-
-        try {
-            const updated = await sendMaterialToProduction(
-                selectedWoodType,
-                parseFloat(usage)
-            );
-
-            setMessage(
-                `Materjal uuendatud: alles ${toNum(updated.usableVolume).toFixed(
-                    2
-                )} m³.`
-            );
-
-            setShowProductionModal(false);
-            loadStock();
-        } catch (err) {
-            setError(err.message);
-        }
-    };
     if (!pageData) return <p>Laadin...</p>;
 
     // ------------------------------------------------------
@@ -367,48 +336,6 @@ const WarehouseDashboard = () => {
                 </div>
             )}
 
-            {/* Tootmise modal */}
-            {showProductionModal && (
-                <div className="modal-bg">
-                    <div className="modal-card">
-                        <h3>Kasuta materjali tootmises</h3>
-
-                        <label>Puiduliik:</label>
-                        <select
-                            value={selectedWoodType}
-                            onChange={(e) =>
-                                setSelectedWoodType(e.target.value)
-                            }
-                            className="warehouse-select"
-                        >
-                            <option value="">-- vali puiduliik --</option>
-                            {woodTypes.map((t) => (
-                                <option key={t} value={t}>
-                                    {t}
-                                </option>
-                            ))}
-                        </select>
-
-                        <label>Kogus (m³):</label>
-                        <input
-                            type="number"
-                            min="0"
-                            step="0.01"
-                            value={usage}
-                            onChange={(e) => setUsage(e.target.value)}
-                        />
-
-                        <button onClick={handleSendToProduction}>Kinnita</button>
-                        <button
-                            style={{ background: "#ccc", color: "#222" }}
-                            onClick={() => setShowProductionModal(false)}
-                        >
-                            Sulge
-                        </button>
-                    </div>
-                </div>
-            )}
-
             <div className="pagination-controls">
                 <button
                     disabled={pageData.number === 0}
@@ -426,12 +353,6 @@ const WarehouseDashboard = () => {
                     onClick={() => loadStock(pageData.number + 1)}
                 >
                     Järgmine ➡
-                </button>
-            </div>
-
-            <div style={{ marginTop: "1.5rem" }}>
-                <button onClick={() => setShowProductionModal(true)}>
-                    Kasuta materjali tootmises
                 </button>
             </div>
             </div>
