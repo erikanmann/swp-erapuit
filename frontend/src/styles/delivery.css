@@ -135,6 +135,7 @@
     flex-direction: column;
     gap: 12px;
     margin: 12px 0;
+    max-width: 400px;
 }
 
 .package-card {
@@ -168,18 +169,20 @@
     justify-content: space-between;
 }
 
-.package-card input {
-    margin-top: 0;
-    order: 2;
-    margin-left: auto;
-    transform: none;
-    align-self: center;
+.package-card input[type="checkbox"] {
+    margin: 0;
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+    flex-shrink: 0;
+    accent-color: var(--accent);
 }
 
 .package-info {
     flex: 1;
     display: grid;
     gap: 4px;
+    min-width: 0;
 }
 
 .package-name {
@@ -187,6 +190,7 @@
     color: #2f281a;
     font-size: 1rem;
     white-space: nowrap;
+    word-break: break-word;
 }
 
 .package-count {
