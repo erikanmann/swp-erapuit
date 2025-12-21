@@ -264,7 +264,7 @@ function OutboundShippingPage() {
                     )}
 
                     {/* AVAILABLE PACKAGES */}
-                    <>
+                    <div className="available-packages-section">
                         <h3>Saadaval pakid</h3>
                         <div className="package-grid">
                             {packages.length === 0 ? (
@@ -294,7 +294,7 @@ function OutboundShippingPage() {
                                 ))
                             )}
                         </div>
-                    </>
+                    </div>
 
                     {/* BUTTONS */}
                     <div className="button-row">

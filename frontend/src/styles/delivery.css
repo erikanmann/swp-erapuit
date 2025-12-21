@@ -72,6 +72,19 @@
     margin-top: 16px;
 }
 
+.available-packages-section {
+    margin-top: 32px;
+    margin-bottom: 16px;
+    border-top: 1px solid #eadfc7;
+    padding-top: 24px;
+}
+
+.available-packages-section h3 {
+    margin-top: 0;
+    margin-bottom: 16px;
+    color: #2f281a;
+}
+
 .form-section {
     margin-bottom: 24px;
 }
