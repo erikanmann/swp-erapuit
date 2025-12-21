@@ -21,7 +21,7 @@ import { useNavigate } from "react-router-dom";
 const PAGE_SIZE = 200;
 
 const RegisterDeliveryPage = () => {
-    const navigate = useNavigate();
+    const navigate = useNavigate();// eslint-disable-line no-unused-vars
 
     const [pageData, setPageData] = useState(null);
     const [editingDelivery, setEditingDelivery] = useState(null);

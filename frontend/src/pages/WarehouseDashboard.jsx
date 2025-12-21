@@ -35,7 +35,7 @@ const formatDate = (iso) => {
 };
 
 const WarehouseDashboard = () => {
-    const navigate = useNavigate();
+    const navigate = useNavigate();// eslint-disable-line no-unused-vars
 
     const [pageData, setPageData] = useState(null);
     const [woodTypes, setWoodTypes] = useState([]);

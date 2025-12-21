@@ -1,7 +1,8 @@
 // frontend/src/pages/UserProfilePage.jsx
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
+// eslint-disable-next-line no-unused-vars
 import { authApi, tokenStorage } from '../api/authApi';
 import Navbar from '../components/Navbar';
 import '../styles/userprofile.css';
@@ -19,11 +20,7 @@ export default function UserProfilePage() {
   });
   const [showPasswordForm, setShowPasswordForm] = useState(false);
 
-  useEffect(() => {
-    loadUserProfile();
-  }, []);
-
-  const loadUserProfile = async () => {
+  const loadUserProfile = useCallback(async () => {
     setLoading(true);
     try {
       const token = tokenStorage.getToken();
@@ -53,7 +50,11 @@ export default function UserProfilePage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [navigate]);
+
+  useEffect(() => {
+    loadUserProfile();
+  }, [loadUserProfile]);
 
   const handleChangePassword = async (e) => {
     e.preventDefault();

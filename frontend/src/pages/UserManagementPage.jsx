@@ -1,6 +1,6 @@
 // frontend/src/pages/UserManagementPage.jsx
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { authApi, tokenStorage } from '../api/authApi';
 import { useUser } from '../context/UserContext';
@@ -34,11 +34,8 @@ export default function UserManagementPage() {
   });
   const [editingUserRoles, setEditingUserRoles] = useState([]);
 
-  useEffect(() => {
-    loadUsers();
-  }, []);
 
-  const loadUsers = async () => {
+  const loadUsers = useCallback(async () => {
     setLoading(true);
     try {
       const token = tokenStorage.getToken();
@@ -55,7 +52,12 @@ export default function UserManagementPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [navigate]);
+
+  useEffect(() => {
+    loadUsers();
+  }, [loadUsers]);
+
 
   const resetForm = () => {
     setFormData({
