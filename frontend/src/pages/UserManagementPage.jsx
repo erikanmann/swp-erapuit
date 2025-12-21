@@ -337,7 +337,7 @@ export default function UserManagementPage() {
                   <td>{user.username}</td>
                   <td>{user.roles ? user.roles.join(', ') : 'No roles'}</td>
                   <td>{user.allowedPages || 'All'}</td>
-                  <td>
+                  <td className="actions-cell">
                     <button
                       className="btn btn-sm btn-primary"
                       onClick={() => startEditUser(user)}
