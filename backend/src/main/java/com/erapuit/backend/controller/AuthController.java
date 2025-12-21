@@ -124,6 +124,11 @@ public class AuthController {
             if (!allowedPages.contains("profile")) {
                 allowedPages.add("profile");
             }
+
+            // kui kasutajal on ligipääs delivery lehele siis ta saab alati ka "vaata" nuppu vajutada
+            if (allowedPages.contains("register-delivery")) {
+                allowedPages.add("deliveries");
+            }
             newUser.setAllowedPages(String.join(",", allowedPages));
             userService.updateUser(newUser);
 

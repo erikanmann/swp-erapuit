@@ -63,7 +63,7 @@ VALUES (
     true,
     NOW(),
     NOW(),
-    'home,register-delivery,warehouse,production-usage,outbound-shipping,users,profile'
+    'home,register-delivery,deliveries,warehouse,production-usage,outbound-shipping,users,profile'
 )
 ON CONFLICT (username) DO NOTHING;
 
