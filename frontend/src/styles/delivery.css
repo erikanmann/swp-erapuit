@@ -236,6 +236,14 @@
 
 .materials-table {
     margin-top: 12px;
+    max-width: 100%;
+    overflow-x: auto;
+}
+
+.modal-card {
+    max-width: 90vw;
+    max-height: 90vh;
+    overflow-y: auto;
 }
 
 .shipments-section .filter-input {
